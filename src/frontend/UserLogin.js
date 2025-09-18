@@ -34,7 +34,7 @@ const UserLogin = ({ onClose }) => {
   };
 
   const handleForgotPassword = () => {
-    alert('Forgot password functionality would be implemented here!');
+    navigate('/userforgotpassword');
   };
 
   const handleSignUp = () => {
