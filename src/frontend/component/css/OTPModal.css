@@ -1,0 +1,131 @@
+/* Overlay */
+.otp-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal box */
+.otp-modal {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 380px;
+  max-width: 90%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease;
+}
+
+.otp-modal h2 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.otp-modal p {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+/* OTP input fields */
+.otp-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+
+.otp-inputs input {
+  width: 50px;
+  height: 60px;
+  font-size: 1.4rem;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.otp-inputs input:focus {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* Footer actions */
+.otp-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.otp-resend {
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.otp-resend:disabled {
+  color: #999;
+  cursor: not-allowed;
+}
+
+.otp-resend.active {
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.otp-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.otp-buttons button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.otp-buttons .cancel-btn {
+  background: #e5e7eb;
+  color: #111;
+}
+
+.otp-buttons .cancel-btn:hover {
+  background: #d1d5db;
+}
+
+.otp-buttons .verify-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.otp-buttons .verify-btn:hover {
+  background: #1d4ed8;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

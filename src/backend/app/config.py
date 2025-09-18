@@ -11,3 +11,7 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY") 
     SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SENDER_EMAIL = "apollomarco1214@gmail.com"
+    SMTP_SERVER = os.getenv("SMTP_SERVER")
+    SMTP_PORT = os.getenv("SMTP_PORT")
+    

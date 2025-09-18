@@ -3,25 +3,68 @@ import { useNavigate } from 'react-router-dom';
 import './UserSignUp.css';
 import SignupIcon1 from '../assets/Sign up 1.png';
 import SignupIcon2 from '../assets/Sign up 2.png';
+import axios from 'axios';
+import OTPModal from "./component/OTPModal";
+
 
 const UserSignUp = ({ onClose }) => {
   const [formData, setFormData] = useState({
+    studentEmail: '',
     firstName: '',
     middleName: '',
     surname: '',
     affix: '',
     birthday: '',
-    gender: '',
-    studentEmail: '',
     password: '',
     confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
   const navigate = useNavigate();
+  const [isOtpOpen, setIsOtpOpen] = useState(false);
+  const handleSignup = async (formData) => {
+    const res = await axios.post("http://localhost:5000/signup", formData, {
+      withCredentials: true,
+    });
+    if (res.data.success) {
+      setIsOtpOpen(true);
+    }
+  };
 
+
+  const handleVerify = async (otp) => {
+  try {
+    const res = await axios.post("http://localhost:5000/verify-email", { otp },
+        { withCredentials: true });
+    if (res.data.success) {
+      if (res.data.success) {
+        alert("Email verified, account created!");
+        setIsOtpOpen(false);
+        navigate("/");
+      } else {
+        alert(res.data.message || "Invalid code");
+      }
+    }
+  } catch (error) {
+    if (error.res) {
+      // Backend gave a response with error status (like 400)
+      alert(error.response.data.message); 
+    } else {
+      // Network or unexpected error
+      alert("Something went wrong, try again later.");
+    }
+  }
+};
+
+  const handleResend = async () => {
+    await axios.post(
+      "http://localhost:5000/verify-email",
+      { resend: true },
+      { withCredentials: true }
+    );
+    alert("New OTP sent!");
+  };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -32,21 +75,44 @@ const UserSignUp = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!');
-      return;
-    }
-
     setIsLoading(true);
+    try {
+    
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-    setTimeout(() => {
-      console.log('Sign up completed:', formData);
-      alert('Account created successfully!');
-      setIsLoading(false);
-      // Navigate to login or dashboard
-      navigate('/login');
-    }, 2000);
+      const res = await axios.post(
+        "http://localhost:5000/signup",
+        { 
+          email: formData.studentEmail, 
+          password: formData.password,
+          first_name: formData.firstName,
+          middle_name: formData.middleName,
+          last_name: formData.surname,
+          affix: formData.affix,
+          birthday: formData.birthday,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword
+        },
+        { withCredentials: true }  // important for cookies/sessions
+      );
+
+      if (res.data.success) {
+          
+          setIsOtpOpen(true);
+        } else {
+          alert(res.data.message);
+        }
+
+    } catch (err) {
+      console.error(err);
+
+      if (err.response?.data?.message) {
+        alert(err.response.data.message);
+      } else {
+        alert("Something went wrong. Try again.");
+      }
+    }
+    setIsLoading(false);
   };
 
   const handleClose = () => {
@@ -115,7 +181,7 @@ const UserSignUp = ({ onClose }) => {
 
               <div className="signup-field">
                 <label className="signup-label">
-                  Middle Name <span className="signup-asterisk">*</span>
+                  Middle Name 
                 </label>
                 <input
                   type="text"
@@ -124,7 +190,6 @@ const UserSignUp = ({ onClose }) => {
                   onChange={handleInputChange}
                   placeholder="Middle Name"
                   className="signup-input"
-                  required
                 />
               </div>
 
@@ -174,21 +239,7 @@ const UserSignUp = ({ onClose }) => {
                   </div>
                 </div>
 
-                <div className="signup-field signup-field-half">
-                  <label className="signup-label">Gender</label>
-                  <select
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleInputChange}
-                    className="signup-input signup-select"
-                  >
-                    <option value="">Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                    <option value="prefer-not-to-say">Prefer not to say</option>
-                  </select>
-                </div>
+                
               </div>
             </div>
 
@@ -266,6 +317,12 @@ const UserSignUp = ({ onClose }) => {
               </button>
             </div>
           </div>
+          <OTPModal
+            isOpen={isOtpOpen}
+            onClose={() => setIsOtpOpen(false)}
+            onSubmit={handleVerify}
+            onResend={handleResend}
+          />
         </form>
       </div>
     </div>

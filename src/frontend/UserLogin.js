@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './UserLogin.css';
 import LoginIcon from '../assets/Login 1.png';
+import axios from 'axios';
+axios.defaults.withCredentials = true;
 
 const UserLogin = ({ onClose }) => {
   const [formData, setFormData] = useState({
@@ -14,6 +16,7 @@ const UserLogin = ({ onClose }) => {
 
   const navigate = useNavigate();
 
+  
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -25,12 +28,36 @@ const UserLogin = ({ onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    const { email, password, rememberMe } = formData;
+    console.log('Login attempted with:', formData);
+    try {
+    
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-    setTimeout(() => {
-      console.log('Login attempted with:', formData);
-      alert('Login functionality would be implemented here!');
-      setIsLoading(false);
-    }, 1500);
+      const res = await axios.post(
+        "http://localhost:5000/login",
+        { 
+          email: formData.email, 
+          password: formData.password, 
+        },
+        { withCredentials: true }  // important for cookies/sessions
+      );
+
+      if (res.data.success) {
+        navigate("/");
+      } else {
+        alert(res.data.message); // correct reference
+      }
+    } catch (err) {
+      console.error(err);
+
+      if (err.response?.data?.message) {
+        alert(err.response.data.message);
+      } else {
+        alert("Something went wrong. Try again.");
+      }
+    }
+    setIsLoading(false);
   };
 
   const handleForgotPassword = () => {
