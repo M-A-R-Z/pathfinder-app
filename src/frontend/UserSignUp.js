@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './UserSignUp.css';
-import SignupIcon1 from '../assets/Sign up 1.png';
-import SignupIcon2 from '../assets/Sign up 2.png';
 import axios from 'axios';
 import OTPModal from "./component/OTPModal";
 
-
 const UserSignUp = ({ onClose }) => {
   const [formData, setFormData] = useState({
-    studentEmail: '',
+    email: '',
     firstName: '',
     middleName: '',
     surname: '',
@@ -21,50 +18,10 @@ const UserSignUp = ({ onClose }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
   const [isOtpOpen, setIsOtpOpen] = useState(false);
-  const handleSignup = async (formData) => {
-    const res = await axios.post("http://localhost:5000/signup", formData, {
-      withCredentials: true,
-    });
-    if (res.data.success) {
-      setIsOtpOpen(true);
-    }
-  };
 
+  const navigate = useNavigate();
 
-  const handleVerify = async (otp) => {
-  try {
-    const res = await axios.post("http://localhost:5000/verify-email", { otp },
-        { withCredentials: true });
-    if (res.data.success) {
-      if (res.data.success) {
-        alert("Email verified, account created!");
-        setIsOtpOpen(false);
-        navigate("/");
-      } else {
-        alert(res.data.message || "Invalid code");
-      }
-    }
-  } catch (error) {
-    if (error.res) {
-      // Backend gave a response with error status (like 400)
-      alert(error.response.data.message); 
-    } else {
-      // Network or unexpected error
-      alert("Something went wrong, try again later.");
-    }
-  }
-};
-
-  const handleResend = async () => {
-    await axios.post(
-      "http://localhost:5000/verify-email",
-      { resend: true },
-      { withCredentials: true }
-    );
-    alert("New OTP sent!");
-  };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -75,37 +32,36 @@ const UserSignUp = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
     setIsLoading(true);
     try {
-    
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
       const res = await axios.post(
         "http://localhost:5000/signup",
         { 
-          email: formData.studentEmail, 
+          email: formData.email, 
           password: formData.password,
           first_name: formData.firstName,
           middle_name: formData.middleName,
           last_name: formData.surname,
           affix: formData.affix,
           birthday: formData.birthday,
-          password: formData.password,
           confirmPassword: formData.confirmPassword
         },
-        { withCredentials: true }  // important for cookies/sessions
+        { withCredentials: true }
       );
 
       if (res.data.success) {
-          
-          setIsOtpOpen(true);
-        } else {
-          alert(res.data.message);
-        }
-
+        setIsOtpOpen(true);   // ✅ open OTP modal
+      } else {
+        alert(res.data.message || "Signup failed.");
+      }
     } catch (err) {
       console.error(err);
-
       if (err.response?.data?.message) {
         alert(err.response.data.message);
       } else {
@@ -124,18 +80,6 @@ const UserSignUp = ({ onClose }) => {
 
   return (
     <div className="signup-page">
-      {/* Decorative Images */}
-      {/*<img 
-        src={SignupIcon2}
-        alt="Books decoration" 
-        className="signup-decoration-left"
-      />
-      <img 
-        src={SignupIcon1} 
-        alt="Trophy decoration" 
-        className="signup-decoration-right"
-      />*/}
-
       {/* Header */}
       <div className="signup-header">
         <div className="signup-logo">
@@ -180,9 +124,7 @@ const UserSignUp = ({ onClose }) => {
               </div>
 
               <div className="signup-field">
-                <label className="signup-label">
-                  Middle Name 
-                </label>
+                <label className="signup-label">Middle Name</label>
                 <input
                   type="text"
                   name="middleName"
@@ -238,8 +180,6 @@ const UserSignUp = ({ onClose }) => {
                     />
                   </div>
                 </div>
-
-                
               </div>
             </div>
 
@@ -251,8 +191,8 @@ const UserSignUp = ({ onClose }) => {
                 </label>
                 <input
                   type="email"
-                  name="studentEmail"
-                  value={formData.studentEmail}
+                  name="email"
+                  value={formData.email}
                   onChange={handleInputChange}
                   placeholder="Student Email"
                   className="signup-input"
@@ -317,14 +257,20 @@ const UserSignUp = ({ onClose }) => {
               </button>
             </div>
           </div>
-          <OTPModal
-            isOpen={isOtpOpen}
-            onClose={() => setIsOtpOpen(false)}
-            onSubmit={handleVerify}
-            onResend={handleResend}
-          />
         </form>
       </div>
+
+      {/* OTP Modal */}
+      <OTPModal 
+        isOpen={isOtpOpen} 
+        onClose={() => setIsOtpOpen(false)}
+        formData={formData}   // ✅ pass form data to modal
+        mode="signup"
+        onSuccess={() => {
+          alert("Signup complete, email verified!");
+          navigate('/');
+        }}
+      />
     </div>
   );
 };

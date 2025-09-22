@@ -1,131 +1,233 @@
-/* Overlay */
+/* css/OTPModal.css */
+
 .otp-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   z-index: 1000;
 }
 
-/* Modal box */
 .otp-modal {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 380px;
-  max-width: 90%;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  animation: fadeIn 0.3s ease;
-}
-
-.otp-modal h2 {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 450px;
+  width: 90%;
   text-align: center;
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
-.otp-modal p {
-  text-align: center;
-  font-size: 0.9rem;
-  color: #555;
-  margin-bottom: 1.5rem;
-}
-
-/* OTP input fields */
-.otp-inputs {
+.otp-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #ccc;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
   display: flex;
-  justify-content: center;
-  gap: 0.6rem;
-  margin-bottom: 1.2rem;
-}
-
-.otp-inputs input {
-  width: 50px;
-  height: 60px;
-  font-size: 1.4rem;
-  text-align: center;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  transition: border-color 0.2s;
-}
-
-.otp-inputs input:focus {
-  border-color: #2563eb;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-}
-
-/* Footer actions */
-.otp-actions {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.otp-close:hover {
+  background-color: #f5f5f5;
+  color: #999;
+}
+
+.email-icon {
+  margin-bottom: 30px;
+}
+
+.envelope {
+  width: 80px;
+  height: 50px;
+  background: linear-gradient(135deg, #0e0af0, #13045a);
+  border-radius: 8px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.envelope::before {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  left: 15px;
+}
+
+.envelope::after {
+  content: '••••••';
+  color: white;
+  font-size: 8px;
+  letter-spacing: 1px;
+  position: absolute;
+  right: 15px;
+}
+
+.location-pin {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #ff4444;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  top: -10px;
+  left: -10px;
+  border: 3px solid white;
+}
+
+.location-pin::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 20px 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.description {
+  color: #999;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 30px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.otp-input-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.otp-digit {
+  width: 50px;
+  height: 50px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  transition: all 0.2s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.otp-digit:focus {
+  outline: none;
+  border-color: #1d047a;
+  box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+}
+
+.otp-digit:nth-child(4) {
+  border-color: #350bee;
+  background-color: #fff8f0;
+}
+
+.change-email {
+  color: #999;
+  font-size: 14px;
+  margin-bottom: 25px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.change-link {
+  color: #666;
+  text-decoration: underline;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.change-link:hover {
+  color: #4733fa;
+}
+
+.otp-submit {
+  width: 100%;
+  background: linear-gradient(135deg, #0e0af0, #13045a);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.otp-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 149, 0, 0.3);
+}
+
+.otp-submit:active {
+  transform: translateY(0);
 }
 
 .otp-resend {
-  font-size: 0.85rem;
-  cursor: pointer;
-  border: none;
   background: none;
-  padding: 0;
-}
-
-.otp-resend:disabled {
-  color: #999;
-  cursor: not-allowed;
-}
-
-.otp-resend.active {
-  color: #2563eb;
-  font-weight: 500;
-}
-
-.otp-buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.otp-buttons button {
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
   border: none;
+  color: #999;
+  font-size: 14px;
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: background 0.2s;
+  text-decoration: underline;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  transition: color 0.2s ease;
 }
 
-.otp-buttons .cancel-btn {
-  background: #e5e7eb;
-  color: #111;
+.otp-resend:hover {
+  color: #3415e2;
 }
 
-.otp-buttons .cancel-btn:hover {
-  background: #d1d5db;
-}
-
-.otp-buttons .verify-btn {
-  background: #2563eb;
-  color: white;
-}
-
-.otp-buttons .verify-btn:hover {
-  background: #1d4ed8;
-}
-
-/* Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
+/* Responsive Design */
+@media (max-width: 480px) {
+  .otp-modal {
+    padding: 30px 20px;
+    margin: 20px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  
+  .otp-input-container {
+    gap: 8px;
+  }
+  
+  .otp-digit {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+  }
+  
+  .title {
+    font-size: 20px;
   }
 }
