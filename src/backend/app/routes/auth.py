@@ -132,3 +132,69 @@ def verify_email_code():
     session.pop("pending_otp", None)
 
     return jsonify({"success": True, "message": "Email verified, user created successfully"}), 201
+
+@auth_bp.route("/signup/resend-otp", methods=["POST"])
+def resend_signup_otp():
+    if "pending_signup" not in session:
+        return jsonify({"success": False, "message": "No signup session found"}), 400
+
+    email = session["pending_signup"]["email"]
+    otp = verify_email(email)
+    if not otp:
+        return jsonify({"success": False, "message": "Error resending OTP"}), 500
+
+    session["pending_otp"] = otp
+    return jsonify({"success": True, "message": "New OTP sent to email"}), 200
+
+
+@auth_bp.route("/request-otp", methods=["POST"])
+def request_otp():
+    data = request.get_json()
+    email = data.get("email")
+
+    if not email:
+        return jsonify({"success": False, "message": "Email is required"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"success": False, "message": "User not found"}), 404
+
+    otp = verify_email(email)
+    if not otp:
+        return jsonify({"success": False, "message": "Error sending OTP email"}), 500
+
+    session["password_reset_otp"] = otp
+    session["password_reset_email"] = email
+
+    return jsonify({"success": True, "message": "OTP sent to email"}), 200
+
+@auth_bp.route("/forgot-password", methods=["POST"])
+def forgot_password():
+    data = request.get_json()
+    otp = data.get("otp")
+    new_password = data.get("newPassword")
+
+    if not otp or not new_password:
+        return jsonify({"success": False, "message": "OTP and new password are required"}), 400
+
+    # Check session
+    if "password_reset_otp" not in session or "password_reset_email" not in session:
+        return jsonify({"success": False, "message": "No password reset session found"}), 400
+
+    if str(session["password_reset_otp"]) != str(otp):
+        return jsonify({"success": False, "message": "Invalid OTP"}), 400
+
+    # Update user password
+    user = User.query.filter_by(email=session["password_reset_email"]).first()
+    if not user:
+        return jsonify({"success": False, "message": "User not found"}), 404
+
+    hashed_password = ph.hash(new_password)
+    user.password = hashed_password
+    db.session.commit()
+
+    # Clear session
+    session.pop("password_reset_otp", None)
+    session.pop("password_reset_email", None)
+
+    return jsonify({"success": True, "message": "Password reset successfully"}), 200

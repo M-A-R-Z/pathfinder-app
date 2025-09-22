@@ -2,61 +2,50 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './UserForgotPassword.css';
 import ForgotIcon from '../assets/Forgot Password.png';
+import axios from 'axios';
+import OTPModal from './component/OTPModal';
 
 const UserForgotPassword = ({ onClose }) => {
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [showResetForm, setShowResetForm] = useState(false);
-  const [passwordData, setPasswordData] = useState({
+  const [formData, setFormData] = useState({
+    email: '',
     newPassword: '',
     confirmPassword: ''
   });
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showOtp, setShowOtp] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    setTimeout(() => {
-      console.log('Password reset requested for:', email);
-      setShowResetForm(true);
-      setIsLoading(false);
-    }, 1500);
-  };
-
-  const handlePasswordReset = async (e) => {
-    e.preventDefault();
-    
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('Passwords do not match!');
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      console.log('Password reset completed for:', email);
-      alert('Password has been reset successfully!');
-      navigate('/userlogin');
-      setIsLoading(false);
-    }, 1500);
-  };
-
-  const handlePasswordInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setPasswordData(prev => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const handleClose = () => {
-    if (onClose) {
-      onClose();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (formData.newPassword !== formData.confirmPassword) {
+      alert('Passwords do not match!');
+      return;
     }
+
+    setIsLoading(true);
+
+    // Simulated request (replace with axios)
+    setTimeout(() => {
+      console.log('Password reset request:', formData);
+      setIsLoading(false);
+      setShowOtp(true); // show OTP modal after request
+    }, 1500);
+  };
+
+  const handleClose = () => {
+    if (onClose) onClose();
     navigate('/');
   };
 
@@ -66,7 +55,7 @@ const UserForgotPassword = ({ onClose }) => {
 
   return (
     <div className="forgot-page">
-      {/* Logo */}
+      {/* Header */}
       <div className="forgot-header">
         <div className="forgot-logo">
           <span className="forgot-logo-icon">🎓</span>
@@ -81,7 +70,6 @@ const UserForgotPassword = ({ onClose }) => {
               "A moment of <span className="forgot-highlight">confusion</span>, a step toward <span className="forgot-highlight">clarity</span>."
             </h1>
           </div>
-          
           {/* 3D Educational Illustration with Orbiting Objects */}
           <div className="forgot-illustration">
             <div className="forgot-3d-scene">
@@ -132,132 +120,117 @@ const UserForgotPassword = ({ onClose }) => {
 
             <div className="forgot-user-section">
               <div className="forgot-user-avatar">
-                  <img 
-                    src={ForgotIcon}
-                    alt="User Avatar" 
-                    className="forgot-avatar-raw"
-                  />
+                <img 
+                  src={ForgotIcon}
+                  alt="User Avatar" 
+                  className="forgot-avatar-raw"
+                />
               </div>
             </div>
 
-            {!showResetForm ? (
-              <form className="forgot-form" onSubmit={handleSubmit}>
-                <div className="forgot-title">
-                  <h2>Forgot Password?</h2>
-                  <p>Enter your email address and we'll send you a link to reset your password.</p>
-                </div>
+            {/* Unified Form */}
+            <form className="forgot-form" onSubmit={handleSubmit}>
+              <div className="forgot-title">
+                <h2>Forgot Password?</h2>
+                <p>Enter your email and reset your password below.</p>
+              </div>
 
-                <div className="forgot-field">
-                  <label className="forgot-label">
-                    Enter Username / Email <span className="forgot-asterisk">*</span>
-                  </label>
+              <div className="forgot-field">
+                <label className="forgot-label">
+                  Enter Username / Email <span className="forgot-asterisk">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Username / Email"
+                  className="forgot-input"
+                  required
+                />
+              </div>
+
+              <div className="forgot-field">
+                <label className="forgot-label">
+                  Enter New Password <span className="forgot-asterisk">*</span>
+                </label>
+                <div className="forgot-password-wrapper">
                   <input
-                    type="email"
-                    name="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Username / Email"
+                    type={showNewPassword ? "text" : "password"}
+                    name="newPassword"
+                    value={formData.newPassword}
+                    onChange={handleChange}
+                    placeholder="Password"
                     className="forgot-input"
                     required
                   />
-                </div>
-
-                <button
-                  type="submit"
-                  className={`forgot-btn ${isLoading ? 'forgot-loading' : ''}`}
-                  disabled={isLoading}
-                >
-                  {isLoading ? <span className="forgot-spinner"></span> : 'SUBMIT'}
-                </button>
-
-                <div className="forgot-back">
-                  Remember your password?{' '}
                   <button
                     type="button"
-                    className="forgot-back-btn"
-                    onClick={handleBackToLogin}
+                    className="forgot-eye-btn"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
                   >
-                    Back to Login
+                    {showNewPassword ? "👁️" : "👁️‍🗨️"}
                   </button>
                 </div>
-              </form>
-            ) : (
-              <form className="forgot-form" onSubmit={handlePasswordReset}>
-                <div className="forgot-title">
-                  <h2>Reset Password</h2>
-                  <p>Enter your new password below.</p>
-                </div>
+              </div>
 
-                <div className="forgot-field">
-                  <label className="forgot-label">
-                    Enter New Password <span className="forgot-asterisk">*</span>
-                  </label>
-                  <div className="forgot-password-wrapper">
-                    <input
-                      type={showNewPassword ? "text" : "password"}
-                      name="newPassword"
-                      value={passwordData.newPassword}
-                      onChange={handlePasswordInputChange}
-                      placeholder="Password"
-                      className="forgot-input"
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="forgot-eye-btn"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                    >
-                      {showNewPassword ? "👁️" : "👁️‍🗨️"}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="forgot-field">
-                  <label className="forgot-label">
-                    Confirm New Password <span className="forgot-asterisk">*</span>
-                  </label>
-                  <div className="forgot-password-wrapper">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      name="confirmPassword"
-                      value={passwordData.confirmPassword}
-                      onChange={handlePasswordInputChange}
-                      placeholder="Confirm Password"
-                      className="forgot-input"
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="forgot-eye-btn"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className={`forgot-btn ${isLoading ? 'forgot-loading' : ''}`}
-                  disabled={isLoading}
-                >
-                  {isLoading ? <span className="forgot-spinner"></span> : 'SUBMIT'}
-                </button>
-
-                <div className="forgot-back">
+              <div className="forgot-field">
+                <label className="forgot-label">
+                  Confirm New Password <span className="forgot-asterisk">*</span>
+                </label>
+                <div className="forgot-password-wrapper">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Confirm Password"
+                    className="forgot-input"
+                    required
+                  />
                   <button
                     type="button"
-                    className="forgot-back-btn"
-                    onClick={handleBackToLogin}
+                    className="forgot-eye-btn"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    Back to Login
+                    {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
                   </button>
                 </div>
-              </form>
-            )}
+              </div>
+
+              <button
+                type="submit"
+                className={`forgot-btn ${isLoading ? 'forgot-loading' : ''}`}
+                disabled={isLoading}
+              >
+                {isLoading ? <span className="forgot-spinner"></span> : 'SUBMIT'}
+              </button>
+
+              <div className="forgot-back">
+                <button
+                  type="button"
+                  className="forgot-back-btn"
+                  onClick={handleBackToLogin}
+                >
+                  Back to Login
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
+
+      {/* OTP Modal */}
+      <OTPModal 
+        isOpen={showOtp} 
+        onClose={() => setShowOtp(false)}
+        formData={formData}
+        mode="forgot"
+        onSuccess={() => {
+          alert("Password reset complete!");
+          navigate('/userlogin');
+        }}
+      />
     </div>
   );
 };
