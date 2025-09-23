@@ -1,0 +1,312 @@
+/* UserDashBoardHome Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #1a1b3a 0%, #2d1b69 50%, #4c1d95 100%);
+  min-height: 100vh;
+  color: white;
+}
+
+.user-dashboard-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Styles */
+.user-dashboard-header {
+  background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(27,17,139,0.85));
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-dashboard-logo-section {
+  display: flex;
+  align-items: center;
+}
+
+.user-dashboard-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.user-dashboard-graduation-cap {
+  background: white;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 1.2rem;
+}
+
+.user-dashboard-logo-text {
+  color: white;
+}
+
+.user-dashboard-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-dashboard-create-btn {
+  background: rgba(59, 130, 246, 0.8);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.user-dashboard-create-btn:hover {
+  background: rgba(59, 130, 246, 1);
+  transform: translateY(-1px);
+}
+
+.user-dashboard-notification-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.user-dashboard-notification-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.user-dashboard-profile-avatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Main Layout */
+.user-dashboard-main-layout {
+  display: flex;
+  flex: 1;
+}
+
+/* Main Content */
+.user-dashboard-main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  background: white;
+  color: #1a202c;
+}
+
+.user-dashboard-welcome-section {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.user-dashboard-welcome-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #1a202c;
+}
+
+.user-dashboard-name-highlight {
+  color: #f59e0b;
+}
+
+/* Assessment Banner */
+.user-dashboard-assessment-banner {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #92400e;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.user-dashboard-banner-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.user-dashboard-banner-subtitle {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+/* Get Started Section */
+.user-dashboard-get-started-section {
+  background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(27,17,139,0.85));
+  padding: 3rem;
+  border-radius: 16px;
+  text-align: center;
+  margin-bottom: 3rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.user-dashboard-section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.user-dashboard-section-description {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.user-dashboard-take-assessment-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.user-dashboard-take-assessment-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+}
+
+/* Dashboard Grid */
+.user-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.user-dashboard-card {
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s;
+  color: #1a202c;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.user-dashboard-card.locked {
+  opacity: 0.6;
+  background: linear-gradient(135deg, #f1f5f9, #cbd5e0);
+}
+
+.user-dashboard-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1a202c;
+}
+
+.user-dashboard-card p {
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+/* Statistics Card */
+.user-dashboard-statistics-card {
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 3rem;
+  opacity: 0.6;
+  color: #1a202c;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-dashboard-statistics-card.locked {
+  background: linear-gradient(135deg, #f1f5f9, #cbd5e0);
+}
+
+.user-dashboard-statistics-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1a202c;
+}
+
+.user-dashboard-statistics-card p {
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+/* Footer */
+.user-dashboard-footer {
+  text-align: center;
+  padding: 2rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(27,17,139,0.85));
+}
+
+.user-dashboard-footer-quote {
+  font-size: 1.2rem;
+  font-style: italic;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.user-dashboard-highlight-orange {
+  color: #f59e0b;
+}
+
+.user-dashboard-copyright {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .user-dashboard-main-layout {
+    flex-direction: column;
+  }
+
+  .user-dashboard-main-content {
+    padding: 1rem;
+  }
+
+  .user-dashboard-welcome-title {
+    font-size: 2rem;
+  }
+
+  .user-dashboard-section-title {
+    font-size: 1.5rem;
+  }
+
+  .user-dashboard-get-started-section {
+    padding: 2rem 1.5rem;
+  }
+
+  .user-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,55 @@
+/* UserDashboardSidebar Styles */
+.user-dashboard-sidebar {
+  width: 280px;
+  background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(27,17,139,0.85));
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2rem 0;
+}
+
+.user-dashboard-sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.user-dashboard-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.user-dashboard-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.user-dashboard-menu-item.active {
+  background: rgba(59, 130, 246, 0.2);
+  color: white;
+}
+
+/* Responsive Design for UserDashboardSidebar */
+@media (max-width: 768px) {
+  .user-dashboard-sidebar {
+    width: 100%;
+    padding: 1rem 0;
+  }
+
+  .user-dashboard-sidebar-content {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0.5rem;
+  }
+
+  .user-dashboard-menu-item {
+    min-width: fit-content;
+    white-space: nowrap;
+  }
+}

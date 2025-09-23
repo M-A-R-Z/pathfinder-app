@@ -12,3 +12,7 @@ pandas
 psycopg2-binary
 smtplib
 MIMEText
+flask_sqlalchemy
+dotenv
+psycopg2
+argon2

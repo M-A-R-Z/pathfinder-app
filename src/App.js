@@ -4,6 +4,7 @@ import UserLandingPage from './frontend/UserLandingPage';
 import UserLogin from './frontend/UserLogin';
 import UserSignUp from './frontend/UserSignUp';
 import UserForgotPassword from './frontend/UserForgotPassword';
+import UserDashBoardHome from './frontend/UserDashBoardHome';
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
       <Route path="/userlogin" element={<UserLogin />} />
       <Route path="/usersignup" element={<UserSignUp />} />
       <Route path="/userforgotpassword" element={<UserForgotPassword />} />
-      
+      <Route path="/userdashboardhome" element={<UserDashBoardHome />} />
     </Routes>
   );
 }
