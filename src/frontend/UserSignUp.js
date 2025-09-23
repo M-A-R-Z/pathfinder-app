@@ -268,7 +268,7 @@ const UserSignUp = ({ onClose }) => {
         mode="signup"
         onSuccess={() => {
           alert("Signup complete, email verified!");
-          navigate('/');
+          navigate('/userdashboardhome');
         }}
       />
     </div>

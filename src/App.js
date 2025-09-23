@@ -5,6 +5,7 @@ import UserLogin from './frontend/UserLogin';
 import UserSignUp from './frontend/UserSignUp';
 import UserForgotPassword from './frontend/UserForgotPassword';
 import UserDashBoardHome from './frontend/UserDashBoardHome';
+import ProtectedRoute from './frontend/component/ProtectedRoute';
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
       <Route path="/userlogin" element={<UserLogin />} />
       <Route path="/usersignup" element={<UserSignUp />} />
       <Route path="/userforgotpassword" element={<UserForgotPassword />} />
-      <Route path="/userdashboardhome" element={<UserDashBoardHome />} />
+      <Route path="/userdashboardhome" element={<ProtectedRoute><UserDashBoardHome /></ProtectedRoute>} />
     </Routes>
   );
 }

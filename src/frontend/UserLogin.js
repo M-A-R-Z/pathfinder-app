@@ -44,7 +44,7 @@ const UserLogin = ({ onClose }) => {
       );
 
       if (res.data.success) {
-        navigate("/");
+        navigate("/userdashboardhome");
       } else {
         alert(res.data.message); // correct reference
       }
