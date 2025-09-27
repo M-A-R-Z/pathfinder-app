@@ -17,13 +17,10 @@ const OTPModal = ({
   const [cooldown, setCooldown] = useState(0);
   const navigate = useNavigate();
 
- 
- useEffect(() => {
+  // 🔥 Only send OTP automatically for forgot password
+  useEffect(() => {
     const sendInitialOtp = async () => {
       if (!isOpen) return;
-
-      setCooldown(60);
-
       try {
         if (mode === "forgot") {
           await axios.post(

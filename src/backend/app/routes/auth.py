@@ -122,7 +122,8 @@ def verify_email_code():
     if str(signup_data["otp"]) != str(otp):
         return jsonify({"success": False, "message": "Invalid OTP"}), 400
 
-    
+    # OTP is correct → create user
+    signup_data = session["pending_signup"]
     new_user = User(
         email=signup_data["email"],
         password=signup_data["password"],
