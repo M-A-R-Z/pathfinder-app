@@ -22,6 +22,24 @@ const UserSignUp = ({ onClose }) => {
 
   const navigate = useNavigate();
 
+  // Eye icon components (since you might not have Lucide React)
+  const EyeIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  );
+
+  const EyeOffIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m15 18-.722-3.25"/>
+      <path d="M2 8a10.645 10.645 0 0 0 20 0"/>
+      <path d="m20 15-1.726-2.05"/>
+      <path d="m4 15 1.726-2.05"/>
+      <path d="m9 18 .722-3.25"/>
+    </svg>
+  );
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -218,8 +236,9 @@ const UserSignUp = ({ onClose }) => {
                     type="button"
                     className="signup-eye-btn"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    👁️
+                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                   </button>
                 </div>
               </div>
@@ -242,8 +261,9 @@ const UserSignUp = ({ onClose }) => {
                     type="button"
                     className="signup-eye-btn"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                   >
-                    👁️
+                    {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
                   </button>
                 </div>
               </div>

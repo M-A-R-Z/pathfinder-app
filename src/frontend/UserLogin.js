@@ -16,7 +16,6 @@ const UserLogin = ({ onClose }) => {
 
   const navigate = useNavigate();
 
-  
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -31,7 +30,6 @@ const UserLogin = ({ onClose }) => {
     const { email, password, rememberMe } = formData;
     console.log('Login attempted with:', formData);
     try {
-    
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       const res = await axios.post(
@@ -40,13 +38,13 @@ const UserLogin = ({ onClose }) => {
           email: formData.email, 
           password: formData.password, 
         },
-        { withCredentials: true }  // important for cookies/sessions
+        { withCredentials: true }
       );
 
       if (res.data.success) {
         navigate("/userdashboardhome");
       } else {
-        alert(res.data.message); // correct reference
+        alert(res.data.message);
       }
     } catch (err) {
       console.error(err);
@@ -74,6 +72,24 @@ const UserLogin = ({ onClose }) => {
     }
     navigate('/');
   };
+
+  // Eye icon components (since you might not have Lucide React)
+  const EyeIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  );
+
+  const EyeOffIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m15 18-.722-3.25"/>
+      <path d="M2 8a10.645 10.645 0 0 0 20 0"/>
+      <path d="m20 15-1.726-2.05"/>
+      <path d="m4 15 1.726-2.05"/>
+      <path d="m9 18 .722-3.25"/>
+    </svg>
+  );
 
   return (
     <div className="login-page">
@@ -143,11 +159,11 @@ const UserLogin = ({ onClose }) => {
 
             <div className="login-user-section">
               <div className="login-user-avatar">
-                  <img 
-                    src={LoginIcon}
-                    alt="User Avatar" 
-                    className="login-avatar-raw"
-                  />
+                <img 
+                  src={LoginIcon}
+                  alt="User Avatar" 
+                  className="login-avatar-raw"
+                />
               </div>
             </div>
 
@@ -185,8 +201,9 @@ const UserLogin = ({ onClose }) => {
                     type="button"
                     className="login-eye-btn"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? "👁️" : "👁️‍🗨️"}
+                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                   </button>
                 </div>
               </div>
