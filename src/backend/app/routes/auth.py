@@ -1,12 +1,14 @@
 from flask import Blueprint, request, jsonify, session, make_response
 from ..models import User
 from argon2 import PasswordHasher
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.services.verify_email import verify_email
 from .. import db
 
 auth_bp = Blueprint("login", __name__)
 ph = PasswordHasher()
+OTP_EXPIRY = 300      
+RESEND_COOLDOWN = 60  
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
@@ -75,7 +77,10 @@ def signup():
         "last_name": last_name,
         "middle_name": middle_name,
         "affix": affix,
-        "birthday": birthday.isoformat()
+        "birthday": birthday.isoformat(),
+        "otp": otp,
+        "otp_expiry": (datetime.utcnow() + timedelta(seconds=OTP_EXPIRY)).isoformat(),
+        "last_sent": datetime.utcnow().isoformat()
     }
     session["pending_otp"] = otp
 
@@ -105,14 +110,19 @@ def verify_email_code():
     data = request.get_json()
     otp = data.get("otp")
 
-    if not otp or "pending_signup" not in session:
+    signup_data = session.get("pending_signup")
+    if not otp or not signup_data:
         return jsonify({"success": False, "message": "No signup session found"}), 400
 
-    if str(session.get("pending_otp")) != str(otp):
+    # Expiry check
+    expiry = datetime.fromisoformat(signup_data["otp_expiry"])
+    if datetime.utcnow() > expiry:
+        return jsonify({"success": False, "message": "OTP expired"}), 400
+
+    if str(signup_data["otp"]) != str(otp):
         return jsonify({"success": False, "message": "Invalid OTP"}), 400
 
-    # OTP is correct → create user
-    signup_data = session["pending_signup"]
+    # ✅ OTP valid → create user
     new_user = User(
         email=signup_data["email"],
         password=signup_data["password"],
@@ -123,28 +133,36 @@ def verify_email_code():
         birthday=datetime.strptime(signup_data["birthday"], "%Y-%m-%d").date(),
         role="USER"
     )
-
     db.session.add(new_user)
     db.session.commit()
 
-    # Clear session
     session.pop("pending_signup", None)
-    session.pop("pending_otp", None)
-
     return jsonify({"success": True, "message": "Email verified, user created successfully"}), 201
+
 
 @auth_bp.route("/signup/resend-otp", methods=["POST"])
 def resend_signup_otp():
-    if "pending_signup" not in session:
+    signup_data = session.get("pending_signup")
+    if not signup_data:
         return jsonify({"success": False, "message": "No signup session found"}), 400
 
-    email = session["pending_signup"]["email"]
-    otp = verify_email(email)
+    last_sent = datetime.fromisoformat(signup_data["last_sent"])
+    if datetime.utcnow() < last_sent + timedelta(seconds=RESEND_COOLDOWN):
+        wait_time = (last_sent + timedelta(seconds=RESEND_COOLDOWN)) - datetime.utcnow()
+        return jsonify({"success": False, "message": f"Please wait {int(wait_time.total_seconds())}s before resending."}), 429
+
+    # Generate new OTP
+    otp = verify_email(signup_data["email"])
     if not otp:
         return jsonify({"success": False, "message": "Error resending OTP"}), 500
 
-    session["pending_otp"] = otp
+    signup_data["otp"] = otp
+    signup_data["otp_expiry"] = (datetime.utcnow() + timedelta(seconds=OTP_EXPIRY)).isoformat()
+    signup_data["last_sent"] = datetime.utcnow().isoformat()
+    session["pending_signup"] = signup_data
+
     return jsonify({"success": True, "message": "New OTP sent to email"}), 200
+
 
 
 @auth_bp.route("/request-otp", methods=["POST"])

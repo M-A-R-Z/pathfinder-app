@@ -14,12 +14,17 @@ const OTPModal = ({
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
   const navigate = useNavigate();
 
   // 🔥 Only send OTP automatically for forgot password
-  useEffect(() => {
+ useEffect(() => {
     const sendInitialOtp = async () => {
       if (!isOpen) return;
+
+      // ⏱️ start 60s countdown immediately
+      setCooldown(60);
+
       try {
         if (mode === "forgot") {
           await axios.post(
@@ -29,7 +34,7 @@ const OTPModal = ({
           );
           console.log("Forgot password OTP sent");
         }
-        // 👉 No need to call /signup again for signup mode
+        // 👉 for signup, OTP is already sent during registration, so no resend here
       } catch (err) {
         console.error("Failed to send OTP:", err.response?.data || err.message);
       }
@@ -109,22 +114,26 @@ const OTPModal = ({
     setIsLoading(false);
   };
 
+  useEffect(() => {
+    let timer;
+    if (cooldown > 0) {
+      timer = setInterval(() => {
+        setCooldown((prev) => Math.max(prev - 1, 0));
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
   const handleResend = async () => {
-   try {
-    if (mode === "signup") {
-      const res = await axios.post(
-        "http://localhost:5000/signup/resend-otp",
-        {},
-        { withCredentials: true }
-      );
-      alert(res.data.message || "New OTP sent to your email!");
+    try {
+      if (mode === "signup") {
+        const res = await axios.post("http://localhost:5000/signup/resend-otp", {}, { withCredentials: true });
+        alert(res.data.message || "New OTP sent!");
+        setCooldown(60); // start 60s cooldown
       } else if (mode === "forgot") {
-        await axios.post(
-          "http://localhost:5000/request-otp",
-          { email },
-          { withCredentials: true }
-        );
-        alert("New reset OTP sent to your email!");
+        await axios.post("http://localhost:5000/request-otp", { email }, { withCredentials: true });
+        alert("New reset OTP sent!");
+        setCooldown(60);
       }
     } catch (err) {
       alert(err.response?.data?.message || "Failed to resend OTP.");
@@ -132,7 +141,7 @@ const OTPModal = ({
   };
 
   if (!isOpen) return null;
-
+  
   return (
     <div className="otp-modal-overlay">
       <div className="otp-modal">
@@ -173,8 +182,12 @@ const OTPModal = ({
           </button>
         </form>
 
-        <button className="otp-resend" onClick={handleResend} disabled={isLoading}>
-          Resend Code
+        <button
+          className="otp-resend"
+          onClick={handleResend}
+          disabled={isLoading || cooldown > 0}
+        >
+          {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend Code"}
         </button>
       </div>
     </div>
