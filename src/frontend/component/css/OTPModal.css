@@ -148,10 +148,7 @@
   box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
 }
 
-.otp-digit:nth-child(4) {
-  border-color: #350bee;
-  background-color: #fff8f0;
-}
+/* Removed the problematic nth-child(4) rule that was causing different styling */
 
 .change-email {
   color: #999;

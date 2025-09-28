@@ -1,6 +1,6 @@
 import React from 'react';
 import UserDashboardSidebar from './component/UserDashboardSidebar';
-import './UserDashBoardHome.css';
+import './UserDashboardHome.css';
 
 // Header Component
 const Header = () => {
@@ -14,9 +14,7 @@ const Header = () => {
       </div>
       <div className="user-dashboard-header-actions">
         <button className="user-dashboard-create-btn">
-          Create
-        </button>
-        <button className="user-dashboard-notification-btn">
+          + Create
         </button>
         <div className="user-dashboard-profile-avatar">
           <img 
@@ -88,11 +86,7 @@ const UserDashBoardHome = () => {
 
           {/* Footer */}
           <div className="user-dashboard-footer">
-            <p className="user-dashboard-footer-quote">
-              "Right <span className="user-dashboard-highlight-orange">Direction</span>. Bright{' '}
-              <span className="user-dashboard-highlight-orange">Future</span>."
-            </p>
-            <p className="user-dashboard-copyright">Copyright © 2025 PathFinder. All Rights Reserved.</p>
+            <p className="user-dashboard-copyright">© 2025 PathFinder. All Rights Reserved.</p>
           </div>
         </div>
       </div>

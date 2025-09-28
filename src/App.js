@@ -4,7 +4,9 @@ import UserLandingPage from './frontend/UserLandingPage';
 import UserLogin from './frontend/UserLogin';
 import UserSignUp from './frontend/UserSignUp';
 import UserForgotPassword from './frontend/UserForgotPassword';
-import UserDashBoardHome from './frontend/UserDashBoardHome';
+import UserDashboardHome from './frontend/UserDashboardHome';
+import UserDashboardAssessment from './frontend/UserDashboardAssessment';
+import UserDashboardTakeAssessment from './frontend/UserDashboardTakeAssessment';
 import ProtectedRoute from './frontend/component/ProtectedRoute';
 
 function App() {
@@ -14,7 +16,9 @@ function App() {
       <Route path="/userlogin" element={<UserLogin />} />
       <Route path="/usersignup" element={<UserSignUp />} />
       <Route path="/userforgotpassword" element={<UserForgotPassword />} />
-      <Route path="/userdashboardhome" element={<ProtectedRoute><UserDashBoardHome /></ProtectedRoute>} />
+      <Route path="/userdashboardhome" element={<ProtectedRoute><UserDashboardHome /></ProtectedRoute>} />
+      <Route path="/userdashboardassessment" element={<ProtectedRoute><UserDashboardAssessment /></ProtectedRoute>} />
+      <Route path="/userdashboardtakeassessment" element={<ProtectedRoute><UserDashboardTakeAssessment /></ProtectedRoute>} />
     </Routes>
   );
 }

@@ -80,7 +80,7 @@ const OTPModal = ({
         if (res.data.success) {
           
           if (onSuccess) onSuccess();
-          navigate("/");
+          navigate("/userlogin");
         }
       } else if (mode === "forgot") {
         if (!newPassword || !confirmPassword) {
