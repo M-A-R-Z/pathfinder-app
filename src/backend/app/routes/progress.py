@@ -2,20 +2,21 @@ from flask import Blueprint, jsonify, request
 from app.models import Assessment
 from app import db
 
-progress_bp = Blueprint("progress", __name__, url_prefix="/api/progress")
+progress_bp = Blueprint("progress", __name__)
 
 # GET progress for a specific user + dataset
-@progress_bp.route("/<int:user_id>/<int:data_set_id>", methods=["GET"])
+@progress_bp.route("/progress/<int:user_id>/<int:data_set_id>", methods=["GET"])
 def get_progress(user_id, data_set_id):
     assessment = Assessment.query.filter_by(user_id=user_id, data_set_id=data_set_id).first()
     if not assessment:
+        print("Assessment not found")
         return jsonify({"error": "Assessment not found"}), 404
 
     return jsonify(assessment.assessment_info())
 
 
 # UPDATE progress for a specific user + dataset
-@progress_bp.route("/<int:user_id>/<int:data_set_id>", methods=["POST"])
+@progress_bp.route("/progress/<int:user_id>/<int:data_set_id>", methods=["POST"])
 def update_progress(user_id, data_set_id):
     data = request.get_json()
     new_progress = data.get("progress")

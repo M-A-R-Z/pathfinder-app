@@ -7,69 +7,49 @@ import statisticsIcon from '../../assets/StatisticsIcon.png';
 import coursesIcon from '../../assets/CoursesIcon.png';
 import careersIcon from '../../assets/CareersIcon.png';
 
-const UserDashboardSidebar = ({ activeItem = 'Dashboard' }) => {
+const UserDashboardSidebar = ({ activeItem = 'Dashboard', progress }) => {
   const navigate = useNavigate();
 
   const menuItems = [
-    { 
-      name: 'Dashboard',
-      iconSrc: dashboardIcon,
-      path: '/userdashboardhome'
-    },
-    { 
-      name: 'Assessment',
-      iconSrc: assessmentIcon,
-      path: '/userdashboardassessment'
-    },
-    { 
-      name: 'Statistics',
-      iconSrc: statisticsIcon,
-      path: '/userdashboardhome'
-    },
-    { 
-      name: 'Courses',
-      iconSrc: coursesIcon,
-      path: '/userdashboardhome'
-    },
-    { 
-      name: 'Careers',
-      iconSrc: careersIcon,
-      path: '/userdashboardhome'
-    }
+    { name: 'Dashboard', path: '/userdashboardhome', iconSrc: dashboardIcon },
+    { name: 'Assessment', path: '/userdashboardassessment', iconSrc: assessmentIcon },
+    { name: 'Statistics', path: '/userdashboardhome', iconSrc: statisticsIcon },
+    { name: 'Courses', path: '/userdashboardhome', iconSrc: coursesIcon },
+    { name: 'Careers', path: '/userdashboardhome', iconSrc: careersIcon },
   ];
 
-  const handleNavigation = (path) => {
-    navigate(path);
+  const handleNavigate = (target) => {
+    if (progress > 0 && progress < 100) {
+      const leave = window.confirm(
+        "You have unsaved progress. Are you sure you want to leave?"
+      );
+      if (!leave) return;
+    }
+    navigate(target);
   };
 
   return (
     <div className="user-dashboard-sidebar">
       <div className="user-dashboard-sidebar-content">
-        {menuItems.map((item) => {
-          return (
-            <div 
-              key={item.name} 
-              className={`user-dashboard-menu-item ${activeItem === item.name ? 'active' : ''}`}
-              onClick={() => handleNavigation(item.path)}
-              style={{ cursor: 'pointer' }}
-            >
-              <img 
-                src={item.iconSrc} 
-                alt={`${item.name} icon`}
-                width={20} 
-                height={20}
-                style={{
-                  filter: 'brightness(0) saturate(100%) invert(1)',
-                  opacity: 0.7
-                }}
-              />
-              <span>{item.name}</span>
-            </div>
-          );
-        })}
+        {menuItems.map((item) => (
+          <div
+            key={item.name}
+            className={`user-dashboard-menu-item ${activeItem === item.name ? 'active' : ''}`}
+            onClick={() => handleNavigate(item.path)} 
+            style={{ cursor: 'pointer' }}
+          >
+            <img
+              src={item.iconSrc}
+              alt={`${item.name} icon`}
+              width={20}
+              height={20}
+              style={{ filter: 'brightness(0) saturate(100%) invert(1)', opacity: 0.7 }}
+            />
+            <span>{item.name}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
-
 export default UserDashboardSidebar;

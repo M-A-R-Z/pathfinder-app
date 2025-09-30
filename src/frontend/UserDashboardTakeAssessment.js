@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import UserDashboardSidebar from "./component/UserDashboardSidebar";
 import "./UserDashboardTakeAssessment.css";
 
@@ -24,142 +25,170 @@ const Header = () => (
 );
 
 const UserDashboardTakeAssessment = () => {
+  const navigate = useNavigate();
+
   const [step, setStep] = useState(0);
   const [isFirstYear, setIsFirstYear] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [courses, setCourses] = useState([]);
-
   const [questions, setQuestions] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [answers, setAnswers] = useState({});
   const [datasetId, setDatasetId] = useState(null);
   const [assessmentId, setAssessmentId] = useState(null);
+  const [existingAssessment, setExistingAssessment] = useState(null);
   const [progress, setProgress] = useState(0);
+  const [userId, setUserId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const userId = 1; // TODO: replace with logged-in user
   const questionsPerPage = 15;
-
   const currentPage = step;
   const startIndex = (currentPage - 1) * questionsPerPage;
-  const currentQuestions = questions.slice(
-    startIndex,
-    startIndex + questionsPerPage
-  );
+  const currentQuestions = questions.slice(startIndex, startIndex + questionsPerPage);
 
-  // Fetch courses
+  // ---------------- Fetch initial data ----------------
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/courses")
-      .then((res) => setCourses(res.data))
-      .catch((err) => console.error("Error fetching courses:", err));
-  }, []);
+    const fetchData = async () => {
+      try {
+        // Get current user
+        const meRes = await axios.get("http://localhost:5000/me", { withCredentials: true });
+        setUserId(meRes.data.user_id);
 
-  // Fetch active dataset + questions
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/active-dataset")
-      .then((res) => {
-        const active = res.data;
-        if (!active.question_set_id) {
-          console.error("Active dataset has no question set");
-          return;
-        }
+        // Get courses
+        const coursesRes = await axios.get("http://localhost:5000/courses");
+        setCourses(coursesRes.data);
+
+        // Get active dataset
+        const datasetRes = await axios.get("http://localhost:5000/active-dataset");
+        const active = datasetRes.data;
+
+        if (!active.question_set_id) return console.error("Active dataset has no question set");
         setDatasetId(active.data_set_id);
-        return axios.get(
+
+        // Get questions
+        const questionsRes = await axios.get(
           `http://localhost:5000/question-sets/${active.question_set_id}`
         );
-      })
-      .then((res) => {
-        if (res) {
-          const data = res.data;
-          setQuestions(data.questions || []);
-          setTotalPages(Math.ceil((data.questions || []).length / questionsPerPage));
+        const data = questionsRes.data;
+        setQuestions(data.questions || []);
+        setTotalPages(Math.ceil((data.questions || []).length / questionsPerPage));
+
+        // Check for existing assessment
+        const res = await axios.get(
+          `http://localhost:5000/progress/${meRes.data.user_id}/${active.data_set_id}`,
+          { withCredentials: true }
+        );
+
+        if (res.data && !res.data.error) {
+          const existing = res.data; // assuming GET /progress returns a single assessment object
+          setExistingAssessment(existing);
+          setAssessmentId(existing.assessment_id);
+          setProgress(existing.progress || 0);
+
+          // Pre-fill Step 0 values
+          setIsFirstYear(existing.is_first_year);
+          setSelectedCourse(existing.course_id || "");
+
+          // Fetch existing answers
+          const answersRes = await axios.get(
+            `http://localhost:5000/assessment/${existing.assessment_id}/answers`,
+            { withCredentials: true }
+          );
+          const savedAnswers = {};
+          answersRes.data.forEach((ans) => {
+            savedAnswers[ans.question_id] = ans.answer_value;
+          });
+          setAnswers(savedAnswers);
+
+          // Skip Step 0 if resuming
+          setStep(1);
         }
-      })
-      .catch((err) =>
-        console.error("Error fetching active dataset/questions:", err)
-      );
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  // Fetch saved progress when returning
+  // ---------------- Warn before leaving ----------------
   useEffect(() => {
-    if (!assessmentId) return;
-    axios
-      .get(`http://localhost:5000/assessment/${assessmentId}/progress`)
-      .then((res) => {
-        setProgress(res.data.progress || 0);
-      })
-      .catch((err) => console.error("Error fetching saved progress:", err));
-  }, [assessmentId]);
-
-  // Handle answer change (autosave)
-  const handleAnswerChange = (questionId, value) => {
-    const newAnswers = {
-      ...answers,
-      [questionId]: value,
+    const handleBeforeUnload = (event) => {
+      if (progress > 0 && progress < 100) {
+        event.preventDefault();
+        event.returnValue = "Are you sure you want to leave? Your progress will be saved.";
+      }
     };
-    setAnswers(newAnswers);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [progress]);
 
-    // Save progress immediately
+  // ---------------- Start assessment ----------------
+  const handleStartAssessment = () => {
     if (assessmentId) {
-      const answeredCount = Object.keys(newAnswers).length;
-      const totalCount = questions.length;
-      const progressValue = (answeredCount / totalCount) * 100;
-
-      setProgress(progressValue);
-
-      axios.put(
-        `http://localhost:5000/assessment/${assessmentId}/progress`,
-        { progress: progressValue },
-        { withCredentials: true }
-      );
+      // Already exists, just continue
+      setStep(1);
+      return;
     }
-  };
 
-  // Handle submit
-  const handleSubmit = () => {
+    if (!userId || !datasetId) return;
     const payload = {
       user_id: userId,
-      dataset_id: datasetId,
+      data_set_id: datasetId,
       is_first_year: isFirstYear,
       course_id: selectedCourse || null,
+    };
+
+    axios
+      .post("http://localhost:5000/assessments", payload, { withCredentials: true })
+      .then((res) => {
+        setAssessmentId(res.data.assessment_id);
+        setStep(1);
+      })
+      .catch((err) => console.error("Error starting assessment:", err));
+  };
+
+  // ---------------- Handle answer change ----------------
+  const handleAnswerChange = (questionId, value) => {
+    const newAnswers = { ...answers, [questionId]: value };
+    setAnswers(newAnswers);
+
+    if (!assessmentId) return;
+
+    axios
+      .put(
+        `http://localhost:5000/assessment/${assessmentId}/answers`,
+        { question_id: questionId, answer: value },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        if (res.data.progress !== undefined) setProgress(res.data.progress);
+      })
+      .catch((err) => console.error("Error saving answer:", err));
+  };
+
+  // ---------------- Submit assessment ----------------
+  const handleSubmit = () => {
+    const payload = {
       answers: Object.entries(answers).map(([qId, ans]) => ({
         question_id: parseInt(qId),
         answer: ans,
       })),
     };
-
     axios
-      .post("http://localhost:5000/assessments", payload)
-      .then((res) => {
-        setAssessmentId(res.data.assessment_id);
+      .put(`http://localhost:5000/assessment/${assessmentId}/submit`, payload, {
+        withCredentials: true,
+      })
+      .then(() => {
         alert("Assessment completed! Redirecting to results...");
-        // TODO: navigate to results page
+        // navigate("/assessment/results");
       })
       .catch((err) => console.error("Error submitting assessment:", err));
   };
 
-  // Warn before leaving
-  useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      if (progress > 0 && progress < 100) {
-        event.preventDefault();
-        event.returnValue =
-          "Are you sure you want to leave? Your progress will be saved.";
-        // save progress one last time
-        if (assessmentId) {
-          axios.put(
-            `http://localhost:5000/assessment/${assessmentId}/progress`,
-            { progress },
-            { withCredentials: true }
-          );
-        }
-      }
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [progress, assessmentId]);
-
+  // ---------------- ScaleOption component ----------------
   const ScaleOption = ({ value, isSelected, onChange, label }) => (
     <div className="scale-option">
       {label && <span className="scale-label">{label}</span>}
@@ -173,34 +202,32 @@ const UserDashboardTakeAssessment = () => {
     </div>
   );
 
-  const allAnswered = currentQuestions.every(
-    (q) => answers[q.question_id] !== undefined
-  );
+  const allAnswered = currentQuestions.every((q) => answers[q.question_id] !== undefined);
 
+  // ---------------- Loading screen ----------------
+  if (loading) return <div className="loading">Loading assessment...</div>;
+
+  // ---------------- Render ----------------
   return (
     <div className="take-assessment-container">
       <Header />
       <div className="take-assessment-main-layout">
-        <UserDashboardSidebar activeItem="Assessment" />
+        <UserDashboardSidebar activeItem="Assessment" progress={progress} />
         <div className="take-assessment-main-content">
           <div className="take-assessment-content-section">
             {/* Step 0: Buffer Page */}
-            {step === 0 && (
+            {step === 0 && !existingAssessment && (
               <div className="buffer-question">
                 <h2>Are you currently a 1st year college student?</h2>
                 <div className="buffer-options">
                   <button
-                    className={`buffer-btn ${
-                      isFirstYear === true ? "selected" : ""
-                    }`}
+                    className={`buffer-btn ${isFirstYear === true ? "selected" : ""}`}
                     onClick={() => setIsFirstYear(true)}
                   >
                     Yes
                   </button>
                   <button
-                    className={`buffer-btn ${
-                      isFirstYear === false ? "selected" : ""
-                    }`}
+                    className={`buffer-btn ${isFirstYear === false ? "selected" : ""}`}
                     onClick={() => setIsFirstYear(false)}
                   >
                     No
@@ -226,10 +253,8 @@ const UserDashboardTakeAssessment = () => {
 
                 <button
                   className="nav-btn next-btn"
-                  onClick={() => setStep(1)}
-                  disabled={
-                    isFirstYear === null || (isFirstYear && !selectedCourse)
-                  }
+                  onClick={handleStartAssessment}
+                  disabled={!userId || isFirstYear === null || (isFirstYear && !selectedCourse)}
                 >
                   Start Assessment →
                 </button>
@@ -253,12 +278,8 @@ const UserDashboardTakeAssessment = () => {
                               key={val}
                               value={val}
                               isSelected={selectedAnswer === val}
-                              onChange={(v) =>
-                                handleAnswerChange(q.question_id, v)
-                              }
-                              label={
-                                val === 1 ? "Disagree" : val === 5 ? "Agree" : ""
-                              }
+                              onChange={(v) => handleAnswerChange(q.question_id, v)}
+                              label={val === 1 ? "Disagree" : val === 5 ? "Agree" : ""}
                             />
                           ))}
                         </div>
@@ -269,17 +290,11 @@ const UserDashboardTakeAssessment = () => {
 
                 <div className="navigation-section">
                   {currentPage > 1 ? (
-                    <button
-                      className="nav-btn previous-btn"
-                      onClick={() => setStep(step - 1)}
-                    >
+                    <button className="nav-btn previous-btn" onClick={() => setStep(step - 1)}>
                       ← Previous
                     </button>
                   ) : (
-                    <button
-                      className="nav-btn previous-btn"
-                      onClick={() => setStep(0)}
-                    >
+                    <button className="nav-btn previous-btn" onClick={() => setStep(1)}>
                       ← Back
                     </button>
                   )}
@@ -304,8 +319,7 @@ const UserDashboardTakeAssessment = () => {
                 </div>
 
                 <div className="progress-indicator">
-                  Page {currentPage} of {totalPages} | Progress:{" "}
-                  {progress.toFixed(0)}%
+                  Page {currentPage} of {totalPages} | Progress: {progress.toFixed(0)}%
                 </div>
               </>
             )}

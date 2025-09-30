@@ -174,3 +174,25 @@ class Assessment(db.Model):
             "completed": self.completed,
             "created_at": self.created_at.isoformat(),
         }
+
+class Answer(db.Model):
+    __tablename__ = "answers"
+
+    answer_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    assessment_id = db.Column(db.Integer, db.ForeignKey("assessments.assessment_id"), nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey("questions.question_id"), nullable=False)
+    answer_value = db.Column(db.Integer, nullable=False)  # scale 1-5
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+    assessment = db.relationship("Assessment", backref="answers", cascade="all, delete-orphan")
+    question = db.relationship("Question", backref="answers", cascade="all, delete-orphan")
+
+    def answer_info(self):
+        return {
+            "answer_id": self.answer_id,
+            "assessment_id": self.assessment_id,
+            "question_id": self.question_id,
+            "answer_value": self.answer_value,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+        }

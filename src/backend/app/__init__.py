@@ -33,6 +33,8 @@ def create_app():
 
     from app.routes.dataManagement import dataset_bp
     app.register_blueprint(dataset_bp)
+    from app.routes.assessment import assessment_bp
+    app.register_blueprint(assessment_bp)
 
     
     frontend_url = os.getenv("FRONTEND_URL")  
