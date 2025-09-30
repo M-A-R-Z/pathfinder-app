@@ -4,7 +4,7 @@ import UserLandingPage from './frontend/UserLandingPage';
 import UserLogin from './frontend/UserLogin';
 import UserSignUp from './frontend/UserSignUp';
 import UserForgotPassword from './frontend/UserForgotPassword';
-import UserDashboardHome from './frontend/UserDashboardHome';
+import UserDashboardHome from './frontend/UserDashBoardHome';
 import UserDashboardAssessment from './frontend/UserDashboardAssessment';
 import UserDashboardTakeAssessment from './frontend/UserDashboardTakeAssessment';
 import ProtectedRoute from './frontend/component/ProtectedRoute';

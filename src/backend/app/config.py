@@ -15,8 +15,9 @@ class Config:
     SENDER_EMAIL = os.getenv("SENDER_EMAIL")
     SMTP_SERVER = os.getenv("SMTP_SERVER")
     SMTP_PORT = os.getenv("SMTP_PORT")
+    VERCEL_LINK = os.getenv("VERCEL_LINK")
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SECURE = True  # True in production
-    SESSION_COOKIE_SAMESITE = "Lax"
-    
+    SESSION_COOKIE_SECURE = True  
+    SESSION_COOKIE_SAMESITE = "None"
+    FRONTEND_URL = os.getenv("FRONTEND_URL")

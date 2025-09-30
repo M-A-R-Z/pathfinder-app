@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ for navigation
+import axios from 'axios';
 import UserDashboardSidebar from './component/UserDashboardSidebar';
-import './UserDashboardHome.css';
+import './UserDashBoardHome.css';
 
 // Header Component
 const Header = () => {
@@ -29,6 +31,31 @@ const Header = () => {
 
 // Main UserDashBoardHome Component
 const UserDashBoardHome = () => {
+  const [progress, setProgress] = useState(0);
+  const [completed, setCompleted] = useState(false);
+  const [userName, setUserName] = useState('Raphael'); // Replace with auth session later
+  const navigate = useNavigate(); // ✅ navigation hook
+
+  // Mock values (replace with session/auth context)
+  const userId = 1;
+  const activeDataSetId = 1; // TODO: fetch from backend (the active dataset)
+
+  // Fetch assessment progress
+  useEffect(() => {
+    axios
+      .get(`/progress/${userId}/${activeDataSetId}`, { withCredentials: true })
+      .then((res) => {
+        setProgress(res.data.progress || 0);
+        setCompleted(res.data.completed || false);
+      })
+      .catch((err) => console.error('Error fetching progress:', err));
+  }, [userId, activeDataSetId]);
+
+  // Handle navigation to assessment page
+  const handleTakeAssessment = () => {
+    navigate('/userdashboardassessment'); // ✅ navigate to assessment page
+  };
+
   return (
     <div className="user-dashboard-container">
       <Header />
@@ -38,16 +65,25 @@ const UserDashBoardHome = () => {
           {/* Welcome Section */}
           <div className="user-dashboard-welcome-section">
             <h1 className="user-dashboard-welcome-title">
-              Welcome, <span className="user-dashboard-name-highlight">Raphael</span>!
+              Welcome, <span className="user-dashboard-name-highlight">{userName}</span>!
             </h1>
             
             {/* Assessment Banner */}
-            <div className="user-dashboard-assessment-banner">
-              <p className="user-dashboard-banner-title">You haven't taken the PathFinder Assessment yet.</p>
-              <p className="user-dashboard-banner-subtitle">
-                Take the quiz to discover your recommended career path and strand.
-              </p>
-            </div>
+            {!completed ? (
+              <div className="user-dashboard-assessment-banner">
+                <p className="user-dashboard-banner-title">You haven't completed the PathFinder Assessment yet.</p>
+                <p className="user-dashboard-banner-subtitle">
+                  Take the quiz to discover your recommended career path and strand.
+                </p>
+              </div>
+            ) : (
+              <div className="user-dashboard-assessment-banner completed">
+                <p className="user-dashboard-banner-title">🎉 Congratulations! You finished the PathFinder Assessment.</p>
+                <p className="user-dashboard-banner-subtitle">
+                  Check your recommended strand, career match, and statistics below.
+                </p>
+              </div>
+            )}
 
             {/* Get Started Section */}
             <div className="user-dashboard-get-started-section">
@@ -56,31 +92,34 @@ const UserDashBoardHome = () => {
                 Answer our assessment to find out which senior high school strand fits you 
                 best—and what careers you're most likely to succeed in.
               </p>
-              <button className="user-dashboard-take-assessment-btn">
-                Take the Assessment
+              <button
+                className="user-dashboard-take-assessment-btn"
+                onClick={handleTakeAssessment} // ✅ go to assessment page
+              >
+                {completed ? "Retake the Assessment" : "Take the Assessment"}
               </button>
             </div>
 
             {/* Dashboard Cards */}
             <div className="user-dashboard-grid">
-              <div className="user-dashboard-card locked">
+              <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>
                 <h3>Recommended Strand</h3>
-                <p>Locked until assessment is completed</p>
+                <p>{completed ? "STEM (example)" : "Locked until assessment is completed"}</p>
               </div>
-              <div className="user-dashboard-card locked">
+              <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>
                 <h3>Top Career Match</h3>
-                <p>Locked until assessment is completed</p>
+                <p>{completed ? "Engineer (example)" : "Locked until assessment is completed"}</p>
               </div>
               <div className="user-dashboard-card">
                 <h3>Progress</h3>
-                <p>0% complete</p>
+                <p>{progress}% complete</p>
               </div>
             </div>
 
             {/* Statistics Card */}
-            <div className="user-dashboard-statistics-card locked">
+            <div className={`user-dashboard-statistics-card ${!completed ? 'locked' : ''}`}>
               <h3>Check your statistics</h3>
-              <p>Locked until assessment is completed</p>
+              <p>{completed ? "View detailed breakdown" : "Locked until assessment is completed"}</p>
             </div>
           </div>
 
