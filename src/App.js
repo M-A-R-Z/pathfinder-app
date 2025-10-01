@@ -7,6 +7,8 @@ import UserForgotPassword from './frontend/UserForgotPassword';
 import UserDashboardHome from './frontend/UserDashBoardHome';
 import UserDashboardAssessment from './frontend/UserDashboardAssessment';
 import UserDashboardTakeAssessment from './frontend/UserDashboardTakeAssessment';
+import UserDashboardCourses from './frontend/UserDashboardCourses';
+import UserDashboardCareers from './frontend/UserDashboardCareers';
 import ProtectedRoute from './frontend/component/ProtectedRoute';
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
       <Route path="/userdashboardhome" element={<ProtectedRoute><UserDashboardHome /></ProtectedRoute>} />
       <Route path="/userdashboardassessment" element={<ProtectedRoute><UserDashboardAssessment /></ProtectedRoute>} />
       <Route path="/userdashboardtakeassessment" element={<ProtectedRoute><UserDashboardTakeAssessment /></ProtectedRoute>} />
+      <Route path="/userdashboardcourses" element={<ProtectedRoute><UserDashboardCourses /></ProtectedRoute>} />
+      <Route path="/userdashboardcareers" element={<ProtectedRoute><UserDashboardCareers /></ProtectedRoute>} />
     </Routes>
   );
 }

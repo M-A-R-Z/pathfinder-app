@@ -1,0 +1,242 @@
+/* UserDashboardCoursesSTEM Component Styles */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stem-courses-content-section {
+  flex: 1;
+  padding: 2rem 3rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.stem-courses-page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+  animation: fadeInUp 1s ease-out 0.4s both;
+}
+
+.stem-courses-subtitle {
+  font-size: 1.1rem;
+  color: #4a5568;
+  margin-bottom: 3rem;
+  animation: fadeInUp 1s ease-out 0.5s both;
+}
+
+/* Course Cards */
+.stem-courses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.stem-course-card {
+  background: white;
+  border: 3px solid #1a202c;
+  border-radius: 20px;
+  padding: 2rem;
+  border-left: 8px solid #10b981;
+  transition: all 0.3s ease;
+  animation: fadeInUp 1s ease-out both;
+}
+
+.stem-course-card:nth-child(1) {
+  animation-delay: 0.6s;
+}
+
+.stem-course-card:nth-child(2) {
+  animation-delay: 0.7s;
+}
+
+.stem-course-card:nth-child(3) {
+  animation-delay: 0.8s;
+}
+
+.stem-course-card:nth-child(4) {
+  animation-delay: 0.9s;
+}
+
+.stem-course-card:hover {
+  transform: translateX(8px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stem-course-card-header {
+  margin-bottom: 1.5rem;
+}
+
+.stem-course-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 0.8rem;
+}
+
+.stem-course-duration {
+  font-size: 1rem;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+}
+
+.stem-course-description {
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+/* Match Section */
+.stem-course-match-section {
+  margin-top: 1.5rem;
+}
+
+.stem-progress-bar-container {
+  width: 100%;
+  height: 30px;
+  background: #e5e7eb;
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.stem-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  transition: width 1s ease-out;
+  border-radius: 15px;
+}
+
+.stem-match-text {
+  font-size: 1.1rem;
+  color: #1a202c;
+  font-weight: 600;
+}
+
+/* Why Programs Section */
+.stem-why-programs-section {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  animation: fadeInUp 1s ease-out 1s both;
+}
+
+.stem-why-programs-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+}
+
+.stem-why-programs-text {
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .stem-courses-content-section {
+    padding: 2rem;
+  }
+  
+  .stem-courses-page-title {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .stem-courses-content-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .stem-courses-page-title {
+    font-size: 1.8rem;
+  }
+
+  .stem-courses-subtitle {
+    font-size: 1rem;
+  }
+
+  .stem-course-card {
+    padding: 1.5rem;
+  }
+
+  .stem-course-title {
+    font-size: 1.5rem;
+  }
+
+  .stem-course-duration,
+  .stem-course-description {
+    font-size: 0.9rem;
+  }
+
+  .stem-match-text {
+    font-size: 1rem;
+  }
+
+  .stem-why-programs-section {
+    padding: 1.5rem;
+  }
+
+  .stem-why-programs-title {
+    font-size: 1.3rem;
+  }
+
+  .stem-why-programs-text {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stem-courses-content-section {
+    padding: 1rem 0.8rem;
+  }
+  
+  .stem-courses-page-title {
+    font-size: 1.5rem;
+  }
+
+  .stem-courses-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .stem-course-card {
+    padding: 1.2rem;
+  }
+
+  .stem-course-title {
+    font-size: 1.3rem;
+  }
+
+  .stem-course-duration,
+  .stem-course-description,
+  .stem-match-text {
+    font-size: 0.85rem;
+  }
+
+  .stem-why-programs-section {
+    padding: 1.2rem;
+  }
+
+  .stem-why-programs-title {
+    font-size: 1.2rem;
+  }
+
+  .stem-why-programs-text {
+    font-size: 0.85rem;
+  }
+}

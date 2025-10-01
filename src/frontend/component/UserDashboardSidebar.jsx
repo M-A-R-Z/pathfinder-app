@@ -14,8 +14,8 @@ const UserDashboardSidebar = ({ activeItem = 'Dashboard', progress }) => {
     { name: 'Dashboard', path: '/userdashboardhome', iconSrc: dashboardIcon },
     { name: 'Assessment', path: '/userdashboardassessment', iconSrc: assessmentIcon },
     { name: 'Statistics', path: '/userdashboardhome', iconSrc: statisticsIcon },
-    { name: 'Courses', path: '/userdashboardhome', iconSrc: coursesIcon },
-    { name: 'Careers', path: '/userdashboardhome', iconSrc: careersIcon },
+    { name: 'Courses', path: '/userdashboardcourses', iconSrc: coursesIcon },
+    { name: 'Careers', path: '/userdashboardcareers', iconSrc: careersIcon },
   ];
 
   const handleNavigate = (target) => {
