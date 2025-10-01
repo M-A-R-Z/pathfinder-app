@@ -150,10 +150,8 @@ class Course(db.Model):
 class Assessment(db.Model):
     __tablename__ = "assessments"
 
-    assessment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user_data.user_id"), nullable=False
-    )
+    assessment_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user_data.user_id"))
     is_first_year = db.Column(db.Boolean, nullable=False, default=False)
     course_id = db.Column(db.Integer, db.ForeignKey("courses.course_id"), nullable=True)
     data_set_id = db.Column(
@@ -162,6 +160,7 @@ class Assessment(db.Model):
     progress = db.Column(db.Float, nullable=False, default=0.0)  # % completed
     completed = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+    answers = db.relationship("Answer", back_populates="assessment", cascade="all, delete-orphan",passive_deletes=True)
 
     def assessment_info(self):
         return {
@@ -179,13 +178,13 @@ class Answer(db.Model):
     __tablename__ = "answers"
 
     answer_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    assessment_id = db.Column(db.Integer, db.ForeignKey("assessments.assessment_id"), nullable=False)
+    assessment_id = db.Column(db.Integer, db.ForeignKey("assessments.assessment_id", ondelete="CASCADE"), nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey("questions.question_id"), nullable=False)
     answer_value = db.Column(db.Integer, nullable=False)  # scale 1-5
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
-    assessment = db.relationship("Assessment", backref="answers", cascade="all, delete-orphan")
-    question = db.relationship("Question", backref="answers", cascade="all, delete-orphan")
+    assessment = db.relationship("Assessment", back_populates="answers")
+    question = db.relationship("Question")  
 
     def answer_info(self):
         return {
