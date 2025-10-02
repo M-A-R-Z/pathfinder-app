@@ -243,8 +243,7 @@ class Results(db.Model):
             "abm_score": self.abm_score,
             "recommendation_description": self.recommendation_description,
             "tie": self.tie,
-            "results_for": self.results_for,
-            "dataset_id": self.dataset_id,
+            "assessment_id": self.assessment_id,
             "recommended_strand": self.recommended_strand,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }

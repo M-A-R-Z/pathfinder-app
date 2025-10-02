@@ -31,32 +31,29 @@ const UserDashBoardHome = () => {
   const [userId, setUserId] = useState(null);
   const [activeDataSetId, setActiveDataSetId] = useState(null);
   const [userName, setUserName] = useState('');
+  const [result, setResult] = useState(null);
 
   // Fetch user info + active dataset
   useEffect(() => {
     const fetchUserAndDataset = async () => {
       try {
-        // 1. Get current user
         const meRes = await axios.get("http://localhost:5000/me", { withCredentials: true });
         const uid = meRes.data.user_id;
         setUserId(uid);
         setUserName(meRes.data.first_name || "User");
 
-        // 2. Get active dataset
         const datasetRes = await axios.get("http://localhost:5000/active-dataset", { withCredentials: true });
-        const active = datasetRes.data;
-        setActiveDataSetId(active.data_set_id || null);
+        setActiveDataSetId(datasetRes.data.data_set_id || null);
       } catch (err) {
         console.error("Error fetching user or dataset:", err);
       }
     };
-
     fetchUserAndDataset();
   }, []);
 
-  // Fetch progress (only after userId + activeDataSetId are set)
+  // Fetch progress + result
   useEffect(() => {
-    const fetchProgress = async () => {
+    const fetchProgressAndResult = async () => {
       if (!userId || !activeDataSetId) return;
       try {
         const res = await axios.get(
@@ -65,30 +62,43 @@ const UserDashBoardHome = () => {
         );
         setProgress(res.data.progress || 0);
         setCompleted(res.data.completed || false);
+
+        if (res.data.completed) {
+          // Fetch submitted results
+          const resultRes = await axios.get(
+            `http://127.0.0.1:5000/results/${res.data.assessment_id}`,
+            { withCredentials: true }
+          );
+          setResult(resultRes.data);
+        }
+
       } catch (err) {
-        console.error("Error fetching progress:", err);
+        console.error("Error fetching progress or result:", err);
       }
     };
 
-    fetchProgress();
+    fetchProgressAndResult();
   }, [userId, activeDataSetId]);
 
   const handleTakeAssessment = () => {
     if (progress === 100 && !completed) {
-      // User finished answering but has not submitted yet
-      navigate('/userdashboardtakeassessment');
+      navigate('/userdashboardtakeassessment'); // submit pending
     } else if (progress === 100 && completed) {
-      // Already submitted → retake flow
-      navigate('/userdashboardassessment');
+      navigate('/userdashboardassessment'); // retake flow
     } else if (progress > 0) {
-      // In-progress
-      navigate('/userdashboardtakeassessment');
+      navigate('/userdashboardtakeassessment'); // in-progress
     } else {
-      // New assessment
-      navigate('/userdashboardassessment');
+      navigate('/userdashboardassessment'); // new
     }
   };
 
+  const goToStatistics = () => {
+    if (result) navigate(`/userdashboard/statistics/${result.results_id}`);
+  };
+
+  const goToCareerMatch = () => {
+    if (result) navigate(`/userdashboard/careermatch/${result.results_id}`);
+  };
 
   return (
     <div className="user-dashboard-container">
@@ -112,7 +122,7 @@ const UserDashBoardHome = () => {
               <div className="user-dashboard-assessment-banner completed">
                 <p className="user-dashboard-banner-title">🎉 Congratulations! You finished the PathFinder Assessment.</p>
                 <p className="user-dashboard-banner-subtitle">
-                  Check your recommended strand, career match, and statistics below.
+                  Your recommended strand and career matches are ready.
                 </p>
               </div>
             )}
@@ -140,11 +150,18 @@ const UserDashBoardHome = () => {
             <div className="user-dashboard-grid">
               <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>
                 <h3>Recommended Strand</h3>
-                <p>{completed ? "STEM (example)" : "Locked until assessment is completed"}</p>
+                <p className="strand-text">
+                  {completed && result ? result.recommended_strand : "Locked until assessment is completed"}
+                </p>
               </div>
               <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>
                 <h3>Top Career Match</h3>
-                <p>{completed ? "Engineer (example)" : "Locked until assessment is completed"}</p>
+                <p>{completed && result ? result.top_career || "Engineer (example)" : "Locked until assessment is completed"}</p>
+                {completed && result && (
+                  <button className="dashboard-action-btn" onClick={goToCareerMatch}>
+                    View Career Match
+                  </button>
+                )}
               </div>
               <div className="user-dashboard-card">         
                 <h3>Progress</h3>
@@ -158,11 +175,15 @@ const UserDashBoardHome = () => {
                   ></div>
                 </div>              
               </div>
-            </div>
-
-            <div className={`user-dashboard-statistics-card ${!completed ? 'locked' : ''}`}>
-              <h3>Check your statistics</h3>
-              <p>{completed ? "View detailed breakdown" : "Locked until assessment is completed"}</p>
+              <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>
+                <h3>Statistics</h3>
+                <p>{completed ? "View detailed breakdown" : "Locked until assessment is completed"}</p>
+                {completed && result && (
+                  <button className="dashboard-action-btn" onClick={goToStatistics}>
+                    View Statistics
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 

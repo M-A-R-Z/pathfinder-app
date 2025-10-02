@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import UserDashboardSidebar from './component/UserDashboardSidebar';
-import './UserDashboardAssessment.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import UserDashboardSidebar from "./component/UserDashboardSidebar";
+import "./UserDashboardAssessment.css";
 
-// Header Component 
+// Header Component
 const Header = () => (
   <div className="assessment-header">
     <div className="assessment-logo-section">
@@ -16,9 +16,9 @@ const Header = () => (
     <div className="assessment-header-actions">
       <button className="assessment-create-btn">+ Create</button>
       <div className="assessment-profile-avatar">
-        <img 
-          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" 
-          alt="Profile" 
+        <img
+          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face"
+          alt="Profile"
         />
       </div>
     </div>
@@ -31,45 +31,46 @@ const UserDashboardAssessment = () => {
   const [datasetId, setDatasetId] = useState(null);
   const [existingAssessment, setExistingAssessment] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showRetakeConfirm, setShowRetakeConfirm] = useState(false);
 
-  // Fetch user and check for existing assessment
+  // Fetch user info and existing assessment
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const meRes = await axios.get('http://localhost:5000/me', { withCredentials: true });
+        const meRes = await axios.get("http://localhost:5000/me", {
+          withCredentials: true,
+        });
         setUserId(meRes.data.user_id);
 
-        // Get active dataset
-        const datasetRes = await axios.get('http://localhost:5000/active-dataset', { withCredentials: true });
+        const datasetRes = await axios.get(
+          "http://localhost:5000/active-dataset",
+          { withCredentials: true }
+        );
         setDatasetId(datasetRes.data.data_set_id);
 
-        // Check for existing assessment by user_id + dataset_id
-        const res = await axios.get(
+        const progressRes = await axios.get(
           `http://localhost:5000/progress/${meRes.data.user_id}/${datasetRes.data.data_set_id}`,
           { withCredentials: true }
         );
 
-        if (res.data && !res.data.error) {
-          setExistingAssessment(res.data);
+        if (progressRes.data && !progressRes.data.error) {
+          setExistingAssessment(progressRes.data);
         }
-
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching assessment data:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
-  const handleTakeAssessment = () => {
-    navigate('/userdashboardtakeassessment');
-  };
+  // Navigate to take/resume assessment
+  const handleTakeAssessment = () => navigate("/userdashboardtakeassessment");
+  const handleResumeAssessment = () => navigate("/userdashboardtakeassessment");
 
-  const handleResumeAssessment = () => {
-    navigate('/userdashboardtakeassessment'); // backend will fetch by user_id + dataset_id
-  };
-
+  // Handle retake with confirmation modal
   const handleRetakeAssessment = async () => {
     if (!existingAssessment) return;
 
@@ -78,10 +79,13 @@ const UserDashboardAssessment = () => {
         `http://localhost:5000/assessment/${existingAssessment.assessment_id}`,
         { withCredentials: true }
       );
+
       setExistingAssessment(null);
-      navigate('/userdashboardtakeassessment'); // start new
+      navigate("/userdashboardtakeassessment");
     } catch (err) {
-      console.error('Error retaking assessment:', err);
+      console.error("Error retaking assessment:", err);
+    } finally {
+      setShowRetakeConfirm(false);
     }
   };
 
@@ -95,41 +99,49 @@ const UserDashboardAssessment = () => {
         <div className="assessment-main-content">
           <div className="assessment-content-section">
             <h1 className="assessment-title">PathFinder Assessment Test</h1>
-            
+
             {/* Steps Grid */}
             <div className="assessment-steps-grid">
-              <div className="assessment-step-card">
-                <div className="step-header step-1"><span className="step-number">STEP 1</span></div>
-                <div className="step-content">
-                  <h3 className="step-title">Complete the Test</h3>
-                  <p className="step-description">
-                    Be yourself and answer honestly to find out which strands fit you.
-                  </p>
-                </div>
-              </div>
-              <div className="assessment-step-card">
-                <div className="step-header step-2"><span className="step-number">STEP 2</span></div>
-                <div className="step-content">
-                  <div className="step-icon">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Statistics Icon" className="step-icon-image"/>
+              {[
+                {
+                  step: 1,
+                  title: "Complete the Test",
+                  description:
+                    "Be yourself and answer honestly to find out which strands fit you.",
+                  icon: null,
+                },
+                {
+                  step: 2,
+                  title: "View Statistics",
+                  description:
+                    "Learn how the strand given to you influenced your answers.",
+                  icon: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+                },
+                {
+                  step: 3,
+                  title: "Check your Course & Career",
+                  description: "Find out what you can be and what you are capable of.",
+                  icon: "https://cdn-icons-png.flaticon.com/512/3002/3002543.png",
+                },
+              ].map(({ step, title, description, icon }) => (
+                <div key={step} className="assessment-step-card">
+                  <div className={`step-header step-${step}`}>
+                    <span className="step-number">STEP {step}</span>
                   </div>
-                  <h3 className="step-title">View Statistics</h3>
-                  <p className="step-description">Learn how the strand given to you influenced your answers.</p>
-                </div>
-              </div>
-              <div className="assessment-step-card">
-                <div className="step-header step-3"><span className="step-number">STEP 3</span></div>
-                <div className="step-content">
-                  <div className="step-icon">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3002/3002543.png" alt="Course & Career Icon" className="step-icon-image"/>
+                  <div className="step-content">
+                    {icon && (
+                      <div className="step-icon">
+                        <img src={icon} alt="" className="step-icon-image" />
+                      </div>
+                    )}
+                    <h3 className="step-title">{title}</h3>
+                    <p className="step-description">{description}</p>
                   </div>
-                  <h3 className="step-title">Check your Course & Career</h3>
-                  <p className="step-description">Find out what you can be and what you are capable of.</p>
                 </div>
-              </div>
+              ))}
             </div>
 
-            {/* Take / Resume / Retake Buttons */}
+            {/* Action Buttons */}
             <div className="assessment-action-section">
               {!existingAssessment && (
                 <button className="assessment-option-btn" onClick={handleTakeAssessment}>
@@ -139,28 +151,53 @@ const UserDashboardAssessment = () => {
 
               {existingAssessment && !existingAssessment.completed && (
                 <>
-                  <button className="assessment-option-btn" onClick={handleResumeAssessment}>
+                  <button
+                    className="assessment-option-btn"
+                    onClick={handleResumeAssessment}
+                  >
                     Resume Assessment
                   </button>
-                  <button className="assessment-option-btn" onClick={handleRetakeAssessment}>
+                  <button
+                    className="assessment-option-btn"
+                    onClick={() => setShowRetakeConfirm(true)}
+                  >
                     Retake Assessment
                   </button>
                 </>
               )}
 
               {existingAssessment && existingAssessment.completed && (
-                <button className="assessment-option-btn" onClick={handleRetakeAssessment}>
+                <button
+                  className="assessment-option-btn"
+                  onClick={() => setShowRetakeConfirm(true)}
+                >
                   Retake Assessment
                 </button>
               )}
             </div>
           </div>
 
+          {/* Footer */}
           <div className="assessment-footer">
-            <p className="assessment-copyright">© 2025 PathFinder. All Rights Reserved.</p>
+            <p className="assessment-copyright">
+              © 2025 PathFinder. All Rights Reserved.
+            </p>
           </div>
         </div>
       </div>
+
+      {/* Retake Confirmation Modal */}
+      {showRetakeConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <p>Are you sure you want to retake the assessment? This will erase your previous results.</p>
+            <div className="modal-actions">
+              <button onClick={() => setShowRetakeConfirm(false)}>Cancel</button>
+              <button onClick={handleRetakeAssessment}>Yes, Retake</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
