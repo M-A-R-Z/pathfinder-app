@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import UniqueConstraint
 from datetime import datetime
 from app import db
 
@@ -194,6 +195,9 @@ class Assessment(db.Model):
 
 class Answer(db.Model):
     __tablename__ = "answers"
+    __table_args__ = (
+        UniqueConstraint('assessment_id', 'question_id', name='uq_assessment_question'),
+    )
 
     answer_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     assessment_id = db.Column(db.Integer, db.ForeignKey("assessments.assessment_id", ondelete="CASCADE"), nullable=False)
@@ -253,6 +257,9 @@ class Results(db.Model):
 # -------------------- Neighbors --------------------
 class Neighbors(db.Model):
     __tablename__ = "neighbors"
+    __table_args__ = (
+        UniqueConstraint('results_id', 'neighbor_index', name='uq_result_neighbor'),
+    )
 
     neighbors_id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     results_id = db.Column(db.Integer, db.ForeignKey("results.results_id"), nullable=False)
