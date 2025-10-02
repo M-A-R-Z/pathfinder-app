@@ -1,0 +1,330 @@
+/* UserDashboardCareersSTEM Component Styles */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stem-careers-content-section {
+  flex: 1;
+  padding: 2rem 3rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.stem-careers-page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+  animation: fadeInUp 1s ease-out 0.4s both;
+}
+
+.stem-careers-subtitle {
+  font-size: 1.1rem;
+  color: #4a5568;
+  margin-bottom: 3rem;
+  animation: fadeInUp 1s ease-out 0.5s both;
+}
+
+/* Career Cards */
+.stem-careers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.stem-career-card {
+  background: white;
+  border: 3px solid #1a202c;
+  border-radius: 20px;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  animation: fadeInUp 1s ease-out both;
+}
+
+.stem-career-card:nth-child(1) {
+  animation-delay: 0.6s;
+}
+
+.stem-career-card:nth-child(2) {
+  animation-delay: 0.7s;
+}
+
+.stem-career-card:nth-child(3) {
+  animation-delay: 0.8s;
+}
+
+.stem-career-card:nth-child(4) {
+  animation-delay: 0.9s;
+}
+
+.stem-career-card.green-border {
+  border-left: 8px solid #10b981;
+}
+
+.stem-career-card.blue-border {
+  border-left: 8px solid #3b82f6;
+}
+
+.stem-career-card.orange-border {
+  border-left: 8px solid #f59e0b;
+}
+
+.stem-career-card.red-border {
+  border-left: 8px solid #ef4444;
+}
+
+.stem-career-card:hover {
+  transform: translateX(8px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stem-career-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.stem-career-info {
+  flex: 1;
+}
+
+.stem-career-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+}
+
+.stem-career-description {
+  font-size: 1rem;
+  color: #4a5568;
+  margin-bottom: 0.8rem;
+  line-height: 1.6;
+}
+
+.stem-career-salary {
+  font-size: 1rem;
+  color: #4a5568;
+  margin-bottom: 0.8rem;
+}
+
+.stem-career-growth {
+  font-size: 1rem;
+  color: #4a5568;
+}
+
+.stem-career-icon {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stem-career-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Why Careers Section */
+.stem-why-careers-section {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  animation: fadeInUp 1s ease-out 1s both;
+}
+
+.stem-why-careers-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1.5rem;
+}
+
+.stem-why-careers-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1.5rem;
+}
+
+.stem-why-careers-list li {
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 2;
+  padding-left: 0.5rem;
+}
+
+.stem-reassessment-text {
+  font-size: 1rem;
+  color: #1a202c;
+  font-weight: 600;
+  line-height: 1.6;
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+/* Retake Button Section */
+.stem-retake-section {
+  text-align: center;
+  margin-bottom: 3rem;
+  animation: fadeInUp 1s ease-out 1.1s both;
+}
+
+.stem-retake-btn {
+  background: linear-gradient(135deg, #1a1b3a, #2d1b69);
+  border: none;
+  padding: 1.2rem 3rem;
+  border-radius: 12px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 20px rgba(26, 27, 58, 0.4);
+}
+
+.stem-retake-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(26, 27, 58, 0.6);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .stem-careers-content-section {
+    padding: 2rem;
+  }
+  
+  .stem-careers-page-title {
+    font-size: 2.2rem;
+  }
+
+  .stem-career-icon {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stem-careers-content-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .stem-careers-page-title {
+    font-size: 1.8rem;
+  }
+
+  .stem-careers-subtitle {
+    font-size: 1rem;
+  }
+
+  .stem-career-card {
+    padding: 1.5rem;
+  }
+
+  .stem-career-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stem-career-icon {
+    width: 80px;
+    height: 80px;
+    order: -1;
+  }
+
+  .stem-career-title {
+    font-size: 1.5rem;
+  }
+
+  .stem-career-description,
+  .stem-career-salary,
+  .stem-career-growth {
+    font-size: 0.9rem;
+  }
+
+  .stem-why-careers-section {
+    padding: 1.5rem;
+  }
+
+  .stem-why-careers-title {
+    font-size: 1.3rem;
+  }
+
+  .stem-why-careers-list li {
+    font-size: 0.9rem;
+  }
+
+  .stem-retake-btn {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stem-careers-content-section {
+    padding: 1rem 0.8rem;
+  }
+  
+  .stem-careers-page-title {
+    font-size: 1.5rem;
+  }
+
+  .stem-careers-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .stem-career-card {
+    padding: 1.2rem;
+  }
+
+  .stem-career-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .stem-career-title {
+    font-size: 1.3rem;
+  }
+
+  .stem-career-description,
+  .stem-career-salary,
+  .stem-career-growth {
+    font-size: 0.85rem;
+  }
+
+  .stem-why-careers-section {
+    padding: 1.2rem;
+  }
+
+  .stem-why-careers-title {
+    font-size: 1.2rem;
+  }
+
+  .stem-why-careers-list li {
+    font-size: 0.85rem;
+  }
+
+  .stem-reassessment-text {
+    font-size: 0.9rem;
+  }
+
+  .stem-retake-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
