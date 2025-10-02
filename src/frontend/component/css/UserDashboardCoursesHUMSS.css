@@ -1,0 +1,242 @@
+/* UserDashboardCoursesHUMSS Component Styles */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.humss-courses-content-section {
+  flex: 1;
+  padding: 2rem 3rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.humss-courses-page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+  animation: fadeInUp 1s ease-out 0.4s both;
+}
+
+.humss-courses-subtitle {
+  font-size: 1.1rem;
+  color: #4a5568;
+  margin-bottom: 3rem;
+  animation: fadeInUp 1s ease-out 0.5s both;
+}
+
+/* Course Cards */
+.humss-courses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.humss-course-card {
+  background: white;
+  border: 3px solid #1a202c;
+  border-radius: 20px;
+  padding: 2rem;
+  border-left: 8px solid #f59e0b;
+  transition: all 0.3s ease;
+  animation: fadeInUp 1s ease-out both;
+}
+
+.humss-course-card:nth-child(1) {
+  animation-delay: 0.6s;
+}
+
+.humss-course-card:nth-child(2) {
+  animation-delay: 0.7s;
+}
+
+.humss-course-card:nth-child(3) {
+  animation-delay: 0.8s;
+}
+
+.humss-course-card:nth-child(4) {
+  animation-delay: 0.9s;
+}
+
+.humss-course-card:hover {
+  transform: translateX(8px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.humss-course-card-header {
+  margin-bottom: 1.5rem;
+}
+
+.humss-course-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 0.8rem;
+}
+
+.humss-course-duration {
+  font-size: 1rem;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+}
+
+.humss-course-description {
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+/* Match Section */
+.humss-course-match-section {
+  margin-top: 1.5rem;
+}
+
+.humss-progress-bar-container {
+  width: 100%;
+  height: 30px;
+  background: #e5e7eb;
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.humss-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  transition: width 1s ease-out;
+  border-radius: 15px;
+}
+
+.humss-match-text {
+  font-size: 1.1rem;
+  color: #1a202c;
+  font-weight: 600;
+}
+
+/* Why Programs Section */
+.humss-why-programs-section {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  animation: fadeInUp 1s ease-out 1s both;
+}
+
+.humss-why-programs-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+}
+
+.humss-why-programs-text {
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .humss-courses-content-section {
+    padding: 2rem;
+  }
+  
+  .humss-courses-page-title {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .humss-courses-content-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .humss-courses-page-title {
+    font-size: 1.8rem;
+  }
+
+  .humss-courses-subtitle {
+    font-size: 1rem;
+  }
+
+  .humss-course-card {
+    padding: 1.5rem;
+  }
+
+  .humss-course-title {
+    font-size: 1.5rem;
+  }
+
+  .humss-course-duration,
+  .humss-course-description {
+    font-size: 0.9rem;
+  }
+
+  .humss-match-text {
+    font-size: 1rem;
+  }
+
+  .humss-why-programs-section {
+    padding: 1.5rem;
+  }
+
+  .humss-why-programs-title {
+    font-size: 1.3rem;
+  }
+
+  .humss-why-programs-text {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .humss-courses-content-section {
+    padding: 1rem 0.8rem;
+  }
+  
+  .humss-courses-page-title {
+    font-size: 1.5rem;
+  }
+
+  .humss-courses-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .humss-course-card {
+    padding: 1.2rem;
+  }
+
+  .humss-course-title {
+    font-size: 1.3rem;
+  }
+
+  .humss-course-duration,
+  .humss-course-description,
+  .humss-match-text {
+    font-size: 0.85rem;
+  }
+
+  .humss-why-programs-section {
+    padding: 1.2rem;
+  }
+
+  .humss-why-programs-title {
+    font-size: 1.2rem;
+  }
+
+  .humss-why-programs-text {
+    font-size: 0.85rem;
+  }
+}

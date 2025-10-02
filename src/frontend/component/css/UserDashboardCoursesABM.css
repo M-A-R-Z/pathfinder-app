@@ -1,0 +1,242 @@
+/* UserDashboardCoursesABM Component Styles */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.abm-courses-content-section {
+  flex: 1;
+  padding: 2rem 3rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.abm-courses-page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+  animation: fadeInUp 1s ease-out 0.4s both;
+}
+
+.abm-courses-subtitle {
+  font-size: 1.1rem;
+  color: #4a5568;
+  margin-bottom: 3rem;
+  animation: fadeInUp 1s ease-out 0.5s both;
+}
+
+/* Course Cards */
+.abm-courses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.abm-course-card {
+  background: white;
+  border: 3px solid #1a202c;
+  border-radius: 20px;
+  padding: 2rem;
+  border-left: 8px solid #8b5cf6;
+  transition: all 0.3s ease;
+  animation: fadeInUp 1s ease-out both;
+}
+
+.abm-course-card:nth-child(1) {
+  animation-delay: 0.6s;
+}
+
+.abm-course-card:nth-child(2) {
+  animation-delay: 0.7s;
+}
+
+.abm-course-card:nth-child(3) {
+  animation-delay: 0.8s;
+}
+
+.abm-course-card:nth-child(4) {
+  animation-delay: 0.9s;
+}
+
+.abm-course-card:hover {
+  transform: translateX(8px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.abm-course-card-header {
+  margin-bottom: 1.5rem;
+}
+
+.abm-course-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 0.8rem;
+}
+
+.abm-course-duration {
+  font-size: 1rem;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+}
+
+.abm-course-description {
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+/* Match Section */
+.abm-course-match-section {
+  margin-top: 1.5rem;
+}
+
+.abm-progress-bar-container {
+  width: 100%;
+  height: 30px;
+  background: #e5e7eb;
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.abm-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  transition: width 1s ease-out;
+  border-radius: 15px;
+}
+
+.abm-match-text {
+  font-size: 1.1rem;
+  color: #1a202c;
+  font-weight: 600;
+}
+
+/* Why Programs Section */
+.abm-why-programs-section {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  animation: fadeInUp 1s ease-out 1s both;
+}
+
+.abm-why-programs-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+}
+
+.abm-why-programs-text {
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .abm-courses-content-section {
+    padding: 2rem;
+  }
+  
+  .abm-courses-page-title {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .abm-courses-content-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .abm-courses-page-title {
+    font-size: 1.8rem;
+  }
+
+  .abm-courses-subtitle {
+    font-size: 1rem;
+  }
+
+  .abm-course-card {
+    padding: 1.5rem;
+  }
+
+  .abm-course-title {
+    font-size: 1.5rem;
+  }
+
+  .abm-course-duration,
+  .abm-course-description {
+    font-size: 0.9rem;
+  }
+
+  .abm-match-text {
+    font-size: 1rem;
+  }
+
+  .abm-why-programs-section {
+    padding: 1.5rem;
+  }
+
+  .abm-why-programs-title {
+    font-size: 1.3rem;
+  }
+
+  .abm-why-programs-text {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .abm-courses-content-section {
+    padding: 1rem 0.8rem;
+  }
+  
+  .abm-courses-page-title {
+    font-size: 1.5rem;
+  }
+
+  .abm-courses-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .abm-course-card {
+    padding: 1.2rem;
+  }
+
+  .abm-course-title {
+    font-size: 1.3rem;
+  }
+
+  .abm-course-duration,
+  .abm-course-description,
+  .abm-match-text {
+    font-size: 0.85rem;
+  }
+
+  .abm-why-programs-section {
+    padding: 1.2rem;
+  }
+
+  .abm-why-programs-title {
+    font-size: 1.2rem;
+  }
+
+  .abm-why-programs-text {
+    font-size: 0.85rem;
+  }
+}

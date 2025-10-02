@@ -1,6 +1,8 @@
 import React from 'react';
 import UserDashboardSidebar from './component/UserDashboardSidebar';
 import UserDashboardCoursesSTEM from './component/UserDashboardCoursesSTEM';
+import UserDashboardCoursesABM from './component/UserDashboardCoursesABM';
+import UserDashboardCoursesHUMSS from './component/UserDashboardCoursesHUMSS';
 import './UserDashboardCourses.css';
 
 // Header Component
@@ -36,7 +38,7 @@ const UserDashboardCourses = () => {
       <div className="courses-main-layout">
         <UserDashboardSidebar activeItem="Courses" />
         <div className="courses-main-content">
-          <UserDashboardCoursesSTEM />
+          <UserDashboardCoursesHUMSS />
 
           {/* Footer */}
           <div className="courses-footer">
