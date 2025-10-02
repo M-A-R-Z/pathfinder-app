@@ -178,6 +178,7 @@ class Assessment(db.Model):
     completed = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     answers = db.relationship("Answer", back_populates="assessment", cascade="all, delete-orphan",passive_deletes=True)
+    results = db.relationship("Results", backref="assessment", cascade="all, delete-orphan")
 
     def assessment_info(self):
         return {
