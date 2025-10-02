@@ -74,14 +74,21 @@ const UserDashBoardHome = () => {
   }, [userId, activeDataSetId]);
 
   const handleTakeAssessment = () => {
-  if (progress === 100) {
-    navigate('/userdashboardassessment'); 
-  } else if (progress > 0) {
-    navigate('/userdashboardtakeassessment'); 
-  } else {
-    navigate('/userdashboardassessment'); 
-  }
-};
+    if (progress === 100 && !completed) {
+      // User finished answering but has not submitted yet
+      navigate('/userdashboardtakeassessment');
+    } else if (progress === 100 && completed) {
+      // Already submitted → retake flow
+      navigate('/userdashboardassessment');
+    } else if (progress > 0) {
+      // In-progress
+      navigate('/userdashboardtakeassessment');
+    } else {
+      // New assessment
+      navigate('/userdashboardassessment');
+    }
+  };
+
 
   return (
     <div className="user-dashboard-container">
@@ -120,11 +127,13 @@ const UserDashBoardHome = () => {
                 className="user-dashboard-take-assessment-btn"
                 onClick={handleTakeAssessment}
               >
-                {progress === 100 
-                  ? "Retake the Assessment" 
-                  : progress > 0 
-                    ? "Resume Assessment" 
-                    : "Take the Assessment"}
+                {progress === 100 && !completed
+                  ? "Submit Assessment"
+                  : progress === 100 && completed
+                    ? "Retake the Assessment"
+                    : progress > 0
+                      ? "Resume Assessment"
+                      : "Take the Assessment"}
               </button>
             </div>
 
@@ -139,7 +148,9 @@ const UserDashBoardHome = () => {
               </div>
               <div className="user-dashboard-card">         
                 <h3>Progress</h3>
-                <p>{progress.toFixed(2)}% complete</p>
+                <p>
+                  {progress.toFixed(0)}% {progress === 100 && !completed ? "(Pending submission)" : "complete"}
+                </p>
                 <div className="progress-bar-container">
                   <div
                     className="progress-bar-fill"

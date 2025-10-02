@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import UserDashboardSidebar from "./component/UserDashboardSidebar";
@@ -41,6 +41,11 @@ const UserDashboardTakeAssessment = () => {
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // new states for submit process
+  const [submitting, setSubmitting] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const questionRefs = useRef({});
+  const [validationError, setValidationError] = useState(null);
   const questionsPerPage = 15;
   const currentPage = step;
   const startIndex = (currentPage - 1) * questionsPerPage;
@@ -50,22 +55,18 @@ const UserDashboardTakeAssessment = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Get current user
         const meRes = await axios.get("http://localhost:5000/me", { withCredentials: true });
         setUserId(meRes.data.user_id);
 
-        // Get courses
         const coursesRes = await axios.get("http://localhost:5000/courses");
         setCourses(coursesRes.data);
 
-        // Get active dataset
         const datasetRes = await axios.get("http://localhost:5000/active-dataset");
         const active = datasetRes.data;
 
         if (!active.question_set_id) return console.error("Active dataset has no question set");
         setDatasetId(active.data_set_id);
 
-        // Get questions
         const questionsRes = await axios.get(
           `http://localhost:5000/question-sets/${active.question_set_id}`
         );
@@ -73,23 +74,19 @@ const UserDashboardTakeAssessment = () => {
         setQuestions(data.questions || []);
         setTotalPages(Math.ceil((data.questions || []).length / questionsPerPage));
 
-        // Check for existing assessment
         const res = await axios.get(
           `http://localhost:5000/progress/${meRes.data.user_id}/${active.data_set_id}`,
           { withCredentials: true }
         );
 
         if (res.data && !res.data.error) {
-          const existing = res.data; // assuming GET /progress returns a single assessment object
+          const existing = res.data;
           setExistingAssessment(existing);
           setAssessmentId(existing.assessment_id);
           setProgress(existing.progress || 0);
-
-          // Pre-fill Step 0 values
           setIsFirstYear(existing.is_first_year);
           setSelectedCourse(existing.course_id || "");
 
-          // Fetch existing answers
           const answersRes = await axios.get(
             `http://localhost:5000/assessment/${existing.assessment_id}/answers`,
             { withCredentials: true }
@@ -100,7 +97,6 @@ const UserDashboardTakeAssessment = () => {
           });
           setAnswers(savedAnswers);
 
-          // Skip Step 0 if resuming
           setStep(1);
         }
       } catch (err) {
@@ -128,7 +124,6 @@ const UserDashboardTakeAssessment = () => {
   // ---------------- Start assessment ----------------
   const handleStartAssessment = () => {
     if (assessmentId) {
-      // Already exists, just continue
       setStep(1);
       return;
     }
@@ -170,25 +165,34 @@ const UserDashboardTakeAssessment = () => {
   };
 
   // ---------------- Submit assessment ----------------
-  const handleSubmit = () => {
-    const payload = {
-      answers: Object.entries(answers).map(([qId, ans]) => ({
-        question_id: parseInt(qId),
-        answer: ans,
-      })),
-    };
-    axios
-      .put(`http://localhost:5000/assessment/${assessmentId}/submit`, payload, {
-        withCredentials: true,
-      })
-      .then(() => {
-        alert("Assessment completed! Redirecting to results...");
-        // navigate("/assessment/results");
-      })
-      .catch((err) => console.error("Error submitting assessment:", err));
+  const handleSubmit = async () => {
+    setSubmitting(true); // show loading overlay
+    try {
+      const res = await axios.post(
+        `http://localhost:5000/submit_assessment/${assessmentId}`,
+        {},
+        { withCredentials: true }
+      );
+
+      console.log("Submission successful:", res.data);
+
+      // stop loading and show modal
+      setSubmitting(false);
+      setShowCompleteModal(true);
+
+      // optional: store recommended strand in local state if you want to display
+      // setRecommendedStrand(res.data.recommended_strand);
+    } catch (err) {
+      console.error("Error submitting assessment:", err);
+      setSubmitting(false); // stop loading even if error
+    }
   };
 
-  // ---------------- ScaleOption component ----------------
+  const handleConfirmComplete = () => {
+    setShowCompleteModal(false);
+    navigate("/userdashboardhome");
+  };
+
   const ScaleOption = ({ value, isSelected, onChange, label }) => (
     <div className="scale-option">
       {label && <span className="scale-label">{label}</span>}
@@ -207,7 +211,6 @@ const UserDashboardTakeAssessment = () => {
   // ---------------- Loading screen ----------------
   if (loading) return <div className="loading">Loading assessment...</div>;
 
-  // ---------------- Render ----------------
   return (
     <div className="take-assessment-container">
       <Header />
@@ -215,7 +218,6 @@ const UserDashboardTakeAssessment = () => {
         <UserDashboardSidebar activeItem="Assessment" progress={progress} />
         <div className="take-assessment-main-content">
           <div className="take-assessment-content-section">
-            {/* Step 0: Buffer Page */}
             {step === 0 && !existingAssessment && (
               <div className="buffer-question">
                 <h2>Are you currently a 1st year college student?</h2>
@@ -261,14 +263,23 @@ const UserDashboardTakeAssessment = () => {
               </div>
             )}
 
-            {/* Questions */}
             {step > 0 && (
               <>
+                
                 <div className="questions-container">
                   {currentQuestions.map((q, index) => {
                     const selectedAnswer = answers[q.question_id];
+                    const isError = validationError === q.question_id;
+
                     return (
-                      <div key={q.question_id} className="question-item">
+                      <div
+                        key={q.question_id}
+                        ref={(el) => (questionRefs.current[q.question_id] = el)}
+                        className={`question-item ${isError ? "error" : ""}`}
+                      >
+                        {isError && (
+                          <p className="error-message">⚠ Please answer this question before continuing</p>
+                        )}
                         <h3 className="question-text">
                           {startIndex + index + 1}. {q.question_text}
                         </h3>
@@ -278,7 +289,10 @@ const UserDashboardTakeAssessment = () => {
                               key={val}
                               value={val}
                               isSelected={selectedAnswer === val}
-                              onChange={(v) => handleAnswerChange(q.question_id, v)}
+                              onChange={(v) => {
+                                handleAnswerChange(q.question_id, v);
+                                if (validationError === q.question_id) setValidationError(null);
+                              }}
                               label={val === 1 ? "Disagree" : val === 5 ? "Agree" : ""}
                             />
                           ))}
@@ -288,32 +302,50 @@ const UserDashboardTakeAssessment = () => {
                   })}
                 </div>
 
-                <div className="navigation-section">
-                  {currentPage > 1 ? (
-                    <button className="nav-btn previous-btn" onClick={() => setStep(step - 1)}>
-                      ← Previous
-                    </button>
-                  ) : (
-                    <button className="nav-btn previous-btn" onClick={() => setStep(1)}>
-                      ← Back
-                    </button>
-                  )}
-
+                <div className="nav-btn-container">
                   {currentPage < totalPages ? (
                     <button
                       className="nav-btn next-btn"
-                      onClick={() => setStep(step + 1)}
-                      disabled={!allAnswered}
+                      onClick={() => {
+                        const firstUnanswered = currentQuestions.find(
+                          (q) => answers[q.question_id] === undefined
+                        );
+
+                        if (firstUnanswered) {
+                          setValidationError(firstUnanswered.question_id); // mark as error
+                          questionRefs.current[firstUnanswered.question_id]?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center",
+                          });
+                        } else {
+                          setValidationError(null);
+                          setStep(step + 1);
+                        }
+                      }}
                     >
                       Next →
                     </button>
                   ) : (
                     <button
                       className="nav-btn submit-btn"
-                      onClick={handleSubmit}
-                      disabled={!allAnswered}
+                      onClick={() => {
+                        const firstUnanswered = currentQuestions.find(
+                          (q) => answers[q.question_id] === undefined
+                        );
+
+                        if (firstUnanswered) {
+                          setValidationError(firstUnanswered.question_id);
+                          questionRefs.current[firstUnanswered.question_id]?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center",
+                          });
+                        } else {
+                          setValidationError(null);
+                          handleSubmit();
+                        }
+                      }}
                     >
-                      Submit Assessment
+                      Submit Assessment ✅
                     </button>
                   )}
                 </div>
@@ -335,6 +367,26 @@ const UserDashboardTakeAssessment = () => {
           </div>
         </div>
       </div>
+
+      {/* Loading overlay */}
+      {submitting && (
+        <div className="loading-overlay">
+          <div className="loading-message">Assessing your answers...</div>
+        </div>
+      )}
+
+      {/* Completion modal */}
+      {showCompleteModal && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h2>Assessment Complete 🎉</h2>
+            <p>Your recommended strand has been generated.</p>
+            <button className="confirm-btn" onClick={handleConfirmComplete}>
+              Confirm
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

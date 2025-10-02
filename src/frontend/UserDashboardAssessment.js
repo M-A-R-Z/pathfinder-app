@@ -137,7 +137,7 @@ const UserDashboardAssessment = () => {
                 </button>
               )}
 
-              {existingAssessment && (
+              {existingAssessment && !existingAssessment.completed && (
                 <>
                   <button className="assessment-option-btn" onClick={handleResumeAssessment}>
                     Resume Assessment
@@ -146,6 +146,12 @@ const UserDashboardAssessment = () => {
                     Retake Assessment
                   </button>
                 </>
+              )}
+
+              {existingAssessment && existingAssessment.completed && (
+                <button className="assessment-option-btn" onClick={handleRetakeAssessment}>
+                  Retake Assessment
+                </button>
               )}
             </div>
           </div>

@@ -78,29 +78,46 @@ class Question(db.Model):
 class DataSet(db.Model):
     __tablename__ = "data_set"
 
-    data_set_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    data_set_name = db.Column(db.String(120), nullable=False, unique=True)
-    data_set_description = db.Column(db.String(255))
+    data_set_id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now(), nullable=False)
+    data_set_name = db.Column(db.Text, unique=True, nullable=False, default="")
     question_set_id = db.Column(
-        db.Integer, db.ForeignKey("question_sets.question_set_id"), nullable=False
+        db.BigInteger,
+        db.ForeignKey("question_sets.question_set_id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=False,
     )
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    data_set_description = db.Column(
+        db.Text,
+        nullable=False,
+        default="Provide description for Data set"
+    )
     last_updated = db.Column(
-        db.DateTime, server_default=db.func.now(), onupdate=db.func.now()
+        db.DateTime(timezone=True),
+        server_default=db.func.now(),
+        onupdate=db.func.now(),
+        nullable=False,
     )
-    status = db.Column(db.String(50), nullable=False, default="Inactive")
+    status = db.Column(db.Text, nullable=False, default="Inactive")
+    best_k = db.Column(db.BigInteger, nullable=False)
+    accuracy = db.Column(db.Float, nullable=False)
+
+    # Relationships
     data = db.relationship("Data", backref="data_set", cascade="all, delete-orphan")
     question_set = db.relationship("QuestionSet", backref="datasets")
 
     def data_set_info(self):
         return {
             "data_set_id": self.data_set_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
             "data_set_name": self.data_set_name,
-            "data_set_description": self.data_set_description,
             "question_set_id": self.question_set_id,
+            "data_set_description": self.data_set_description,
+            "last_updated": self.last_updated.isoformat() if self.last_updated else None,
             "status": self.status,
-            "created_at": self.created_at.isoformat(),
+            "best_k": self.best_k,
+            "accuracy": self.accuracy,
         }
+
 
 
 # -------------------- Data --------------------
@@ -194,4 +211,90 @@ class Answer(db.Model):
             "answer_value": self.answer_value,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
+        }
+    
+# -------------------- Results --------------------
+class Results(db.Model):
+    __tablename__ = "results"
+
+    results_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    stem_score = db.Column(db.Integer, nullable=False)
+    humss_score = db.Column(db.Integer, nullable=False)
+    abm_score = db.Column(db.Integer, nullable=False)
+    recommendation_description = db.Column(db.Text, nullable=False)
+    tie = db.Column(db.Boolean, nullable=True)
+    assessment_id = db.Column(
+        db.BigInteger,
+        db.ForeignKey("assessments.assessment_id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=False,
+    )
+    recommended_strand = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    # Relationships
+    neighbors = db.relationship("Neighbors", back_populates="result", cascade="all, delete-orphan")
+    tie_table = db.relationship("TieTable", back_populates="result", uselist=False, cascade="all, delete-orphan")
+
+    def result_info(self):
+        return {
+            "results_id": self.results_id,
+            "stem_score": self.stem_score,
+            "humss_score": self.humss_score,
+            "abm_score": self.abm_score,
+            "recommendation_description": self.recommendation_description,
+            "tie": self.tie,
+            "results_for": self.results_for,
+            "dataset_id": self.dataset_id,
+            "recommended_strand": self.recommended_strand,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }
+
+
+# -------------------- Neighbors --------------------
+class Neighbors(db.Model):
+    __tablename__ = "neighbors"
+
+    neighbors_id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    results_id = db.Column(db.Integer, db.ForeignKey("results.results_id"), nullable=False)
+    neighbor_index = db.Column(db.Integer, nullable=False)
+    strand = db.Column(db.Text, nullable=False)
+    distance = db.Column(db.Float, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    # Relationships
+    result = db.relationship("Results", back_populates="neighbors")
+
+    def neighbor_info(self):
+        return {
+            "neighbors_id": self.neighbors_id,
+            "results_id": self.results_id,
+            "neighbor_index": self.neighbor_index,
+            "strand": self.strand,
+            "distance": self.distance,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }
+
+
+# -------------------- Tie Table --------------------
+class TieTable(db.Model):
+    __tablename__ = "tie_table"
+
+    tie_table_id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    stem_weight = db.Column(db.Float, nullable=False)
+    humss_weight = db.Column(db.Float, nullable=False)
+    abm_weight = db.Column(db.Float, nullable=False)
+    results_id = db.Column(db.Integer, db.ForeignKey("results.results_id"), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    # Relationships
+    result = db.relationship("Results", back_populates="tie_table")
+
+    def tie_info(self):
+        return {
+            "tie_table_id": self.tie_table_id,
+            "stem_weight": self.stem_weight,
+            "humss_weight": self.humss_weight,
+            "abm_weight": self.abm_weight,
+            "results_id": self.results_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
         }
