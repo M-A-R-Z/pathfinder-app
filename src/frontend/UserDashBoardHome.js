@@ -93,13 +93,14 @@ const UserDashBoardHome = () => {
   };
 
   const goToStatistics = () => {
-    if (result) navigate(`/userdashboard/statistics/${result.results_id}`);
+    if (result) navigate(`/userdashboard/statistics`);
   };
-
   const goToCareerMatch = () => {
-    if (result) navigate(`/userdashboard/careermatch/${result.results_id}`);
+    if (result) navigate(`/userdashboardcareers`);
   };
-
+    const goToCourseMatch = () => {
+    if (result) navigate(`/userdashboardcourses`);
+  };
   return (
     <div className="user-dashboard-container">
       <Header />
@@ -155,8 +156,17 @@ const UserDashBoardHome = () => {
                 </p>
               </div>
               <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>
-                <h3>Top Career Match</h3>
-                <p>{completed && result ? result.top_career || "Engineer (example)" : "Locked until assessment is completed"}</p>
+                <h3>Alligned Courses</h3>
+                <p>{completed && result ? result.top_career : "Locked until assessment is completed"}</p>
+                {completed && result && (
+                  <button className="dashboard-action-btn" onClick={goToCourseMatch}>
+                    View Course Match
+                  </button>
+                )}
+              </div>
+              <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>
+                <h3>Alligned Careers</h3>
+                <p>{completed && result ? result.top_career : "Locked until assessment is completed"}</p>
                 {completed && result && (
                   <button className="dashboard-action-btn" onClick={goToCareerMatch}>
                     View Career Match
