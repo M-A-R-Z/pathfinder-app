@@ -1,0 +1,100 @@
+/* ===== Results Dashboard Layout ===== */
+.results-dashboard {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto auto;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+/* ===== Card Style (containers) ===== */
+.results-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.results-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.results-card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #333;
+  border-left: 4px solid #4cafef;
+  padding-left: 0.5rem;
+}
+
+/* ===== Description Card ===== */
+.results-description p {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.results-description strong {
+  color: #222;
+}
+
+/* ===== Bar Chart & Pie Chart Container ===== */
+.chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 280px;
+}
+
+/* ===== Neighbors Table ===== */
+.neighbors-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.neighbors-table th,
+.neighbors-table td {
+  border: 1px solid #e0e0e0;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.neighbors-table th {
+  background: #f5f7fa;
+  font-weight: 600;
+  color: #333;
+}
+
+.neighbors-table tr:hover {
+  background: #f0faff;
+}
+
+.neighbors-table td {
+  color: #555;
+}
+
+/* ===== Status Badge (optional for neighbors strand) ===== */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.badge.STEM {
+  background: #4cafef;
+}
+
+.badge.ABM {
+  background: #ff9800;
+}
+
+.badge.HUMSS {
+  background: #8bc34a;
+}
