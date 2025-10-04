@@ -113,6 +113,7 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s;
+  overflow: hidden;
 }
 
 .header-profile-avatar:hover {
@@ -123,6 +124,13 @@
 
 .header-profile-avatar:active {
   transform: scale(0.98);
+}
+
+/* Avatar Image */
+.header-avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .default-avatar-icon {
