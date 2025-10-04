@@ -137,7 +137,7 @@ const UserDashboardTakeAssessment = () => {
     };
 
     axios
-      .post("${API_BASE_URL}/assessments", payload, { withCredentials: true })
+      .post(`${API_BASE_URL}/assessments`, payload, { withCredentials: true })
       .then((res) => {
         setAssessmentId(res.data.assessment_id);
         setStep(1);
