@@ -1,0 +1,158 @@
+/* ===== Dashboard Container ===== */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+ 
+}
+
+/* ===== Header (fixed height assumed 60px) ===== */
+.dashboard-header {
+  height: 60px;
+  flex-shrink: 0;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  z-index: 100;
+  position: sticky;
+  top: 0;
+}
+
+/* ===== Main Content Layout ===== */
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden; 
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  
+  background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(27,17,139,0.85));
+  color: white;
+  
+  position: sticky;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: #f9fafc;
+}
+
+/* ===== Sections ===== */
+.top-section,
+.bottom-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns by default */
+  gap: 1.5rem;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  flex: 1;
+}
+
+/* ===== Card Style ===== */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.card-header h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.card-body {
+  padding: 1.25rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ===== Description Card ===== */
+.description p {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.description strong {
+  color: #222;
+}
+
+/* ===== Chart Containers ===== */
+.chart .card-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 250px;
+}
+
+/* ===== Neighbors Table ===== */
+.question-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.question-table th,
+.question-table td {
+  border: 1px solid #e0e0e0;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.question-table th {
+  background: #f5f7fa;
+  font-weight: 600;
+  color: #333;
+}
+
+.question-table tr:hover {
+  background: #f0faff;
+}
+
+.question-table td {
+  color: #555;
+}
+
+/* ===== Responsive: Collapse to 1 column on mobile ===== */
+@media (max-width: 1024px) {
+  .top-section,
+  .bottom-section {
+    grid-template-columns: 1fr; /* stack cards vertically */
+  }
+
+  .sidebar {
+    width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none; /* hide sidebar on mobile */
+  }
+
+  .top-section,
+  .bottom-section {
+    padding: 1rem;
+  }
+}

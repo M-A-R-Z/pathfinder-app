@@ -180,6 +180,9 @@ class Assessment(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     answers = db.relationship("Answer", back_populates="assessment", cascade="all, delete-orphan",passive_deletes=True)
     results = db.relationship("Results", backref="assessment", cascade="all, delete-orphan")
+    stem_total = db.Column(db.Float, nullable=False, default=0.0)
+    abm_total = db.Column(db.Float, nullable=False, default=0.0)
+    humss_total = db.Column(db.Float, nullable=False, default=0.0)
 
     def assessment_info(self):
         return {
@@ -190,6 +193,9 @@ class Assessment(db.Model):
             "data_set_id": self.data_set_id,
             "progress": self.progress,
             "completed": self.completed,
+            "stem_total": self.stem_total,
+            "abm_total": self.abm_total,
+            "humss_total": self.humss_total,
             "created_at": self.created_at.isoformat(),
         }
 

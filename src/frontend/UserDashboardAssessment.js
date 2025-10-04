@@ -12,24 +12,24 @@ const UserDashboardAssessment = () => {
   const [existingAssessment, setExistingAssessment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showRetakeConfirm, setShowRetakeConfirm] = useState(false);
-
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
   // Fetch user info and existing assessment
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const meRes = await axios.get("http://localhost:5000/me", {
+        const meRes = await axios.get(`${API_BASE_URL}/me`, {
           withCredentials: true,
         });
         setUserId(meRes.data.user_id);
 
         const datasetRes = await axios.get(
-          "http://localhost:5000/active-dataset",
+          `${API_BASE_URL}/active-dataset`,
           { withCredentials: true }
         );
         setDatasetId(datasetRes.data.data_set_id);
 
         const progressRes = await axios.get(
-          `http://localhost:5000/progress/${meRes.data.user_id}/${datasetRes.data.data_set_id}`,
+          `${API_BASE_URL}/progress/${meRes.data.user_id}/${datasetRes.data.data_set_id}`,
           { withCredentials: true }
         );
 
@@ -56,7 +56,7 @@ const UserDashboardAssessment = () => {
 
     try {
       await axios.delete(
-        `http://localhost:5000/assessment/${existingAssessment.assessment_id}`,
+        `${API_BASE_URL}/assessment/${existingAssessment.assessment_id}`,
         { withCredentials: true }
       );
 
