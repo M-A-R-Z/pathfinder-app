@@ -134,8 +134,20 @@ const UserDashBoardHome = () => {
             <div className="user-dashboard-grid">
               <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>
                 <h3>Recommended Strand</h3>
-                <p className="strand-text">
-                  {completed && result ? result.recommended_strand : "Locked until assessment is completed"}
+                <p
+                  className={`strand-text ${completed ? 'strand-completed' : ''} ${
+                    result?.recommended_strand === 'STEM'
+                      ? 'strand-stem'
+                      : result?.recommended_strand === 'HUMSS'
+                      ? 'strand-humss'
+                      : result?.recommended_strand === 'ABM'
+                      ? 'strand-abm'
+                      : ''
+                  }`}
+                >
+                  {completed && result
+                    ? result.recommended_strand
+                    : "Locked until assessment is completed"}
                 </p>
               </div>
               <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>

@@ -262,6 +262,26 @@ body {
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
+
+.strand-text.strand-completed {
+  font-size: 2.2rem;
+  transform: scale(1.05);
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+/*Different colors per strand */
+.strand-text.strand-stem {
+  color: #007bff; 
+}
+
+.strand-text.strand-humss {
+  color: green; 
+}
+
+.strand-text.strand-abm {
+  color: orange; 
+}
+
 .strand-text:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
