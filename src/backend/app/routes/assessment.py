@@ -6,19 +6,39 @@ from app.services.KNN import KNN
 
 assessment_bp = Blueprint("assessment", __name__)
 
-def preprocess_answers(answers):
-    strand_scores = {"STEM": 0, "ABM": 0, "HUMSS": 0}
+# ---------------- Helper ----------------
+def calculate_assessment_stats(assessment_id):
+    """Recalculate strand totals and progress for an assessment."""
+    assessment = Assessment.query.get_or_404(assessment_id)
+    dataset = DataSet.query.get_or_404(assessment.data_set_id)
 
-    for ans in answers:
-        strand = ans.question.strand  # assumes Question has a "strand" column
-        if strand in strand_scores:
-            strand_scores[strand] += ans.answer_value
+    # Join answers with questions
+    rows = (
+        db.session.query(Answer, Question)
+        .join(Question, Answer.question_id == Question.question_id)
+        .filter(Answer.assessment_id == assessment_id, Question.set_id == dataset.question_set_id)
+        .all()
+    )
 
-    return [[
-        strand_scores["STEM"],
-        strand_scores["ABM"],
-        strand_scores["HUMSS"]
-    ]]
+    # Strand totals
+    strand_totals = {"STEM": 0, "ABM": 0, "HUMSS": 0}
+    for ans, q in rows:
+        if q.strand in strand_totals:
+            strand_totals[q.strand] += ans.answer_value
+
+    # Progress
+    total_questions = Question.query.filter_by(set_id=dataset.question_set_id).count()
+    answered_count = len(rows)
+    progress = (answered_count / total_questions) * 100 if total_questions > 0 else 0
+
+    return {
+        "strand_totals": strand_totals,
+        "progress": progress,
+        "answered_count": answered_count,
+        "total_questions": total_questions
+    }
+
+# ---------------- Routes ----------------
 
 # Create assessment
 @assessment_bp.route("/assessments", methods=["POST"])
@@ -32,7 +52,6 @@ def create_assessment():
     course_id = data.get("course_id")
     is_first_year = data.get("is_first_year", True)
 
-    # Double check user exists
     user = User.query.get(user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
@@ -45,47 +64,13 @@ def create_assessment():
         progress=0.0,
         completed=False
     )
-
     db.session.add(new_assessment)
     db.session.commit()
 
     return jsonify(new_assessment.assessment_info()), 201
 
 
-# Update progress
-@assessment_bp.route("/assessment/<int:assessment_id>/progress", methods=["PUT"])
-def update_progress(assessment_id):
-    data = request.get_json()
-    progress = data.get("progress")
-
-    assessment = Assessment.query.get(assessment_id)
-    if not assessment:
-        return jsonify({"error": "Assessment not found"}), 404
-
-    assessment.progress = float(progress or 0.0)
-    assessment.completed = assessment.progress >= 100.0
-    db.session.commit()
-
-    return jsonify({
-        "assessment_id": assessment.assessment_id,
-        "progress": assessment.progress,
-        "completed": assessment.completed
-    }), 200
-
-
-# Get saved progress
-@assessment_bp.route("/assessment/<int:assessment_id>/progress", methods=["GET"])
-def get_progress(assessment_id):
-    assessment = Assessment.query.get(assessment_id)
-    if not assessment:
-        return jsonify({"error": "Assessment not found"}), 404
-
-    return jsonify({
-        "assessment_id": assessment.assessment_id,
-        "progress": assessment.progress,
-        "completed": assessment.completed
-    }), 200
-
+# Save or update answer
 @assessment_bp.route("/assessment/<int:assessment_id>/answers", methods=["PUT"])
 def save_answer(assessment_id):
     data = request.get_json()
@@ -95,116 +80,95 @@ def save_answer(assessment_id):
     if not question_id or answer_value is None:
         return jsonify({"error": "Missing question_id or answer"}), 400
 
-    # check if answer exists
-    existing = Answer.query.filter_by(assessment_id=assessment_id, question_id=question_id).first()
-    if existing:
-        existing.answer_value = answer_value
-    else:
-        new_answer = Answer(
-            assessment_id=assessment_id,
-            question_id=question_id,
-            answer_value=answer_value
-        )
-        db.session.add(new_answer)
-
     assessment = Assessment.query.get(assessment_id)
     if not assessment:
         return jsonify({"error": "Assessment not found"}), 404
 
-    # ✅ Add here: get dataset to fetch question_set_id
-    from app.models import DataSet
-    dataset = DataSet.query.get(assessment.data_set_id)
-    if not dataset:
-        return jsonify({"error": "Dataset not found"}), 404
+    try:
+        # Upsert answer
+        existing = Answer.query.filter_by(assessment_id=assessment_id, question_id=question_id).first()
+        if existing:
+            existing.answer_value = answer_value
+        else:
+            new_answer = Answer(
+                assessment_id=assessment_id,
+                question_id=question_id,
+                answer_value=answer_value
+            )
+            db.session.add(new_answer)
 
-    question_set_id = dataset.question_set_id
+        db.session.flush()
 
-    # count total questions and answered questions
-    total_questions = Question.query.filter_by(set_id=question_set_id).count()
-    answered_count = Answer.query.join(Question).filter(
-        Answer.assessment_id == assessment_id,
-        Question.set_id == question_set_id
-    ).count()
+        # Recalculate stats
+        stats = calculate_assessment_stats(assessment_id)
 
-    assessment.progress = (answered_count / total_questions) * 100
-    db.session.commit()
+        # Update assessment
+        assessment.progress = stats["progress"]
+        assessment.stem_total = stats["strand_totals"]["STEM"]
+        assessment.abm_total = stats["strand_totals"]["ABM"]
+        assessment.humss_total = stats["strand_totals"]["HUMSS"]
 
-    return jsonify({"success": True, "progress": assessment.progress})
+        db.session.commit()
 
-@assessment_bp.route("/assessment/<int:assessment_id>/answers", methods=["GET"])
-def get_answers(assessment_id):
-    assessment = Assessment.query.get(assessment_id)
-    if not assessment:
-        return jsonify({"error": "Assessment not found"}), 404
+        return jsonify({
+            "success": True,
+            "progress": assessment.progress,
+            "answered_count": stats["answered_count"],
+            "total_questions": stats["total_questions"],
+            "strand_totals": stats["strand_totals"]
+        })
 
-    answers = Answer.query.filter_by(assessment_id=assessment_id).all()
-    result = [
-        {
-            "question_id": a.question_id,
-            "answer_value": a.answer_value
-        } for a in answers
-    ]
-    return jsonify(result), 200\
-    
-@assessment_bp.route("/assessment/<int:assessment_id>", methods=["DELETE"])
-def delete_assessment(assessment_id):
-    assessment = Assessment.query.get(assessment_id)
-    if not assessment:
-        return jsonify({"error": "Assessment not found"}), 404
-
-    # Delete all associated answers first
-    Answer.query.filter_by(assessment_id=assessment_id).delete()
-
-    # Then delete the assessment itself
-    db.session.delete(assessment)
-    db.session.commit()
-
-    return jsonify({"success": True, "message": "Assessment deleted"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 
+# Submit assessment
 @assessment_bp.route("/submit_assessment/<int:assessment_id>", methods=["POST"])
 def submit_assessment(assessment_id):
     try:
-        # 1. Fetch assessment
         assessment = Assessment.query.get_or_404(assessment_id)
-
         if assessment.completed:
             return jsonify({"error": "Assessment already completed"}), 400
 
-        dataset = DataSet.query.get_or_404(assessment.data_set_id)
+        # Recalculate stats (authoritative source of truth)
+        stats = calculate_assessment_stats(assessment_id)
+        strand_totals = stats["strand_totals"]
 
-        # 2. Gather user answers
-        answers = Answer.query.filter_by(assessment_id=assessment_id).all()
-        if not answers:
+        if stats["answered_count"] == 0:
             return jsonify({"error": "No answers found"}), 400
 
-        # Preprocess answers into [STEM, ABM, HUMSS]
-        sample_answers = preprocess_answers(answers)  
+        # Prepare vector for KNN
+        sample_answers = [
+            strand_totals["STEM"],
+            strand_totals["ABM"],
+            strand_totals["HUMSS"]
+        ]
 
-        # 3. Get dataset training data
-        dataset_entries = Data.query.filter_by(data_set_id=dataset.data_set_id).all()
+        # Training data
+        dataset_entries = Data.query.filter_by(data_set_id=assessment.data_set_id).all()
         if not dataset_entries:
             return jsonify({"error": "No training data found for dataset"}), 400
 
         dataset_list = [[d.stem_score, d.abm_score, d.humss_score] for d in dataset_entries]
         strand_list = [d.strand for d in dataset_entries]
 
-        # 4. Run KNN with preprocessed vector
-        knn = KNN(sample_answers, dataset_list, strand_list, dataset.data_set_id)
+        # Run KNN
+        knn = KNN(sample_answers, dataset_list, strand_list, assessment.data_set_id)
         results = knn.start_algorithm()
 
-        # 5. Save Results
+        # Save Results
         new_result = Results(
-            stem_score=results["stem_score"],
-            humss_score=results["humss_score"],
-            abm_score=results["abm_score"],
+            stem_score=strand_totals["STEM"],
+            abm_score=strand_totals["ABM"],
+            humss_score=strand_totals["HUMSS"],
             recommendation_description=f"Recommended strand: {results['recommendation']}",
             tie=results["tie"],
-            assessment_id=assessment_id,          
+            assessment_id=assessment_id,
             recommended_strand=results["recommendation"],
         )
         db.session.add(new_result)
-        db.session.commit()
+        db.session.flush()
 
         # Save neighbors
         for n in results["neighbors"]:
@@ -216,7 +180,7 @@ def submit_assessment(assessment_id):
             )
             db.session.add(neighbor)
 
-        # Save tie info if exists
+        # Save tie info
         if results["tie"] and results["tie_strands"]:
             tie = TieTable(
                 results_id=new_result.results_id,
@@ -226,8 +190,11 @@ def submit_assessment(assessment_id):
             )
             db.session.add(tie)
 
-        # Mark assessment as completed
+        # Mark assessment as completed and sync totals
         assessment.completed = True
+        assessment.stem_total = strand_totals["STEM"]
+        assessment.abm_total = strand_totals["ABM"]
+        assessment.humss_total = strand_totals["HUMSS"]
         db.session.commit()
 
         return jsonify({

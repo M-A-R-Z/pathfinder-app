@@ -19,7 +19,8 @@ const UserSignUp = ({ onClose }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isOtpOpen, setIsOtpOpen] = useState(false);
-
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
+  
   const navigate = useNavigate();
 
   // Eye icon components (since you might not have Lucide React)
@@ -59,7 +60,7 @@ const UserSignUp = ({ onClose }) => {
     setIsLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:5000/signup",
+        `${API_BASE_URL}/signup`,
         { 
           email: formData.email, 
           password: formData.password,

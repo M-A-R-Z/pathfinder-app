@@ -13,16 +13,16 @@ const UserDashboardCareers = () => {
   const [strand, setStrand] = useState(null);
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
-
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
   useEffect(() => {
     const fetchResult = async () => {
       try {
         // get logged-in user info + active dataset
-        const meRes = await axios.get("http://localhost:5000/me", { withCredentials: true });
-        const datasetRes = await axios.get("http://localhost:5000/active-dataset", { withCredentials: true });
+        const meRes = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
+        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`, { withCredentials: true });
 
         const res = await axios.get(
-          `http://localhost:5000/progress/${meRes.data.user_id}/${datasetRes.data.data_set_id}`,
+          `${API_BASE_URL}/progress/${meRes.data.user_id}/${datasetRes.data.data_set_id}`,
           { withCredentials: true }
         );
 
@@ -30,7 +30,7 @@ const UserDashboardCareers = () => {
 
         if (res.data.completed) {
           const resultRes = await axios.get(
-            `http://127.0.0.1:5000/results/${res.data.assessment_id}`,
+            `${API_BASE_URL}/results/${res.data.assessment_id}`,
             { withCredentials: true }
           );
           setStrand(resultRes.data.recommended_strand);

@@ -13,7 +13,7 @@ const UserLogin = ({ onClose }) => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -33,7 +33,7 @@ const UserLogin = ({ onClose }) => {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       const res = await axios.post(
-        "http://localhost:5000/login",
+        `${API_BASE_URL}/login`,
         { 
           email: formData.email, 
           password: formData.password, 

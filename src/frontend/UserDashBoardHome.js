@@ -13,17 +13,18 @@ const UserDashBoardHome = () => {
   const [activeDataSetId, setActiveDataSetId] = useState(null);
   const [userName, setUserName] = useState('');
   const [result, setResult] = useState(null);
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
 
   // Fetch user info + active dataset
   useEffect(() => {
     const fetchUserAndDataset = async () => {
       try {
-        const meRes = await axios.get("http://localhost:5000/me", { withCredentials: true });
+        const meRes = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
         const uid = meRes.data.user_id;
         setUserId(uid);
         setUserName(meRes.data.first_name || "User");
 
-        const datasetRes = await axios.get("http://localhost:5000/active-dataset", { withCredentials: true });
+        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`, { withCredentials: true });
         setActiveDataSetId(datasetRes.data.data_set_id || null);
       } catch (err) {
         console.error("Error fetching user or dataset:", err);
@@ -38,7 +39,7 @@ const UserDashBoardHome = () => {
       if (!userId || !activeDataSetId) return;
       try {
         const res = await axios.get(
-          `http://127.0.0.1:5000/progress/${userId}/${activeDataSetId}`,
+          `${API_BASE_URL}/progress/${userId}/${activeDataSetId}`,
           { withCredentials: true }
         );
         setProgress(res.data.progress || 0);
@@ -47,7 +48,7 @@ const UserDashBoardHome = () => {
         if (res.data.completed) {
           // Fetch submitted results
           const resultRes = await axios.get(
-            `http://127.0.0.1:5000/results/${res.data.assessment_id}`,
+            `${API_BASE_URL}/results/${res.data.assessment_id}`,
             { withCredentials: true }
           );
           setResult(resultRes.data);
@@ -74,7 +75,7 @@ const UserDashBoardHome = () => {
   };
 
   const goToStatistics = () => {
-    if (result) navigate(`/userdashboard/statistics`);
+    if (result) navigate(`/userdashboardstatistics`);
   };
   const goToCareerMatch = () => {
     if (result) navigate(`/userdashboardcareers`);

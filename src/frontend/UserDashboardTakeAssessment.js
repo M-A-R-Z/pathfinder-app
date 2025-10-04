@@ -26,7 +26,7 @@ const Header = () => (
 
 const UserDashboardTakeAssessment = () => {
   const navigate = useNavigate();
-
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
   const [step, setStep] = useState(0);
   const [isFirstYear, setIsFirstYear] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState("");
@@ -55,27 +55,27 @@ const UserDashboardTakeAssessment = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const meRes = await axios.get("http://localhost:5000/me", { withCredentials: true });
+        const meRes = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
         setUserId(meRes.data.user_id);
 
-        const coursesRes = await axios.get("http://localhost:5000/courses");
+        const coursesRes = await axios.get(`${API_BASE_URL}/courses`);
         setCourses(coursesRes.data);
 
-        const datasetRes = await axios.get("http://localhost:5000/active-dataset");
+        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`);
         const active = datasetRes.data;
 
         if (!active.question_set_id) return console.error("Active dataset has no question set");
         setDatasetId(active.data_set_id);
 
         const questionsRes = await axios.get(
-          `http://localhost:5000/question-sets/${active.question_set_id}`
+          `${API_BASE_URL}/question-sets/${active.question_set_id}`
         );
         const data = questionsRes.data;
         setQuestions(data.questions || []);
         setTotalPages(Math.ceil((data.questions || []).length / questionsPerPage));
 
         const res = await axios.get(
-          `http://localhost:5000/progress/${meRes.data.user_id}/${active.data_set_id}`,
+          `${API_BASE_URL}/progress/${meRes.data.user_id}/${active.data_set_id}`,
           { withCredentials: true }
         );
 
@@ -88,7 +88,7 @@ const UserDashboardTakeAssessment = () => {
           setSelectedCourse(existing.course_id || "");
 
           const answersRes = await axios.get(
-            `http://localhost:5000/assessment/${existing.assessment_id}/answers`,
+            `${API_BASE_URL}/assessment/${existing.assessment_id}/answers`,
             { withCredentials: true }
           );
           const savedAnswers = {};
@@ -137,7 +137,7 @@ const UserDashboardTakeAssessment = () => {
     };
 
     axios
-      .post("http://localhost:5000/assessments", payload, { withCredentials: true })
+      .post("${API_BASE_URL}/assessments", payload, { withCredentials: true })
       .then((res) => {
         setAssessmentId(res.data.assessment_id);
         setStep(1);
@@ -154,7 +154,7 @@ const UserDashboardTakeAssessment = () => {
 
     axios
       .put(
-        `http://localhost:5000/assessment/${assessmentId}/answers`,
+        `${API_BASE_URL}/assessment/${assessmentId}/answers`,
         { question_id: questionId, answer: value },
         { withCredentials: true }
       )
@@ -169,7 +169,7 @@ const UserDashboardTakeAssessment = () => {
     setSubmitting(true); // show loading overlay
     try {
       const res = await axios.post(
-        `http://localhost:5000/submit_assessment/${assessmentId}`,
+        `${API_BASE_URL}/submit_assessment/${assessmentId}`,
         {},
         { withCredentials: true }
       );
