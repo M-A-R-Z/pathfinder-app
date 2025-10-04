@@ -1,11 +1,10 @@
 from sklearn.neighbors import KNeighborsClassifier
 from app.models import DataSet, Question
-
+import numpy as np
 
 class KNN:
     def __init__(self, sample_answers, dataset_list, strand_list, dataset_id):
-        # sample_answers is ALREADY a processed vector like [[2, 5, 7]]
-        self.sample_answers = sample_answers
+        self.sample_answers = np.array(sample_answers).reshape(1, -1)
         self.dataset_list = dataset_list
         self.strand_list = strand_list
         self.dataset_id = dataset_id
@@ -19,7 +18,7 @@ class KNN:
         knn = KNeighborsClassifier(n_neighbors=k)
         knn.fit(self.dataset_list, self.strand_list)
 
-        # ✅ use self.sample_answers directly
+        
         results = self.predict(knn, k, self.sample_answers)
         return results
 
@@ -29,16 +28,40 @@ class KNN:
 
     def predict(self, knn, k, sample_vector):
         indices, distances = self.calculate_distance(knn, sample_vector)
-        nearest_neighbors = [self.strand_list[i] for i in indices]
 
-        # Count votes
-        total_stem = nearest_neighbors.count("STEM")
-        total_humss = nearest_neighbors.count("HUMSS")
-        total_abm = nearest_neighbors.count("ABM")
+        total_stem, total_humss, total_abm = 0, 0, 0
+        neighbors = []
+        print("Nearest Neighbors:")
+        print("Index\tStrand\tDistance")
+        print("-------------------------")
+        print(f"Sample Vector: {sample_vector.flatten().tolist()}")
+        print("-------------------------")
+        print(f"K: {k}")
+        for i, idx in enumerate(indices):
+            strand = self.strand_list[idx]
+            dist = float(distances[i])
+
+            neighbors.append({
+                "neighbor_index": int(idx + 1),
+                "strand": strand,
+                "distance": dist,
+            })
+
+            if strand == "STEM":
+                total_stem += 1
+            elif strand == "HUMSS":
+                total_humss += 1
+            elif strand == "ABM":
+                total_abm += 1
+            else:
+                print(f"⚠️ Unexpected strand at index {idx}: {strand}")
+            
         strand_votes = {
             "stem_score": total_stem,
             "humss_score": total_humss,
             "abm_score": total_abm,
+            "neighbors": neighbors,
+            "k": k,
         }
 
         vote_score = [total_stem, total_humss, total_abm]
@@ -47,7 +70,9 @@ class KNN:
             strand_votes["tie"] = True
             strand_votes["tie_strands"] = {}
             recommendation = self.tie_breaker(
-                strand_votes, nearest_neighbors, distances, max(vote_score)
+                strand_votes, [n["strand"] for n in neighbors],
+                [n["distance"] for n in neighbors],
+                max(vote_score)
             )
         else:
             strand_votes["tie"] = False
@@ -56,20 +81,9 @@ class KNN:
                 ["stem_score", "humss_score", "abm_score"], key=strand_votes.get
             )
 
-        fixed_recommendation = self.fix_recommendation(recommendation)
-        strand_votes["recommendation"] = fixed_recommendation
-
-        # Add neighbors info
-        strand_votes["neighbors"] = []
-        strand_votes["k"] = k
-        for i, idx in enumerate(indices):
-            strand_votes["neighbors"].append({
-                "neighbor_index": int(idx + 1),
-                "strand": nearest_neighbors[i],
-                "distance": float(distances[i]),
-            })
-
+        strand_votes["recommendation"] = self.fix_recommendation(recommendation)
         return strand_votes
+
 
     def tie_breaker(self, strand_votes, nearest_neighbors, distances, tie_score):
         tied_strands = {}

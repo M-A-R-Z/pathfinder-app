@@ -1,7 +1,10 @@
 # app/routes/assessment.py
 from flask import Blueprint, request, jsonify, session
 from app import db
-from app.models import Assessment, Answer, Data, DataSet, Results, Neighbors, TieTable, Question, User
+from app.models import (
+    Assessment, Answer, Data, DataSet, Results,
+    Neighbors, TieTable, Question, User
+)
 from app.services.KNN import KNN
 
 assessment_bp = Blueprint("assessment", __name__)
@@ -16,7 +19,10 @@ def calculate_assessment_stats(assessment_id):
     rows = (
         db.session.query(Answer, Question)
         .join(Question, Answer.question_id == Question.question_id)
-        .filter(Answer.assessment_id == assessment_id, Question.set_id == dataset.question_set_id)
+        .filter(
+            Answer.assessment_id == assessment_id,
+            Question.set_id == dataset.question_set_id
+        )
         .all()
     )
 
@@ -123,6 +129,76 @@ def save_answer(assessment_id):
         return jsonify({"error": str(e)}), 500
 
 
+# Get saved answers
+@assessment_bp.route("/assessment/<int:assessment_id>/answers", methods=["GET"])
+def get_answers(assessment_id):
+    assessment = Assessment.query.get(assessment_id)
+    if not assessment:
+        return jsonify({"error": "Assessment not found"}), 404
+
+    answers = Answer.query.filter_by(assessment_id=assessment_id).all()
+    result = [
+        {"question_id": a.question_id, "answer_value": a.answer_value}
+        for a in answers
+    ]
+    return jsonify(result), 200
+
+
+# Get progress
+@assessment_bp.route("/assessment/<int:assessment_id>/progress", methods=["GET"])
+def get_progress(assessment_id):
+    assessment = Assessment.query.get(assessment_id)
+    if not assessment:
+        return jsonify({"error": "Assessment not found"}), 404
+
+    return jsonify({
+        "assessment_id": assessment.assessment_id,
+        "progress": assessment.progress,
+        "completed": assessment.completed
+    }), 200
+
+
+# Update progress manually
+@assessment_bp.route("/assessment/<int:assessment_id>/progress", methods=["PUT"])
+def update_progress(assessment_id):
+    data = request.get_json()
+    progress = data.get("progress")
+
+    assessment = Assessment.query.get(assessment_id)
+    if not assessment:
+        return jsonify({"error": "Assessment not found"}), 404
+
+    assessment.progress = float(progress or 0.0)
+    assessment.completed = assessment.progress >= 100.0
+    db.session.commit()
+
+    return jsonify({
+        "assessment_id": assessment.assessment_id,
+        "progress": assessment.progress,
+        "completed": assessment.completed
+    }), 200
+
+
+# Delete assessment
+@assessment_bp.route("/assessment/<int:assessment_id>", methods=["DELETE", "OPTIONS"])
+def delete_assessment(assessment_id):
+    if request.method == "OPTIONS":
+        return "", 200  # handle CORS preflight
+
+    assessment = Assessment.query.get(assessment_id)
+    if not assessment:
+        return jsonify({"error": "Assessment not found"}), 404
+
+    # Delete all associated answers first
+    Answer.query.filter_by(assessment_id=assessment_id).delete()
+
+    # Then delete the assessment itself
+    db.session.delete(assessment)
+    db.session.commit()
+
+    return jsonify({"success": True, "message": "Assessment deleted"}), 200
+
+
 # Submit assessment
 @assessment_bp.route("/submit_assessment/<int:assessment_id>", methods=["POST"])
 def submit_assessment(assessment_id):
@@ -152,6 +228,7 @@ def submit_assessment(assessment_id):
 
         dataset_list = [[d.stem_score, d.abm_score, d.humss_score] for d in dataset_entries]
         strand_list = [d.strand for d in dataset_entries]
+        print
 
         # Run KNN
         knn = KNN(sample_answers, dataset_list, strand_list, assessment.data_set_id)
@@ -159,9 +236,9 @@ def submit_assessment(assessment_id):
 
         # Save Results
         new_result = Results(
-            stem_score=strand_totals["STEM"],
-            abm_score=strand_totals["ABM"],
-            humss_score=strand_totals["HUMSS"],
+            stem_score=results["stem_score"],
+            abm_score=results["abm_score"],
+            humss_score=results["humss_score"],
             recommendation_description=f"Recommended strand: {results['recommendation']}",
             tie=results["tie"],
             assessment_id=assessment_id,

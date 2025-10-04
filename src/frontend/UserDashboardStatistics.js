@@ -18,7 +18,7 @@ import "./UserDashboardStatistics.css";
 
 export default function UserResultsDashboard() {
   const API_BASE_URL = process.env.REACT_APP_API_URL;
-
+  const COLORS = ["#4cafef", "#ff9800", "#8bc34a"];
   const [user, setUser] = useState(null);
   const [assessment, setAssessment] = useState(null);
   const [result, setResult] = useState(null);
@@ -51,18 +51,16 @@ export default function UserResultsDashboard() {
         const resultData = resultsRes.data;
         setResult(resultData);
 
-        // 5️⃣ Extract neighbors and compute pie chart
+        // ✅ Use backend-provided neighbor vote counts for pie chart
+        setPieData([
+          { name: "STEM", value: resultData.stem_score || 0 },
+          { name: "ABM", value: resultData.abm_score || 0 },
+          { name: "HUMSS", value: resultData.humss_score || 0 },
+        ]);
+
+        // Keep neighbors for table display
         if (resultData.neighbors) {
           setNeighbors(resultData.neighbors);
-          const counts = { STEM: 0, ABM: 0, HUMSS: 0 };
-          resultData.neighbors.forEach(n => {
-            if (n.strand in counts) counts[n.strand]++;
-          });
-          setPieData([
-            { name: "STEM", value: counts.STEM },
-            { name: "ABM", value: counts.ABM },
-            { name: "HUMSS", value: counts.HUMSS },
-          ]);
         }
 
         setLoading(false);
@@ -109,7 +107,7 @@ export default function UserResultsDashboard() {
                             {Object.entries(result.tie_info).map(([strand, weight]) => (
                               <tr key={strand}>
                                 <td>{strand.replace("_weight","").toUpperCase()}</td>
-                                <td>{Number(weight).toFixed(3)}</td>
+                                <td>{weight != null ? Number(weight).toFixed(3) : "N/A"}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -157,13 +155,13 @@ export default function UserResultsDashboard() {
                     </thead>
                     <tbody>
                       {neighbors
-                        .slice() // copy so we don’t mutate state
-                        .sort((a, b) => a.distance - b.distance) // ✅ ascending
+                        .slice()
+                        .sort((a, b) => a.distance - b.distance)
                         .map((n, index) => (
                           <tr key={`${n.neighbors_id || index}-${n.strand}`}>
                             <td>{index + 1}</td>
                             <td>{n.strand}</td>
-                            <td>{n.distance.toFixed(3)}</td>
+                            <td>{n.distance != null ? n.distance.toFixed(3) : "0.000"}</td>
                           </tr>
                       ))}
                     </tbody>
@@ -185,11 +183,11 @@ export default function UserResultsDashboard() {
                         cy="50%"
                         outerRadius={90}
                         dataKey="value"
-                        label={({ name, percent }) => `${name} ${(percent*100).toFixed(0)}%`}
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                       >
-                        <Cell fill="#4cafef" />
-                        <Cell fill="#ff9800" />
-                        <Cell fill="#8bc34a" />
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
                       </Pie>
                       <Tooltip />
                       <Legend />
