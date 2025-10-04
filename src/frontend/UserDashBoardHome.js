@@ -2,27 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import UserDashboardSidebar from './component/UserDashboardSidebar';
+import UserDashboardHeader from './component/UserDashboardHeader';
 import './UserDashBoardHome.css';
-
-const Header = () => (
-  <div className="user-dashboard-header">
-    <div className="user-dashboard-logo-section">
-      <div className="user-dashboard-logo">
-        <span className="user-dashboard-graduation-cap">🎓</span>
-        <span className="user-dashboard-logo-text">PathFinder</span>
-      </div>
-    </div>
-    <div className="user-dashboard-header-actions">
-      <button className="user-dashboard-create-btn">+ Create</button>
-      <div className="user-dashboard-profile-avatar">
-        <img
-          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face"
-          alt="Profile"
-        />
-      </div>
-    </div>
-  </div>
-);
 
 const UserDashBoardHome = () => {
   const navigate = useNavigate();
@@ -98,12 +79,13 @@ const UserDashBoardHome = () => {
   const goToCareerMatch = () => {
     if (result) navigate(`/userdashboardcareers`);
   };
-    const goToCourseMatch = () => {
+  const goToCourseMatch = () => {
     if (result) navigate(`/userdashboardcourses`);
   };
+
   return (
     <div className="user-dashboard-container">
-      <Header />
+      <UserDashboardHeader />
       <div className="user-dashboard-main-layout">
         <UserDashboardSidebar activeItem="Dashboard" />
         <div className="user-dashboard-main-content">

@@ -6,45 +6,12 @@
 }
 
 /* Loading Animations */
-@keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes fadeInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -56,6 +23,24 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
   }
 }
 
@@ -71,71 +56,6 @@ body {
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.6s ease-out;
-}
-
-/* Header Styles */
-.courses-header {
-  background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(27,17,139,0.85));
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  animation: slideDown 0.8s ease-out;
-}
-
-.courses-logo-section {
-  display: flex;
-  align-items: center;
-  animation: fadeInLeft 1s ease-out 0.2s both;
-}
-
-.courses-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.courses-graduation-cap {
-  background: white;
-  border-radius: 6px;
-  padding: 4px 6px;
-  font-size: 1.2rem;
-}
-
-.courses-logo-text {
-  color: white;
-}
-
-.courses-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  animation: fadeInRight 1s ease-out 0.2s both;
-}
-
-.courses-create-btn {
-  background: rgba(59, 130, 246, 0.8);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  color: white;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.courses-create-btn:hover {
-  background: rgba(59, 130, 246, 1);
-  transform: translateY(-1px);
-}
-
-.courses-profile-avatar img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Main Layout */
@@ -154,6 +74,86 @@ body {
   animation: fadeIn 1s ease-out 0.3s both;
 }
 
+/* Loading State */
+.courses-loading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2rem;
+  gap: 1.5rem;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e5e7eb;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.courses-loading p {
+  font-size: 1.1rem;
+  color: #6b7280;
+}
+
+/* Locked State */
+.courses-locked {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  animation: fadeInUp 1s ease-out;
+}
+
+.courses-locked-icon {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.courses-locked-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+}
+
+.courses-locked-text {
+  font-size: 1.1rem;
+  color: #6b7280;
+  max-width: 600px;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.courses-locked-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.courses-locked-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+}
+
+.courses-locked-btn:active {
+  transform: translateY(0);
+}
+
 /* Footer */
 .courses-footer {
   background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(27,17,139,0.85));
@@ -169,45 +169,62 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .courses-header {
-    padding: 1rem;
-  }
-  
-  .courses-logo {
-    font-size: 1.3rem;
-  }
-  
-  .courses-create-btn {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-  }
-  
   .courses-main-layout {
     flex-direction: column;
+  }
+
+  .courses-locked {
+    padding: 3rem 1.5rem;
+  }
+
+  .courses-locked-icon {
+    font-size: 4rem;
+  }
+
+  .courses-locked-title {
+    font-size: 1.6rem;
+  }
+
+  .courses-locked-text {
+    font-size: 1rem;
+  }
+
+  .courses-locked-btn {
+    padding: 0.9rem 2rem;
+    font-size: 1rem;
   }
 }
 
 @media (max-width: 480px) {
-  .courses-header {
-    padding: 0.8rem;
+  .courses-locked {
+    padding: 2rem 1rem;
   }
-  
-  .courses-logo {
-    font-size: 1.1rem;
+
+  .courses-locked-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
   }
-  
-  .courses-graduation-cap {
-    padding: 3px 5px;
+
+  .courses-locked-title {
+    font-size: 1.4rem;
+  }
+
+  .courses-locked-text {
+    font-size: 0.95rem;
+  }
+
+  .courses-locked-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+
+  .courses-loading p {
     font-size: 1rem;
-  }
-  
-  .courses-create-btn {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.8rem;
-  }
-  
-  .courses-profile-avatar img {
-    width: 32px;
-    height: 32px;
   }
 }

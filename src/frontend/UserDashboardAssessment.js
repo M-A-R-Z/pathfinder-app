@@ -2,28 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import UserDashboardSidebar from "./component/UserDashboardSidebar";
+import UserDashboardHeader from "./component/UserDashboardHeader";
 import "./UserDashboardAssessment.css";
-
-// Header Component
-const Header = () => (
-  <div className="assessment-header">
-    <div className="assessment-logo-section">
-      <div className="assessment-logo">
-        <span className="assessment-graduation-cap">🎓</span>
-        <span className="assessment-logo-text">PathFinder</span>
-      </div>
-    </div>
-    <div className="assessment-header-actions">
-      <button className="assessment-create-btn">+ Create</button>
-      <div className="assessment-profile-avatar">
-        <img
-          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face"
-          alt="Profile"
-        />
-      </div>
-    </div>
-  </div>
-);
 
 const UserDashboardAssessment = () => {
   const navigate = useNavigate();
@@ -93,7 +73,7 @@ const UserDashboardAssessment = () => {
 
   return (
     <div className="assessment-container">
-      <Header />
+      <UserDashboardHeader />
       <div className="assessment-main-layout">
         <UserDashboardSidebar activeItem="Assessment" />
         <div className="assessment-main-content">

@@ -2,31 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import UserDashboardSidebar from './component/UserDashboardSidebar';
+import UserDashboardHeader from './component/UserDashboardHeader';
 import UserDashboardCoursesSTEM from './component/UserDashboardCoursesSTEM';
 import UserDashboardCoursesABM from './component/UserDashboardCoursesABM';
 import UserDashboardCoursesHUMSS from './component/UserDashboardCoursesHUMSS';
 import './UserDashboardCourses.css';
-
-// Header Component
-const Header = () => (
-  <div className="courses-header">
-    <div className="courses-logo-section">
-      <div className="courses-logo">
-        <span className="courses-graduation-cap">🎓</span>
-        <span className="courses-logo-text">PathFinder</span>
-      </div>
-    </div>
-    <div className="courses-header-actions">
-      <button className="courses-create-btn">+ Create</button>
-      <div className="courses-profile-avatar">
-        <img
-          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face"
-          alt="Profile"
-        />
-      </div>
-    </div>
-  </div>
-);
 
 const UserDashboardCourses = () => {
   const navigate = useNavigate();
@@ -69,9 +49,13 @@ const UserDashboardCourses = () => {
     if (!completed) {
       return (
         <div className="courses-locked">
-          <p>You need to complete the PathFinder Assessment first.</p>
+          <div className="courses-locked-icon">🔒</div>
+          <h2 className="courses-locked-title">Assessment Required</h2>
+          <p className="courses-locked-text">
+            You need to complete the PathFinder Assessment first to unlock your personalized course recommendations.
+          </p>
           <button
-            className="dashboard-action-btn"
+            className="courses-locked-btn"
             onClick={() => navigate('/userdashboardassessment')}
           >
             Take the Assessment
@@ -81,7 +65,11 @@ const UserDashboardCourses = () => {
     }
 
     if (!strand) {
-      return <p>No recommended strand found.</p>;
+      return (
+        <div className="courses-locked">
+          <p>No recommended strand found.</p>
+        </div>
+      );
     }
 
     switch (strand.toUpperCase()) {
@@ -92,17 +80,28 @@ const UserDashboardCourses = () => {
       case "HUMSS":
         return <UserDashboardCoursesHUMSS />;
       default:
-        return <p>Unknown strand: {strand}</p>;
+        return (
+          <div className="courses-locked">
+            <p>Unknown strand: {strand}</p>
+          </div>
+        );
     }
   };
 
   return (
     <div className="courses-container">
-      <Header />
+      <UserDashboardHeader />
       <div className="courses-main-layout">
         <UserDashboardSidebar activeItem="Courses" />
         <div className="courses-main-content">
-          {loading ? <p>Loading courses...</p> : renderCourses()}
+          {loading ? (
+            <div className="courses-loading">
+              <div className="loading-spinner"></div>
+              <p>Loading courses...</p>
+            </div>
+          ) : (
+            renderCourses()
+          )}
 
           {/* Footer */}
           <div className="courses-footer">

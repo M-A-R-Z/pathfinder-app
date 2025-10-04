@@ -1,0 +1,345 @@
+/* UserDashboardHeader Component Styles */
+
+/* Animations */
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header Container */
+.header-with-dropdown {
+  background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(27,17,139,0.85));
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideDown 0.8s ease-out;
+  position: relative;
+  overflow: visible;
+  z-index: 1000;
+}
+
+/* Logo Section */
+.header-logo-section {
+  display: flex;
+  align-items: center;
+  animation: fadeInLeft 1s ease-out 0.2s both;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.header-graduation-cap {
+  background: white;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 1.2rem;
+}
+
+.header-logo-text {
+  color: white;
+}
+
+/* Header Actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  animation: fadeInRight 1s ease-out 0.2s both;
+  position: relative;
+  overflow: visible;
+}
+
+/* Profile Container */
+.header-profile-container {
+  position: relative;
+  overflow: visible;
+}
+
+.header-profile-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.header-profile-avatar:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.header-profile-avatar:active {
+  transform: scale(0.98);
+}
+
+.default-avatar-icon {
+  width: 28px;
+  height: 28px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Dropdown Menu */
+.header-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  min-width: 200px;
+  overflow: hidden;
+  z-index: 10000;
+  animation: dropdownSlide 0.3s ease-out;
+}
+
+.header-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.2rem;
+  color: #1a202c;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-bottom: 1px solid #f1f5f9;
+  user-select: none;
+}
+
+.header-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.header-dropdown-item:hover {
+  background: #f8fafc;
+}
+
+.header-dropdown-item:active {
+  background: #f1f5f9;
+}
+
+.header-dropdown-item.logout {
+  color: #ef4444;
+}
+
+.header-dropdown-item.logout:hover {
+  background: #fef2f2;
+}
+
+.dropdown-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.header-dropdown-item.logout .dropdown-icon {
+  color: #ef4444;
+}
+
+/* Responsive Design - Tablet */
+@media (max-width: 1024px) {
+  .header-with-dropdown {
+    padding: 1rem 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-with-dropdown {
+    padding: 1rem;
+  }
+  
+  .header-logo {
+    font-size: 1.3rem;
+  }
+
+  .header-graduation-cap {
+    padding: 3px 5px;
+    font-size: 1.1rem;
+  }
+  
+  .header-create-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .header-actions {
+    gap: 0.75rem;
+  }
+
+  .header-profile-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .default-avatar-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .header-dropdown-menu {
+    min-width: 180px;
+  }
+
+  .header-dropdown-item {
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .dropdown-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Responsive Design - Mobile */
+@media (max-width: 480px) {
+  .header-with-dropdown {
+    padding: 0.8rem;
+  }
+  
+  .header-logo {
+    font-size: 1.1rem;
+  }
+  
+  .header-graduation-cap {
+    padding: 3px 5px;
+    font-size: 1rem;
+  }
+
+  .header-logo-text {
+    display: none; /* Hide "PathFinder" text on very small screens */
+  }
+  
+  .header-create-btn {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.85rem;
+  }
+
+  .header-actions {
+    gap: 0.5rem;
+  }
+  
+  .header-profile-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .default-avatar-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .header-dropdown-menu {
+    min-width: 160px;
+    right: -0.5rem;
+  }
+
+  .header-dropdown-item {
+    padding: 0.7rem 0.9rem;
+    font-size: 0.85rem;
+    gap: 0.5rem;
+  }
+
+  .dropdown-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* Extra Small Screens */
+@media (max-width: 360px) {
+  .header-with-dropdown {
+    padding: 0.6rem;
+  }
+
+  .header-logo {
+    font-size: 1rem;
+  }
+
+  .header-graduation-cap {
+    padding: 2px 4px;
+    font-size: 0.9rem;
+  }
+
+  .header-create-btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  .header-profile-avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .default-avatar-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .header-dropdown-menu {
+    min-width: 140px;
+  }
+
+  .header-dropdown-item {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .dropdown-icon {
+    width: 14px;
+    height: 14px;
+  }
+}

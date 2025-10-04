@@ -2,33 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import UserDashboardSidebar from './component/UserDashboardSidebar';
+import UserDashboardHeader from './component/UserDashboardHeader';
 import UserDashboardCareersSTEM from './component/UserDashboardCareersSTEM';
 import UserDashboardCareersABM from './component/UserDashboardCareersABM';
 import UserDashboardCareersHUMSS from './component/UserDashboardCareersHUMSS';
-import './UserDashboardCourses.css';
+import './UserDashboardCareers.css';
 
-// Header Component
-const Header = () => (
-  <div className="courses-header">
-    <div className="courses-logo-section">
-      <div className="courses-logo">
-        <span className="courses-graduation-cap">🎓</span>
-        <span className="courses-logo-text">PathFinder</span>
-      </div>
-    </div>
-    <div className="courses-header-actions">
-      <button className="courses-create-btn">+ Create</button>
-      <div className="courses-profile-avatar">
-        <img
-          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face"
-          alt="Profile"
-        />
-      </div>
-    </div>
-  </div>
-);
-
-const UserDashboardCourses = () => {
+const UserDashboardCareers = () => {
   const navigate = useNavigate();
   const [strand, setStrand] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -56,7 +36,7 @@ const UserDashboardCourses = () => {
           setStrand(resultRes.data.recommended_strand);
         }
       } catch (err) {
-        console.error("Error fetching results for courses:", err);
+        console.error("Error fetching results for careers:", err);
       } finally {
         setLoading(false);
       }
@@ -65,13 +45,17 @@ const UserDashboardCourses = () => {
     fetchResult();
   }, []);
 
-  const renderCourses = () => {
+  const renderCareers = () => {
     if (!completed) {
       return (
-        <div className="courses-locked">
-          <p>You need to complete the PathFinder Assessment first.</p>
+        <div className="careers-locked">
+          <div className="careers-locked-icon">🔒</div>
+          <h2 className="careers-locked-title">Assessment Required</h2>
+          <p className="careers-locked-text">
+            You need to complete the PathFinder Assessment first to unlock your personalized career recommendations.
+          </p>
           <button
-            className="dashboard-action-btn"
+            className="careers-locked-btn"
             onClick={() => navigate('/userdashboardassessment')}
           >
             Take the Assessment
@@ -81,7 +65,11 @@ const UserDashboardCourses = () => {
     }
 
     if (!strand) {
-      return <p>No recommended strand found.</p>;
+      return (
+        <div className="careers-locked">
+          <p>No recommended strand found.</p>
+        </div>
+      );
     }
 
     switch (strand.toUpperCase()) {
@@ -92,21 +80,32 @@ const UserDashboardCourses = () => {
       case "HUMSS":
         return <UserDashboardCareersHUMSS />;
       default:
-        return <p>Unknown strand: {strand}</p>;
+        return (
+          <div className="careers-locked">
+            <p>Unknown strand: {strand}</p>
+          </div>
+        );
     }
   };
 
   return (
-    <div className="courses-container">
-      <Header />
-      <div className="courses-main-layout">
-        <UserDashboardSidebar activeItem="Courses" />
-        <div className="courses-main-content">
-          {loading ? <p>Loading courses...</p> : renderCourses()}
+    <div className="careers-container">
+      <UserDashboardHeader />
+      <div className="careers-main-layout">
+        <UserDashboardSidebar activeItem="Careers" />
+        <div className="careers-main-content">
+          {loading ? (
+            <div className="careers-loading">
+              <div className="loading-spinner"></div>
+              <p>Loading careers...</p>
+            </div>
+          ) : (
+            renderCareers()
+          )}
 
           {/* Footer */}
-          <div className="courses-footer">
-            <p className="courses-copyright">
+          <div className="careers-footer">
+            <p className="careers-copyright">
               © 2025 PathFinder. All Rights Reserved.
             </p>
           </div>
@@ -116,4 +115,4 @@ const UserDashboardCourses = () => {
   );
 };
 
-export default UserDashboardCourses;
+export default UserDashboardCareers;

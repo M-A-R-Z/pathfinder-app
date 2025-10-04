@@ -1,472 +1,256 @@
 /* UserDashboardAssessment Styles */
 * {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 /* Loading Animations */
 @keyframes fadeInUp {
-from {
+  from {
     opacity: 0;
     transform: translateY(30px);
-}
-to {
+  }
+  to {
     opacity: 1;
     transform: translateY(0);
-}
-}
-
-@keyframes fadeInLeft {
-from {
-    opacity: 0;
-    transform: translateX(-30px);
-}
-to {
-    opacity: 1;
-    transform: translateX(0);
-}
-}
-
-@keyframes fadeInRight {
-from {
-    opacity: 0;
-    transform: translateX(30px);
-}
-to {
-    opacity: 1;
-    transform: translateX(0);
-}
+  }
 }
 
 @keyframes fadeIn {
-from {
+  from {
     opacity: 0;
-}
-to {
+  }
+  to {
     opacity: 1;
-}
-}
-
-@keyframes slideDown {
-from {
-    opacity: 0;
-    transform: translateY(-20px);
-}
-to {
-    opacity: 1;
-    transform: translateY(0);
-}
+  }
 }
 
 @keyframes scaleIn {
-from {
+  from {
     opacity: 0;
     transform: scale(0.9);
-}
-to {
+  }
+  to {
     opacity: 1;
     transform: scale(1);
-}
+  }
 }
 
 body {
-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-background: linear-gradient(135deg, #1a1b3a 0%, #2d1b69 50%, #4c1d95 100%);
-min-height: 100vh;
-color: white;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #1a1b3a 0%, #2d1b69 50%, #4c1d95 100%);
+  min-height: 100vh;
+  color: white;
 }
 
 .assessment-container {
-min-height: 100vh;
-display: flex;
-flex-direction: column;
-animation: fadeIn 0.6s ease-out;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.6s ease-out;
 }
 
-/* Header Styles (same as dashboard) */
-.assessment-header {
-background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(27,17,139,0.85));
-padding: 1rem 2rem;
-display: flex;
-justify-content: space-between;
-align-items: center;
-border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-animation: slideDown 0.8s ease-out;
-}
-
-.assessment-logo-section {
-display: flex;
-align-items: center;
-animation: fadeInLeft 1s ease-out 0.2s both;
-}
-
-.assessment-logo {
-display: flex;
-align-items: center;
-gap: 0.5rem;
-font-size: 1.5rem;
-font-weight: 700;
-}
-
-.assessment-graduation-cap {
-background: white;
-border-radius: 6px;
-padding: 4px 6px;
-font-size: 1.2rem;
-}
-
-.assessment-logo-text {
-color: white;
-}
-
-.assessment-header-actions {
-display: flex;
-align-items: center;
-gap: 1rem;
-animation: fadeInRight 1s ease-out 0.2s both;
-}
-
-.assessment-create-btn {
-background: rgba(59, 130, 246, 0.8);
-border: none;
-padding: 0.5rem 1rem;
-border-radius: 6px;
-color: white;
-cursor: pointer;
-transition: all 0.2s;
-}
-
-.assessment-create-btn:hover {
-background: rgba(59, 130, 246, 1);
-transform: translateY(-1px);
-}
-
-.assessment-notification-btn {
-background: transparent;
-border: none;
-color: white;
-padding: 0.5rem;
-border-radius: 6px;
-cursor: pointer;
-transition: all 0.2s;
-}
-
-.assessment-notification-btn:hover {
-background: rgba(255, 255, 255, 0.1);
-}
-
-.assessment-profile-avatar img {
-width: 40px;
-height: 40px;
-border-radius: 50%;
-border: 2px solid rgba(255, 255, 255, 0.2);
+/* Loading State */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.5rem;
+  color: white;
 }
 
 /* Main Layout */
 .assessment-main-layout {
-display: flex;
-flex: 1;
+  display: flex;
+  flex: 1;
 }
 
 /* Main Content */
 .assessment-main-content {
-flex: 1;
-background: white;
-color: #1a202c;
-display: flex;
-flex-direction: column;
-animation: fadeIn 1s ease-out 0.4s both;
+  flex: 1;
+  background: white;
+  color: #1a202c;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 1s ease-out 0.4s both;
 }
 
 .assessment-content-section {
-flex: 1;
-padding: 3rem 4rem;
-max-width: 1400px;
-margin: 0 auto;
-width: 100%;
+  flex: 1;
+  padding: 3rem 4rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .assessment-title {
-font-size: 2.5rem;
-font-weight: 700;
-text-align: center;
-margin-bottom: 4rem;
-color: #1a202c;
-animation: fadeInUp 1s ease-out 0.5s both;
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 4rem;
+  color: #1a202c;
+  animation: fadeInUp 1s ease-out 0.5s both;
 }
 
 /* Steps Grid */
 .assessment-steps-grid {
-display: grid;
-grid-template-columns: repeat(3, 1fr);
-gap: 2rem;
-margin-bottom: 4rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 4rem;
 }
 
 .assessment-step-card {
-background: white;
-border-radius: 16px;
-overflow: hidden;
-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-transition: all 0.3s ease;
-animation: fadeInUp 1s ease-out both;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  animation: fadeInUp 1s ease-out both;
 }
 
 .assessment-step-card:nth-child(1) {
-animation-delay: 0.6s;
+  animation-delay: 0.6s;
 }
 
 .assessment-step-card:nth-child(2) {
-animation-delay: 0.7s;
+  animation-delay: 0.7s;
 }
 
 .assessment-step-card:nth-child(3) {
-animation-delay: 0.8s;
+  animation-delay: 0.8s;
 }
 
 .assessment-step-card:hover {
-transform: translateY(-5px);
-box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 .step-header {
-height: 8px;
-position: relative;
+  height: 8px;
+  position: relative;
 }
 
 .step-1 {
-background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
 }
 
 .step-2 {
-background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
 }
 
 .step-3 {
-background: linear-gradient(90deg, #10b981, #059669);
+  background: linear-gradient(90deg, #10b981, #059669);
 }
 
 .step-number {
-position: absolute;
-top: 1rem;
-left: 1.5rem;
-background: white;
-color: #1a202c;
-padding: 0.3rem 0.8rem;
-border-radius: 12px;
-font-size: 0.75rem;
-font-weight: 600;
-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 1rem;
+  left: 1.5rem;
+  background: white;
+  color: #1a202c;
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .step-content {
-padding: 3rem 1.5rem 2rem;
-text-align: center;
+  padding: 3rem 1.5rem 2rem;
+  text-align: center;
 }
 
 .step-icon {
-display: flex;
-justify-content: center;
-align-items: center;
-margin-bottom: 1rem;
-height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  height: 80px;
 }
 
 .step-icon-image {
-width: 60px;
-height: 60px;
-object-fit: contain;
-filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-transition: transform 0.3s ease;
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease;
 }
 
 .assessment-step-card:hover .step-icon-image {
-transform: scale(1.1);
+  transform: scale(1.1);
 }
 
 .step-title {
-font-size: 1.25rem;
-font-weight: 600;
-margin-bottom: 1rem;
-color: #1a202c;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1a202c;
 }
 
 .step-description {
-color: #6b7280;
-line-height: 1.6;
-font-size: 0.95rem;
+  color: #6b7280;
+  line-height: 1.6;
+  font-size: 0.95rem;
 }
 
 /* Take Assessment Button */
 .assessment-action-section {
-text-align: center;
-animation: fadeInUp 1s ease-out 0.9s both;
+  text-align: center;
+  animation: fadeInUp 1s ease-out 0.9s both;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .assessment-option-btn {
-background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-border: none;
-padding: 1.2rem 3rem;
-border-radius: 50px;
-color: white;
-font-size: 1.1rem;
-font-weight: 600;
-cursor: pointer;
-transition: all 0.3s;
-box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border: none;
+  padding: 1.2rem 3rem;
+  border-radius: 50px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
 .assessment-option-btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
 }
 
 /* Footer */
 .assessment-footer {
-background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(27,17,139,0.85));
-padding: 2rem;
-text-align: center;
-animation: fadeInUp 1s ease-out 1s both;
+  background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(27,17,139,0.85));
+  padding: 2rem;
+  text-align: center;
+  animation: fadeInUp 1s ease-out 1s both;
 }
 
 .assessment-copyright {
-color: rgba(255, 255, 255, 0.7);
-font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-.assessment-content-section {
-    padding: 2rem 3rem;
-}
-
-.assessment-steps-grid {
-    gap: 1.5rem;
-}
-}
-
-@media (max-width: 1024px) {
-.assessment-steps-grid {
-    grid-template-columns: 1fr;
-    max-width: 500px;
-    margin: 0 auto 4rem;
-}
-
-.assessment-title {
-    font-size: 2.2rem;
-}
-
-.assessment-content-section {
-    padding: 2rem;
-}
-}
-
-@media (max-width: 768px) {
-.assessment-header {
-    padding: 1rem;
-}
-
-.assessment-logo {
-    font-size: 1.3rem;
-}
-
-.assessment-create-btn {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-}
-
-.assessment-main-layout {
-    flex-direction: column;
-}
-
-.assessment-content-section {
-    padding: 1.5rem 1rem;
-}
-
-.assessment-title {
-    font-size: 1.8rem;
-    margin-bottom: 2rem;
-}
-
-.step-content {
-    padding: 2rem 1rem 1.5rem;
-}
-
-.step-title {
-    font-size: 1.1rem;
-}
-
-.step-description {
-    font-size: 0.9rem;
-}
-
-.assessment-option-btn {
-    padding: 1rem 2rem;
-    font-size: 1rem;
-}
-}
-
-@media (max-width: 480px) {
-.assessment-header {
-    padding: 0.8rem;
-}
-
-.assessment-logo {
-    font-size: 1.1rem;
-}
-
-.assessment-graduation-cap {
-    padding: 3px 5px;
-    font-size: 1rem;
-}
-
-.assessment-create-btn {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.8rem;
-}
-
-.assessment-content-section {
-    padding: 1rem 0.8rem;
-}
-
-.assessment-title {
-    font-size: 1.5rem;
-}
-
-.step-content {
-    padding: 1.5rem 0.8rem 1rem;
-}
-
-.step-icon-image {
-    width: 50px;
-    height: 50px;
-}
-
-.assessment-option-btn {
-    padding: 0.8rem 1.5rem;
-    font-size: 0.9rem;
-}
-
-.assessment-profile-avatar img {
-    width: 32px;
-    height: 32px;
-}
-}
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999; /* on top of everything */
+  z-index: 9999;
 }
 
-/* Modal content box */
 .modal-content {
   background-color: #fff;
   padding: 30px 25px;
@@ -478,21 +262,18 @@ font-size: 0.9rem;
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Modal message */
 .modal-content p {
   font-size: 16px;
   margin-bottom: 25px;
   color: #333;
 }
 
-/* Modal buttons container */
 .modal-actions {
   display: flex;
   justify-content: space-between;
   gap: 10px;
 }
 
-/* Modal buttons */
 .modal-actions button {
   flex: 1;
   padding: 10px 0;
@@ -503,7 +284,6 @@ font-size: 0.9rem;
   transition: background-color 0.2s ease;
 }
 
-/* Cancel button */
 .modal-actions button:first-child {
   background-color: #e0e0e0;
   color: #333;
@@ -513,7 +293,6 @@ font-size: 0.9rem;
   background-color: #d5d5d5;
 }
 
-/* Confirm/Retake button */
 .modal-actions button:last-child {
   background-color: #4caf50;
   color: #fff;
@@ -523,8 +302,93 @@ font-size: 0.9rem;
   background-color: #43a047;
 }
 
-/* Simple fadeIn animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .assessment-content-section {
+    padding: 2rem 3rem;
+  }
+
+  .assessment-steps-grid {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .assessment-steps-grid {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    margin: 0 auto 4rem;
+  }
+
+  .assessment-title {
+    font-size: 2.2rem;
+  }
+
+  .assessment-content-section {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .assessment-main-layout {
+    flex-direction: column;
+  }
+
+  .assessment-content-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .assessment-title {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+  }
+
+  .step-content {
+    padding: 2rem 1rem 1.5rem;
+  }
+
+  .step-title {
+    font-size: 1.1rem;
+  }
+
+  .step-description {
+    font-size: 0.9rem;
+  }
+
+  .assessment-option-btn {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .assessment-content-section {
+    padding: 1rem 0.8rem;
+  }
+
+  .assessment-title {
+    font-size: 1.5rem;
+  }
+
+  .step-content {
+    padding: 1.5rem 0.8rem 1rem;
+  }
+
+  .step-icon-image {
+    width: 50px;
+    height: 50px;
+  }
+
+  .assessment-option-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .modal-content {
+    padding: 20px 15px;
+  }
+
+  .modal-content p {
+    font-size: 14px;
+  }
 }
