@@ -1,9 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './css/UserDashboardHeader.css';
 
 const UserDashboardHeader = () => {
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [avatar, setAvatar] = useState('');
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/me', {
+          withCredentials: true
+        });
+        setAvatar(response.data.avatar_url || '');
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const toggleDropdown = () => {
     console.log('Dropdown toggled:', !isDropdownOpen);
@@ -27,15 +46,13 @@ const UserDashboardHeader = () => {
   const handleProfile = () => {
     console.log('Navigate to Profile');
     setIsDropdownOpen(false);
-    // Add your navigation logic here
-    // navigate('/profile');
+    navigate('/userdashboardprofile');
   };
 
   const handleSettings = () => {
     console.log('Navigate to Settings');
     setIsDropdownOpen(false);
-    // Add your navigation logic here
-    // navigate('/settings');
+    navigate('/userdashboardsettings');
   };
 
   const handleLogout = () => {
@@ -59,14 +76,22 @@ const UserDashboardHeader = () => {
             className="header-profile-avatar" 
             onClick={toggleDropdown}
           >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              viewBox="0 0 24 24" 
-              fill="currentColor"
-              className="default-avatar-icon"
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-            </svg>
+            {avatar ? (
+              <img 
+                src={avatar} 
+                alt="Profile" 
+                className="header-avatar-image"
+              />
+            ) : (
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 24 24" 
+                fill="currentColor"
+                className="default-avatar-icon"
+              >
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+              </svg>
+            )}
           </div>
           
           {isDropdownOpen && (
