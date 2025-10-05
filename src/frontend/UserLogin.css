@@ -49,19 +49,6 @@
   gap: 12px;
 }
 
-.login-logo-icon {
-  font-size: 32px;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
-}
-
-.login-logo-text {
-  font-size: 28px;
-  font-weight: 700;
-  color: white;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  letter-spacing: -0.5px;
-}
-
 /* Main content */
 .login-main {
   display: flex;

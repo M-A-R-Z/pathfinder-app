@@ -4,6 +4,7 @@ import './UserLandingPage.css';
 import AboutUs1 from '../assets/About Us 1.png';
 import AboutUs2 from '../assets/About Us 2.png';
 import AboutUs3 from '../assets/About Us 3.png';
+import logo from '../assets/logo.png';
 
 const UserLandingPage = () => {
   const [email, setEmail] = useState('');
@@ -168,7 +169,7 @@ const UserLandingPage = () => {
         <div className="container">
           <div className="nav">
             <div className="logo" onClick={(e) => scrollToSection('home', e)}>
-              <span className="logo-icon">🎓</span>
+              <span className="logo-icon"><img src = {logo} alt="Logo"></img></span>
               <span className="logo-text">Strandify</span>
             </div>
             

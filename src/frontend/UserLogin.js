@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './UserLogin.css';
 import LoginIcon from '../assets/Login 1.png';
+import logo from '../assets/logo.png';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
@@ -96,8 +97,6 @@ const UserLogin = ({ onClose }) => {
       {/* Logo */}
       <div className="login-header">
         <div className="login-logo">
-          <span className="login-logo-icon">🎓</span>
-          <span className="login-logo-text">Strandify</span>
         </div>
       </div>
 
