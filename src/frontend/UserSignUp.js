@@ -63,6 +63,7 @@ const UserSignUp = ({ onClose }) => {
 
     setIsLoading(true);
     try {
+      console.log("Submitting signup:", formData);
       const res = await axios.post(
         `${API_BASE_URL}/signup`,
         { 
