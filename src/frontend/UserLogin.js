@@ -97,7 +97,7 @@ const UserLogin = ({ onClose }) => {
       <div className="login-header">
         <div className="login-logo">
           <span className="login-logo-icon">🎓</span>
-          <span className="login-logo-text">PathFinder</span>
+          <span className="login-logo-text">Strandify</span>
         </div>
       </div>
 
