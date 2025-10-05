@@ -2,9 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './css/UserDashboardHeader.css';
 import defaultAvatar from '../../assets/defaultAvatar.png';
+import axios from 'axios';
 
 const UserDashboardHeader = () => {
   const navigate = useNavigate();
+  const API_BASE_URL = 'http://localhost:5000';
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -39,10 +42,22 @@ const UserDashboardHeader = () => {
     navigate('/userdashboardsettings');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     console.log('Log out');
-    setIsDropdownOpen(false);
-    // navigate('/login');
+    try {
+      const res = await axios.post(
+        `${API_BASE_URL}/logout`,
+        {},
+        { withCredentials: true }
+      );
+
+      if (res.data.success) {
+        navigate(res.data.redirect || "/");
+      }
+    } catch (err) {
+      console.error("Logout failed", err);
+      alert("Logout failed: " + (err.response?.data?.error || err.message));
+    }
   };
 
   return (
@@ -90,7 +105,7 @@ const UserDashboardHeader = () => {
                 </svg>
                 <span>Change Password</span>
               </div>
-              <div className="header-dropdown-item logout" onClick={handleLogout}>
+              <div className="header-dropdown-item logout" onClick={() => setShowLogoutModal(true)}>
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
                   viewBox="0 0 24 24" 
@@ -105,6 +120,18 @@ const UserDashboardHeader = () => {
           )}
         </div>
       </div>
+      {showLogoutModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout?</p>
+            <div className="modal-actions">
+              <button onClick={() => setShowLogoutModal(false)}>Cancel</button>
+              <button className="logout-button" onClick={handleLogout}>Logout</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

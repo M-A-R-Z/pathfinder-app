@@ -351,3 +351,124 @@
     height: 14px;
   }
 }
+
+/* Overlay to cover the entire screen */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20000; /* Higher than everything else */
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Modal container */
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  animation: slideDown 0.3s ease-out;
+  position: relative;
+}
+
+/* Modal Heading */
+.modal h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #1a202c;
+}
+
+/* Modal Paragraph */
+.modal p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  color: #4b5563;
+}
+
+/* Modal Actions (buttons container) */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Cancel Button */
+.modal-actions button:first-child {
+  background: #f3f4f6;
+  color: #1f2937;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-actions button:first-child:hover {
+  background: #e5e7eb;
+}
+
+/* Logout Button */
+.logout-button {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logout-button:hover {
+  background: #dc2626;
+}
+
+/* ---------------- Animations ---------------- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+@media (max-width: 480px) {
+  .modal {
+    width: 90%;
+    padding: 1.5rem 1rem;
+  }
+
+  .modal h3 {
+    font-size: 1.25rem;
+  }
+
+  .modal p {
+    font-size: 0.95rem;
+  }
+
+  .modal-actions button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}

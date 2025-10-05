@@ -7,32 +7,18 @@
 
 /* Animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 body {
@@ -186,41 +172,59 @@ body {
   padding-right: 2.5rem;
 }
 
-/* Save Section */
+/* Save & Revert Section */
 .profile-save-section {
   display: flex;
   justify-content: center;
   margin-top: 2rem;
   padding-top: 2rem;
   border-top: 2px solid #e5e7eb;
+  gap: 12px;
 }
 
+/* Save button */
 .profile-save-btn {
-  background: linear-gradient(135deg, #1a1b3a, #2d1b69);
-  border: none;
-  padding: 1rem 3rem;
-  border-radius: 12px;
+  background-color: #4cafef;
   color: white;
-  font-size: 1.1rem;
-  font-weight: 700;
+  border: none;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 6px 20px rgba(26, 27, 58, 0.4);
+  transition: background-color 0.2s ease;
 }
 
-.profile-save-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(26, 27, 58, 0.6);
+.profile-save-btn:hover:not(:disabled) {
+  background-color: #3a9ad9;
 }
 
 .profile-save-btn:disabled {
-  opacity: 0.6;
+  background-color: #bcdff8;
   cursor: not-allowed;
-  transform: none;
 }
 
-.profile-save-btn:active:not(:disabled) {
-  transform: translateY(0);
+/* Revert button */
+.profile-revert-btn {
+  background-color: transparent;
+  color: #e74c3c;
+  border: 2px solid #e74c3c;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-revert-btn:hover:not(:disabled) {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.profile-revert-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Footer */
@@ -234,6 +238,106 @@ body {
 .profile-copyright {
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
+}
+
+/* Confirmation Modal */
+.confirm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.confirm-modal-box {
+  background: #fff;
+  padding: 20px 25px;
+  border-radius: 8px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0px 6px 18px rgba(0,0,0,0.25);
+  text-align: left;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.confirm-modal-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #333;
+  text-align: center;
+}
+
+.confirm-changes-list {
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+.confirm-change-item {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.confirm-change-label {
+  font-weight: bold;
+  margin-right: 6px;
+  color: #444;
+}
+
+.confirm-change-old {
+  color: #d9534f;
+  text-decoration: line-through;
+  margin-right: 6px;
+}
+
+.confirm-change-new {
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.confirm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.confirm-btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+
+.confirm-btn.cancel {
+  background: #bdc3c7;
+  color: #2c3e50;
+}
+
+.confirm-btn.confirm {
+  background: #27ae60;
+  color: white;
+}
+
+.confirm-btn.cancel:hover {
+  background: #95a5a6;
+}
+.confirm-btn.confirm:hover {
+  background: #219150;
+}
+.modal-close-btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  background: #bdc3c7;
+  color: #2c3e50;
 }
 
 /* Responsive Design */
@@ -283,7 +387,8 @@ body {
     font-size: 0.95rem;
   }
 
-  .profile-save-btn {
+  .profile-save-btn,
+  .profile-revert-btn {
     padding: 0.9rem 2rem;
     font-size: 1rem;
   }
@@ -316,11 +421,6 @@ body {
   .profile-select {
     padding: 0.6rem 0.8rem;
     font-size: 0.9rem;
-  }
-
-  .profile-save-btn {
-    padding: 0.8rem 1.5rem;
-    font-size: 0.95rem;
   }
 
   .loading-spinner {

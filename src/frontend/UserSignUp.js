@@ -52,6 +52,10 @@ const UserSignUp = ({ onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (formData.password.length < 8) {
+      alert("Password must be at least 8 characters long!");
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
@@ -232,6 +236,7 @@ const UserSignUp = ({ onClose }) => {
                     placeholder="Password"
                     className="signup-input"
                     required
+                    minLength={8}
                   />
                   <button
                     type="button"
@@ -257,6 +262,7 @@ const UserSignUp = ({ onClose }) => {
                     placeholder="Confirm Password"
                     className="signup-input"
                     required
+                    minLength={8}
                   />
                   <button
                     type="button"
@@ -289,7 +295,7 @@ const UserSignUp = ({ onClose }) => {
         mode="signup"
         onSuccess={() => {
           alert("Signup complete, email verified!");
-          navigate('/userlogin');
+          navigate('/userdashboardhome');
         }}
       />
     </div>

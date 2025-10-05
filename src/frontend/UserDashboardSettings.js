@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import UserDashboardSidebar from './component/UserDashboardSidebar';
 import UserDashboardHeader from './component/UserDashboardHeader';
+import OTPModal from './component/OTPModal';
 import './UserDashboardSettings.css';
 
 const UserDashboardSettings = () => {
-  const navigate = useNavigate();
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
   const [saving, setSaving] = useState(false);
   const [showPassword, setShowPassword] = useState({
     current: false,
@@ -19,6 +19,22 @@ const UserDashboardSettings = () => {
     newPassword: '',
     confirmPassword: ''
   });
+
+  const [showOTPModal, setShowOTPModal] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+
+  // fetch logged in user info
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
+        setUserInfo(res.data);
+      } catch (err) {
+        console.error("Failed to fetch user info:", err);
+      }
+    };
+    fetchUser();
+  }, [API_BASE_URL]);
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
@@ -35,7 +51,7 @@ const UserDashboardSettings = () => {
     }));
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     // Validation
     if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
       alert('Please fill in all password fields!');
@@ -52,29 +68,7 @@ const UserDashboardSettings = () => {
       return;
     }
 
-    setSaving(true);
-    try {
-      await axios.put('http://localhost:5000/settings', {
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword
-      }, {
-        withCredentials: true
-      });
-      
-      alert('Password updated successfully!');
-      
-      // Clear password fields after successful update
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
-    } catch (error) {
-      console.error('Error saving settings:', error);
-      alert(error.response?.data?.message || 'Failed to update password. Please try again.');
-    } finally {
-      setSaving(false);
-    }
+    setShowOTPModal(true);
   };
 
   return (
@@ -92,7 +86,7 @@ const UserDashboardSettings = () => {
               {/* Change Password Section */}
               <div className="settings-section">
                 <div className="settings-form-group">
-                  <label className="settings-label">Change Password:</label>
+                  <label className="settings-label">Current Password:</label>
                   <div className="settings-password-wrapper">
                     <input
                       type={showPassword.current ? "text" : "password"}
@@ -101,29 +95,21 @@ const UserDashboardSettings = () => {
                       onChange={handlePasswordChange}
                       className="settings-input"
                       placeholder="**************"
+                      minLength={8}
+                      required
                     />
                     <button
                       type="button"
                       className="settings-password-toggle"
                       onClick={() => togglePasswordVisibility('current')}
                     >
-                      {showPassword.current ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
-                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                          <line x1="1" y1="1" x2="23" y2="23"></line>
-                        </svg>
-                      ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                      )}
+                      👁
                     </button>
                   </div>
                 </div>
 
                 <div className="settings-form-group">
-                  <label className="settings-label">Confirm Password:</label>
+                  <label className="settings-label">New Password:</label>
                   <div className="settings-password-wrapper">
                     <input
                       type={showPassword.new ? "text" : "password"}
@@ -132,23 +118,38 @@ const UserDashboardSettings = () => {
                       onChange={handlePasswordChange}
                       className="settings-input"
                       placeholder="**************"
+                      minLength={8}
+                      required                    
                     />
                     <button
                       type="button"
                       className="settings-password-toggle"
                       onClick={() => togglePasswordVisibility('new')}
                     >
-                      {showPassword.new ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
-                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                          <line x1="1" y1="1" x2="23" y2="23"></line>
-                        </svg>
-                      ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                      )}
+                      👁
+                    </button>
+                  </div>
+                </div>
+
+                <div className="settings-form-group">
+                  <label className="settings-label">Confirm Password:</label>
+                  <div className="settings-password-wrapper">
+                    <input
+                      type={showPassword.confirm ? "text" : "password"}
+                      name="confirmPassword"
+                      value={passwordData.confirmPassword}
+                      onChange={handlePasswordChange}
+                      className="settings-input"
+                      placeholder="**************"
+                      minLength={8}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="settings-password-toggle"
+                      onClick={() => togglePasswordVisibility('confirm')}
+                    >
+                      👁
                     </button>
                   </div>
                 </div>
@@ -172,6 +173,30 @@ const UserDashboardSettings = () => {
           </div>
         </div>
       </div>
+
+      {/* ✅ OTP Modal for Password Change */}
+      {showOTPModal && (
+        <OTPModal
+          isOpen={showOTPModal}
+          onClose={() => setShowOTPModal(false)}
+          mode="forgot"   // or "change", depending on your backend logic
+          formData={{
+            email: userInfo?.email,
+            currentPassword: passwordData.currentPassword,
+            newPassword: passwordData.newPassword,
+            confirmPassword: passwordData.confirmPassword
+          }}
+          onSuccess={() => {
+            setShowOTPModal(false);
+            setPasswordData({
+              currentPassword: '',
+              newPassword: '',
+              confirmPassword: ''
+            });
+
+          }}
+        />
+      )}
     </div>
   );
 };

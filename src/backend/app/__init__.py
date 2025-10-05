@@ -23,8 +23,10 @@ def create_app():
     # Register your blueprints
     from app.routes.auth import auth_bp
     app.register_blueprint(auth_bp)
+
     from app.routes.courses import courses_bp
     app.register_blueprint(courses_bp)
+
     from app.routes.progress import progress_bp
     app.register_blueprint(progress_bp)
 
@@ -33,11 +35,15 @@ def create_app():
 
     from app.routes.dataManagement import dataset_bp
     app.register_blueprint(dataset_bp)
+
     from app.routes.assessment import assessment_bp
     app.register_blueprint(assessment_bp)
+
     from app.routes.results import results_bp
     app.register_blueprint(results_bp)
 
+    from app.routes.userManagement import userManagement_bp
+    app.register_blueprint(userManagement_bp)
     
     frontend_url = os.getenv("FRONTEND_URL")  
     CORS(
