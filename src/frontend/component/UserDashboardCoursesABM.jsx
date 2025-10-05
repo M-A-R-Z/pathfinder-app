@@ -17,10 +17,10 @@ const CourseCard = ({ title, duration, description, matchPercentage, matchText }
         <div className="abm-progress-bar-container">
           <div 
             className="abm-progress-bar-fill" 
-            style={{ width: `${matchPercentage}%` }}
+            style={{ width: `100%` }}
           />
         </div>
-        <p className="abm-match-text">{matchPercentage}% Match - {matchText}</p>
+        <p className="abm-match-text">{matchText}</p>
       </div>
     </div>
   );
@@ -33,28 +33,24 @@ const UserDashboardCoursesABM = () => {
       title: "BS Accountancy",
       duration: "4 Years",
       description: "Financial accounting, auditing, taxation, and business law.",
-      matchPercentage: 95,
       matchText: "Perfect for analytical business minds!"
     },
     {
       title: "BS Hospitality Management",
       duration: "4 Years",
       description: "Hotel operations, food service management, and customer relations.",
-      matchPercentage: 88,
       matchText: "Great for people-focused business!"
     },
     {
       title: "BS Tourism Management",
       duration: "4 Years",
       description: "Travel industry operations, destination marketing, and event management.",
-      matchPercentage: 92,
       matchText: "Perfect for travel industry careers!"
     },
     {
       title: "BS Legal Management",
       duration: "6+ Years",
       description: "Business law, legal procedures, and regulatory compliance.",
-      matchPercentage: 80,
       matchText: "Excellent pre-law preparation!"
     }
   ];

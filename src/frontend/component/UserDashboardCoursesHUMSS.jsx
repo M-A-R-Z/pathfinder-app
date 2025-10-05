@@ -17,10 +17,10 @@ const CourseCard = ({ title, duration, description, matchPercentage, matchText }
         <div className="humss-progress-bar-container">
           <div 
             className="humss-progress-bar-fill" 
-            style={{ width: `${matchPercentage}%` }}
+            style={{ width: `100%` }}
           />
         </div>
-        <p className="humss-match-text">{matchPercentage}% Match - {matchText}</p>
+        <p className="humss-match-text">{matchText}</p>
       </div>
     </div>
   );
@@ -33,28 +33,24 @@ const UserDashboardCoursesHUMSS = () => {
       title: "BS Psychology",
       duration: "4 years",
       description: "Human behavior, mental processes, counseling, and psychological research",
-      matchPercentage: 95,
       matchText: "Perfect for understanding people!"
     },
     {
       title: "Bachelor of Elementary Education",
       duration: "4 years",
       description: "Child development, teaching methods, and elementary curriculum design",
-      matchPercentage: 88,
       matchText: "Great if you want to shape young minds!"
     },
     {
       title: "BA Broadcasting",
       duration: "4 years",
       description: "Media production, journalism, communication arts, and broadcasting techniques",
-      matchPercentage: 92,
       matchText: "Perfect if you want to tell important stories!"
     },
     {
       title: "BA Political Science",
       duration: "4 years",
       description: "Government systems, public policy, international relations, and political theory",
-      matchPercentage: 88,
       matchText: "Perfect if you want to lead social change!"
     }
   ];

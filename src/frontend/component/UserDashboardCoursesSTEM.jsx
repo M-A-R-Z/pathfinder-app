@@ -17,10 +17,10 @@ const CourseCard = ({ title, duration, description, matchPercentage, matchText }
         <div className="stem-progress-bar-container">
           <div 
             className="stem-progress-bar-fill" 
-            style={{ width: `${matchPercentage}%` }}
+            style={{ width: `100%` }}
           />
         </div>
-        <p className="stem-match-text">{matchPercentage}% Match - {matchText}</p>
+        <p className="stem-match-text">{matchText}</p>
       </div>
     </div>
   );
@@ -33,28 +33,24 @@ const UserDashboardCoursesSTEM = () => {
       title: "BS Computer Science",
       duration: "4 Years",
       description: "Programming, App Development, Artificial Intelligence, Software Engineering.",
-      matchPercentage: 95,
       matchText: "Perfect for tech enthusiasts and Programmers!"
     },
     {
       title: "BS Civil Engineering",
       duration: "4 Years",
       description: "Designing Infrastructure projects, building roads, buildings, and bridges.",
-      matchPercentage: 90,
       matchText: "Great for problem solvers and world builders!"
     },
     {
       title: "BS Data Science",
       duration: "4 Years",
       description: "Analyzing Big Data, creating Predictions, and help companies make Smart Decisions.",
-      matchPercentage: 92,
       matchText: "Perfect for math lovers!"
     },
     {
       title: "Doctor of Dental Medicine",
       duration: "6+ Years",
       description: "Human Biology, Disease Treatment, and help saving lives in general.",
-      matchPercentage: 80,
       matchText: "For science lovers with a passion of helping others!"
     }
   ];
