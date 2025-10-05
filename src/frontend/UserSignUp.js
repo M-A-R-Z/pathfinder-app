@@ -107,6 +107,8 @@ const UserSignUp = ({ onClose }) => {
       {/* Header */}
       <div className="signup-header">
         <div className="signup-logo">
+          <span className="signup-logo-icon">🎓</span>
+          <span className="signup-logo-text">PathFinder</span>
         </div>
       </div>
 
