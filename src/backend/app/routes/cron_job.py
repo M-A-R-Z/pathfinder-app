@@ -3,7 +3,7 @@ import datetime
 
 cron_bp = Blueprint("cron", __name__)
 
-@cron_bp.route("/run-cron-task", methods=["GET"])
+@cron_bp.route("/cron", methods=["GET"])
 def run_cron_task():
     # Replace with your real task
     print("Cron task executed at", datetime.datetime.now())
