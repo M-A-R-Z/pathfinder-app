@@ -97,8 +97,6 @@ const UserLogin = ({ onClose }) => {
       {/* Logo */}
       <div className="login-header">
         <div className="login-logo">
-          <span className="login-logo-icon">🎓</span>
-          <span className="login-logo-text">PathFinder</span>
         </div>
       </div>
 

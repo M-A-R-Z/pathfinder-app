@@ -58,8 +58,6 @@ const UserForgotPassword = ({ onClose }) => {
       {/* Header */}
       <div className="forgot-header">
         <div className="forgot-logo">
-          <span className="forgot-logo-icon">🎓</span>
-          <span className="forgot-logo-text">PathFinder</span>
         </div>
       </div>
 
