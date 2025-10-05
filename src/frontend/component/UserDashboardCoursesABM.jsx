@@ -30,22 +30,22 @@ const CourseCard = ({ title, duration, description, matchPercentage, matchText }
 const UserDashboardCoursesABM = () => {
   const courses = [
     {
-      title: "BS Accountancy",
+      title: "BS in Accountancy (BSA)",
       duration: "4 Years",
       description: "Financial accounting, auditing, taxation, and business law.",
       matchText: "Perfect for analytical business minds!"
     },
     {
-      title: "BS Hospitality Management",
+      title: "BS in Management Accounting (BSMA)",
       duration: "4 Years",
-      description: "Hotel operations, food service management, and customer relations.",
-      matchText: "Great for people-focused business!"
+  description: "Centers on internal business decision-making, cost management, budgeting, and performance evaluation.",
+  matchText: "Perfect for detail-oriented thinkers who enjoy analyzing numbers to improve business operations!"
     },
     {
-      title: "BS Tourism Management",
+      title: "BS in Financial Management(BSFM)",
       duration: "4 Years",
-      description: "Travel industry operations, destination marketing, and event management.",
-      matchText: "Perfect for travel industry careers!"
+      description: "Covers investment analysis, financial planning, corporate finance, and risk management.",
+  matchText: "Best for strategic thinkers who aim to excel in banking, finance, or investment industries!"
     },
     {
       title: "BS Legal Management",

@@ -75,15 +75,24 @@
   cursor: pointer;
 }
 
-.header-graduation-cap {
-  background: white;
-  border-radius: 6px;
-  padding: 4px 6px;
-  font-size: 1.2rem;
+.header-graduation-cap img {
+  width: 70px; /* logo size on desktop */
+  height: 70px;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+  margin-right: -15px; /* ensures no extra space */
+}
+
+.header-graduation-cap img:hover {
+  transform: scale(1.05);
 }
 
 .header-logo-text {
   color: white;
+  font-size: 1.8rem;
+  font-weight: bold;
+  line-height: 1;
+  margin-left: 0; /* remove any margin space between logo and text */
 }
 
 /* Header Actions */

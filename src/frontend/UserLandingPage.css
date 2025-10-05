@@ -140,8 +140,12 @@ body, html {
   transform: scale(1.05);
 }
 
-.landing-page .logo-icon {
-  font-size: 28px;
+.landing-page .logo-icon img{
+  width: 70px; /* logo size on desktop */
+  height: 70px;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+  margin-right: -15px; /* ensures no extra space */
   filter: drop-shadow(0 0 10px rgba(255, 213, 61, 0.6));
   animation: landing-logo-pulse 3s ease-in-out infinite;
 }

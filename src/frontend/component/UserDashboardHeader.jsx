@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './css/UserDashboardHeader.css';
 import defaultAvatar from '../../assets/defaultAvatar.png';
+import logo from '../../assets/logo.png';
 import axios from 'axios';
 
 const UserDashboardHeader = () => {
@@ -64,7 +65,7 @@ const UserDashboardHeader = () => {
     <div className="header-with-dropdown">
       <div className="header-logo-section">
         <div className="header-logo">
-          <span className="header-graduation-cap">🎓</span>
+          <span className="header-graduation-cap"><img src ={logo} alt="Logo"></img></span>
           <span className="header-logo-text">Strandify</span>
         </div>
       </div>
