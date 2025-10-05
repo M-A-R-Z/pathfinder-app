@@ -2,27 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import UserDashboardSidebar from "./component/UserDashboardSidebar";
+import UserDashboardHeader from "./component/UserDashboardHeader";
 import "./UserDashboardTakeAssessment.css";
-
-const Header = () => (
-  <div className="take-assessment-header">
-    <div className="take-assessment-logo-section">
-      <div className="take-assessment-logo">
-        <span className="take-assessment-graduation-cap">🎓</span>
-        <span className="take-assessment-logo-text">PathFinder</span>
-      </div>
-    </div>
-    <div className="take-assessment-header-actions">
-      <button className="take-assessment-create-btn">+ Create</button>
-      <div className="take-assessment-profile-avatar">
-        <img
-          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face"
-          alt="Profile"
-        />
-      </div>
-    </div>
-  </div>
-);
 
 const UserDashboardTakeAssessment = () => {
   const navigate = useNavigate();
@@ -107,7 +88,7 @@ const UserDashboardTakeAssessment = () => {
     };
 
     fetchData();
-  }, []);
+  }, [API_BASE_URL]);
 
   // ---------------- Warn before leaving ----------------
   useEffect(() => {
@@ -166,7 +147,7 @@ const UserDashboardTakeAssessment = () => {
 
   // ---------------- Submit assessment ----------------
   const handleSubmit = async () => {
-    setSubmitting(true); // show loading overlay
+    setSubmitting(true);
     try {
       const res = await axios.post(
         `${API_BASE_URL}/submit_assessment/${assessmentId}`,
@@ -176,15 +157,11 @@ const UserDashboardTakeAssessment = () => {
 
       console.log("Submission successful:", res.data);
 
-      // stop loading and show modal
       setSubmitting(false);
       setShowCompleteModal(true);
-
-      // optional: store recommended strand in local state if you want to display
-      // setRecommendedStrand(res.data.recommended_strand);
     } catch (err) {
       console.error("Error submitting assessment:", err);
-      setSubmitting(false); // stop loading even if error
+      setSubmitting(false);
     }
   };
 
@@ -206,14 +183,27 @@ const UserDashboardTakeAssessment = () => {
     </div>
   );
 
-  const allAnswered = currentQuestions.every((q) => answers[q.question_id] !== undefined);
-
   // ---------------- Loading screen ----------------
-  if (loading) return <div className="loading">Loading assessment...</div>;
+  if (loading) {
+    return (
+      <div className="take-assessment-container">
+        <UserDashboardHeader />
+        <div className="take-assessment-main-layout">
+          <UserDashboardSidebar activeItem="Assessment" />
+          <div className="take-assessment-main-content">
+            <div className="take-assessment-loading">
+              <div className="loading-spinner"></div>
+              <p>Loading assessment...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="take-assessment-container">
-      <Header />
+      <UserDashboardHeader />
       <div className="take-assessment-main-layout">
         <UserDashboardSidebar activeItem="Assessment" progress={progress} />
         <div className="take-assessment-main-content">
@@ -265,7 +255,6 @@ const UserDashboardTakeAssessment = () => {
 
             {step > 0 && (
               <>
-                
                 <div className="questions-container">
                   {currentQuestions.map((q, index) => {
                     const selectedAnswer = answers[q.question_id];
@@ -284,7 +273,13 @@ const UserDashboardTakeAssessment = () => {
                           {startIndex + index + 1}. {q.question_text}
                         </h3>
                         <div className="scale-container">
-                          {[1, 2, 3, 4, 5].map((val) => (
+                          {[
+                            { val: 1, label: "Strongly Disagree" },
+                            { val: 2, label: "Disagree" },
+                            { val: 3, label: "Neutral" },
+                            { val: 4, label: "Agree" },
+                            { val: 5, label: "Strongly Agree" }
+                          ].map(({ val, label }) => (
                             <ScaleOption
                               key={val}
                               value={val}
@@ -293,7 +288,7 @@ const UserDashboardTakeAssessment = () => {
                                 handleAnswerChange(q.question_id, v);
                                 if (validationError === q.question_id) setValidationError(null);
                               }}
-                              label={val === 1 ? "Disagree" : val === 5 ? "Agree" : ""}
+                              label={label}
                             />
                           ))}
                         </div>
@@ -312,7 +307,7 @@ const UserDashboardTakeAssessment = () => {
                         );
 
                         if (firstUnanswered) {
-                          setValidationError(firstUnanswered.question_id); // mark as error
+                          setValidationError(firstUnanswered.question_id);
                           questionRefs.current[firstUnanswered.question_id]?.scrollIntoView({
                             behavior: "smooth",
                             block: "center",
@@ -358,11 +353,8 @@ const UserDashboardTakeAssessment = () => {
           </div>
 
           <div className="take-assessment-footer">
-            <p className="take-assessment-tagline">
-              "Aligned for <span className="highlight-orange">Success</span>."
-            </p>
             <p className="take-assessment-copyright">
-              Copyright © 2025 PathFinder. All Rights Reserved.
+              © 2025 Strandify. All Rights Reserved.
             </p>
           </div>
         </div>
@@ -371,6 +363,7 @@ const UserDashboardTakeAssessment = () => {
       {/* Loading overlay */}
       {submitting && (
         <div className="loading-overlay">
+          <div className="loading-spinner"></div>
           <div className="loading-message">Assessing your answers...</div>
         </div>
       )}
@@ -379,7 +372,7 @@ const UserDashboardTakeAssessment = () => {
       {showCompleteModal && (
         <div className="modal-overlay">
           <div className="modal-box">
-            <h2>Assessment Complete 🎉</h2>
+            <h2>Assessment Complete!</h2>
             <p>Your recommended strand has been generated.</p>
             <button className="confirm-btn" onClick={handleConfirmComplete}>
               Confirm

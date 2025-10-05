@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import UserDashboardHeader from "./component/UserDashboardHeader";
 import UserDashboardSidebar from "./component/UserDashboardSidebar";
@@ -17,6 +18,7 @@ import {
 import "./UserDashboardStatistics.css";
 
 export default function UserResultsDashboard() {
+  const navigate = useNavigate();
   const API_BASE_URL = process.env.REACT_APP_API_URL;
   const COLORS = ["#4cafef", "#ff9800", "#8bc34a"];
   const [user, setUser] = useState(null);
@@ -25,6 +27,7 @@ export default function UserResultsDashboard() {
   const [neighbors, setNeighbors] = useState([]);
   const [pieData, setPieData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [completed, setCompleted] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -43,7 +46,15 @@ export default function UserResultsDashboard() {
           `${API_BASE_URL}/progress/${currentUser.user_id}/${activeDataset.data_set_id}`
         );
         const userAssessment = assessmentRes.data;
-        if (!userAssessment) throw new Error("No assessment found for this user and dataset");
+        
+        // Check if assessment is completed
+        if (!userAssessment || !userAssessment.completed) {
+          setCompleted(false);
+          setLoading(false);
+          return;
+        }
+
+        setCompleted(true);
         setAssessment(userAssessment);
 
         // 4️⃣ Get the results for that assessment
@@ -66,6 +77,7 @@ export default function UserResultsDashboard() {
         setLoading(false);
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
+        setCompleted(false);
         setLoading(false);
       }
     };
@@ -73,22 +85,64 @@ export default function UserResultsDashboard() {
     fetchDashboardData();
   }, [API_BASE_URL]);
 
-  if (loading) return <p>Loading dashboard...</p>;
+  if (loading) {
+    return (
+      <div className="statistics-container">
+        <UserDashboardHeader />
+        <div className="statistics-main-layout">
+          <UserDashboardSidebar activeItem="Statistics" />
+          <div className="statistics-main-content">
+            <div className="statistics-loading">
+              <div className="loading-spinner"></div>
+              <p>Loading statistics...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!completed) {
+    return (
+      <div className="statistics-container">
+        <UserDashboardHeader />
+        <div className="statistics-main-layout">
+          <UserDashboardSidebar activeItem="Statistics" />
+          <div className="statistics-main-content">
+            <div className="statistics-locked">
+              <div className="statistics-locked-icon">🔒</div>
+              <h2 className="statistics-locked-title">Assessment Required</h2>
+              <p className="statistics-locked-text">
+                You need to complete the Strandify Assessment first to view your personalized statistics and results.
+              </p>
+              <button
+                className="statistics-locked-btn"
+                onClick={() => navigate('/userdashboardassessment')}
+              >
+                Take the Assessment
+              </button>
+            </div>
+            <div className="statistics-footer">
+              <p className="statistics-copyright">© 2025 PathFinder. All Rights Reserved.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="dashboard-container">
+    <div className="statistics-container">
       <UserDashboardHeader />
-      <div className="main-content">
-        <div className="sidebar">
-          <UserDashboardSidebar activeItem="Statistics" />
-        </div>
-        <div className="content-area">
+      <div className="statistics-main-layout">
+        <UserDashboardSidebar activeItem="Statistics" />
+        <div className="statistics-content-area">
           {/* Top Section */}
-          <div className="top-section">
+          <div className="statistics-top-section">
             {/* Assessment Summary */}
-            <div className="card description">
-              <div className="card-header"><h2>Assessment Summary</h2></div>
-              <div className="card-body">
+            <div className="statistics-card statistics-description">
+              <div className="statistics-card-header"><h2>Assessment Summary</h2></div>
+              <div className="statistics-card-body">
                 {result ? (
                   <>
                     <p><strong>Recommended Strand:</strong> {result.recommended_strand}</p>
@@ -97,9 +151,9 @@ export default function UserResultsDashboard() {
                     <p><strong>Date:</strong> {new Date(result.created_at).toLocaleString()}</p>
 
                     {result.tie_info && (
-                      <div className="tie-table-container" style={{ marginTop: "1rem" }}>
+                      <div className="statistics-tie-table-container">
                         <h3>Tie Resolution Weights</h3>
-                        <table className="question-table">
+                        <table className="statistics-question-table">
                           <thead>
                             <tr><th>Strand</th><th>Weighted Distance</th></tr>
                           </thead>
@@ -120,9 +174,9 @@ export default function UserResultsDashboard() {
             </div>
 
             {/* Bar Chart */}
-            <div className="card chart">
-              <div className="card-header"><h2>User Scores Per Strand</h2></div>
-              <div className="card-body">
+            <div className="statistics-card statistics-chart">
+              <div className="statistics-card-header"><h2>User Scores Per Strand</h2></div>
+              <div className="statistics-card-body">
                 {result ? (
                   <ResponsiveContainer width="100%" height={250}>
                     <BarChart data={[
@@ -143,13 +197,13 @@ export default function UserResultsDashboard() {
           </div>
 
           {/* Bottom Section */}
-          <div className="bottom-section">
+          <div className="statistics-bottom-section">
             {/* Neighbors Table */}
-            <div className="card">
-              <div className="card-header"><h2>Nearest Neighbors</h2></div>
-              <div className="card-body">
+            <div className="statistics-card">
+              <div className="statistics-card-header"><h2>Nearest Neighbors</h2></div>
+              <div className="statistics-card-body">
                 {neighbors.length > 0 ? (
-                  <table className="question-table">
+                  <table className="statistics-question-table">
                     <thead>
                       <tr><th>#</th><th>Strand</th><th>Distance</th></tr>
                     </thead>
@@ -171,9 +225,9 @@ export default function UserResultsDashboard() {
             </div>
 
             {/* Pie Chart */}
-            <div className="card chart">
-              <div className="card-header"><h2>Neighbor Strand Distribution</h2></div>
-              <div className="card-body">
+            <div className="statistics-card statistics-chart">
+              <div className="statistics-card-header"><h2>Neighbor Strand Distribution</h2></div>
+              <div className="statistics-card-body">
                 {pieData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
@@ -196,6 +250,11 @@ export default function UserResultsDashboard() {
                 ) : <p>No distribution available.</p>}
               </div>
             </div>
+          </div>
+
+          {/* Footer */}
+          <div className="statistics-footer">
+            <p className="statistics-copyright">© 2025 PathFinder. All Rights Reserved.</p>
           </div>
         </div>
       </div>

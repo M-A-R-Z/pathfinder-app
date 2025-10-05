@@ -97,14 +97,14 @@ const UserDashBoardHome = () => {
 
             {!completed ? (
               <div className="user-dashboard-assessment-banner">
-                <p className="user-dashboard-banner-title">You haven't completed the PathFinder Assessment yet.</p>
+                <p className="user-dashboard-banner-title">You haven't completed the Strandify Assessment yet.</p>
                 <p className="user-dashboard-banner-subtitle">
                   Take the quiz to discover your recommended career path and strand.
                 </p>
               </div>
             ) : (
               <div className="user-dashboard-assessment-banner completed">
-                <p className="user-dashboard-banner-title">🎉 Congratulations! You finished the PathFinder Assessment.</p>
+                <p className="user-dashboard-banner-title">🎉 Congratulations! You finished the Strandify Assessment.</p>
                 <p className="user-dashboard-banner-subtitle">
                   Your recommended strand and career matches are ready.
                 </p>
@@ -112,7 +112,7 @@ const UserDashBoardHome = () => {
             )}
 
             <div className="user-dashboard-get-started-section">
-              <h2 className="user-dashboard-section-title">Get started with PathFinder!</h2>
+              <h2 className="user-dashboard-section-title">Get started with Strandify!</h2>
               <p className="user-dashboard-section-description">
                 Answer our assessment to find out which senior high school strand fits you
                 best—and what careers you're most likely to succeed in.
@@ -193,7 +193,7 @@ const UserDashBoardHome = () => {
           </div>
 
           <div className="user-dashboard-footer">
-            <p className="user-dashboard-copyright">© 2025 PathFinder. All Rights Reserved.</p>
+            <p className="user-dashboard-copyright">© 2025 Strandify. All Rights Reserved.</p>
           </div>
         </div>
       </div>

@@ -78,7 +78,7 @@ const UserDashboardAssessment = () => {
         <UserDashboardSidebar activeItem="Assessment" />
         <div className="assessment-main-content">
           <div className="assessment-content-section">
-            <h1 className="assessment-title">PathFinder Assessment Test</h1>
+            <h1 className="assessment-title">Strandify Assessment Test</h1>
 
             {/* Steps Grid */}
             <div className="assessment-steps-grid">
@@ -160,7 +160,7 @@ const UserDashboardAssessment = () => {
           {/* Footer */}
           <div className="assessment-footer">
             <p className="assessment-copyright">
-              © 2025 PathFinder. All Rights Reserved.
+              © 2025 Strandify. All Rights Reserved.
             </p>
           </div>
         </div>

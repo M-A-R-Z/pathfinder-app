@@ -52,7 +52,7 @@ const UserDashboardCareers = () => {
           <div className="careers-locked-icon">🔒</div>
           <h2 className="careers-locked-title">Assessment Required</h2>
           <p className="careers-locked-text">
-            You need to complete the PathFinder Assessment first to unlock your personalized career recommendations.
+            You need to complete the Strandify Assessment first to unlock your personalized career recommendations.
           </p>
           <button
             className="careers-locked-btn"
@@ -106,7 +106,7 @@ const UserDashboardCareers = () => {
           {/* Footer */}
           <div className="careers-footer">
             <p className="careers-copyright">
-              © 2025 PathFinder. All Rights Reserved.
+              © 2025 Strandify. All Rights Reserved.
             </p>
           </div>
         </div>

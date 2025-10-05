@@ -1,0 +1,296 @@
+/* UserDashboardSettings Page Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #1a1b3a 0%, #2d1b69 50%, #4c1d95 100%);
+  min-height: 100vh;
+  color: white;
+}
+
+.settings-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Main Layout */
+.settings-main-layout {
+  display: flex;
+  flex: 1;
+}
+
+/* Main Content */
+.settings-main-content {
+  flex: 1;
+  background: white;
+  color: #1a202c;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 1s ease-out 0.3s both;
+}
+
+/* Settings Content */
+.settings-content-section {
+  flex: 1;
+  padding: 3rem;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  animation: fadeInUp 1s ease-out 0.4s both;
+}
+
+/* Settings Header */
+.settings-header {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.settings-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+/* Settings Form */
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* Settings Section */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Form Group */
+.settings-form-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.settings-label {
+  font-weight: 600;
+  color: #1a202c;
+  min-width: 200px;
+  font-size: 1rem;
+}
+
+.settings-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #1a202c;
+  transition: all 0.3s;
+}
+
+.settings-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.settings-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Password Wrapper with Toggle */
+.settings-password-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.settings-password-wrapper .settings-input {
+  width: 100%;
+  padding-right: 3rem;
+}
+
+.settings-password-toggle {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.settings-password-toggle:hover {
+  color: #3b82f6;
+}
+
+.settings-password-toggle:focus {
+  outline: none;
+}
+
+/* Save Section */
+.settings-save-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e5e7eb;
+}
+
+.settings-save-btn {
+  background: linear-gradient(135deg, #1a1b3a, #2d1b69);
+  border: none;
+  padding: 1rem 3rem;
+  border-radius: 12px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 20px rgba(26, 27, 58, 0.4);
+}
+
+.settings-save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(26, 27, 58, 0.6);
+}
+
+.settings-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.settings-save-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Footer */
+.settings-footer {
+  background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(27,17,139,0.85));
+  padding: 2rem;
+  text-align: center;
+  animation: fadeInUp 1s ease-out 1.1s both;
+}
+
+.settings-copyright {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .settings-content-section {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .settings-main-layout {
+    flex-direction: column;
+  }
+
+  .settings-content-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .settings-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .settings-title {
+    font-size: 2rem;
+  }
+
+  .settings-form-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .settings-label {
+    min-width: auto;
+    font-size: 0.9rem;
+  }
+
+  .settings-input {
+    font-size: 0.95rem;
+  }
+
+  .settings-save-btn {
+    padding: 0.9rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-content-section {
+    padding: 1rem 0.8rem;
+  }
+
+  .settings-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .settings-title {
+    font-size: 1.6rem;
+  }
+
+  .settings-label {
+    font-size: 0.85rem;
+  }
+
+  .settings-input {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .settings-password-wrapper .settings-input {
+    padding-right: 2.5rem;
+  }
+
+  .settings-password-toggle {
+    right: 0.75rem;
+  }
+
+  .settings-save-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}

@@ -35,17 +35,6 @@
   }
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: linear-gradient(135deg, #1a1b3a 0%, #2d1b69 50%, #4c1d95 100%);
@@ -149,24 +138,6 @@ body {
   color: #3b82f6;
 }
 
-.profile-edit-avatar-btn {
-  background: white;
-  border: 2px solid #3b82f6;
-  padding: 0.6rem 1.5rem;
-  border-radius: 8px;
-  color: #3b82f6;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.profile-edit-avatar-btn:hover {
-  background: #3b82f6;
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
 /* Profile Form */
 .profile-form {
   display: flex;
@@ -265,110 +236,6 @@ body {
   font-size: 0.9rem;
 }
 
-/* Avatar Modal Styles */
-.avatar-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease-out;
-}
-
-.avatar-modal {
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  max-width: 500px;
-  width: 90%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.3s ease-out;
-}
-
-.avatar-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-.avatar-modal-header h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1a202c;
-}
-
-.avatar-modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: #6b7280;
-  cursor: pointer;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  transition: all 0.2s;
-}
-
-.avatar-modal-close:hover {
-  background: #f3f4f6;
-  color: #1a202c;
-}
-
-.avatar-options {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-}
-
-.avatar-option {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.5rem;
-  border: 3px solid #e5e7eb;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.avatar-option:hover {
-  border-color: #3b82f6;
-  background: #f9fafb;
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
-}
-
-.avatar-option.selected {
-  border-color: #3b82f6;
-  background: #eff6ff;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-}
-
-.avatar-option img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.avatar-option span {
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: #1a202c;
-}
-
 /* Responsive Design */
 @media (max-width: 1024px) {
   .profile-content-section {
@@ -420,31 +287,6 @@ body {
     padding: 0.9rem 2rem;
     font-size: 1rem;
   }
-
-  .avatar-modal {
-    padding: 1.5rem;
-  }
-
-  .avatar-modal-header h2 {
-    font-size: 1.3rem;
-  }
-
-  .avatar-options {
-    gap: 1rem;
-  }
-
-  .avatar-option {
-    padding: 1rem;
-  }
-
-  .avatar-option img {
-    width: 100px;
-    height: 100px;
-  }
-
-  .avatar-option span {
-    font-size: 1rem;
-  }
 }
 
 @media (max-width: 480px) {
@@ -466,11 +308,6 @@ body {
     font-size: 1.4rem;
   }
 
-  .profile-edit-avatar-btn {
-    padding: 0.5rem 1.2rem;
-    font-size: 0.9rem;
-  }
-
   .profile-label {
     font-size: 0.85rem;
   }
@@ -490,30 +327,5 @@ body {
     width: 40px;
     height: 40px;
     border-width: 3px;
-  }
-
-  .avatar-modal {
-    padding: 1.5rem;
-  }
-
-  .avatar-modal-header h2 {
-    font-size: 1.3rem;
-  }
-
-  .avatar-options {
-    gap: 1rem;
-  }
-
-  .avatar-option {
-    padding: 1rem;
-  }
-
-  .avatar-option img {
-    width: 100px;
-    height: 100px;
-  }
-
-  .avatar-option span {
-    font-size: 1rem;
   }
 }

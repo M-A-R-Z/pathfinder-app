@@ -4,18 +4,12 @@ import axios from 'axios';
 import UserDashboardSidebar from './component/UserDashboardSidebar';
 import UserDashboardHeader from './component/UserDashboardHeader';
 import './UserDashboardProfile.css';
-
-// Avatar URLs 
-const AVATARS = {
-  male: 'https://api.dicebear.com/7.x/avataaars/svg?seed=male&backgroundColor=b6e3f4',
-  female: 'https://api.dicebear.com/7.x/avataaars/svg?seed=female&backgroundColor=ffdfbf&hair=long'
-};
+import defaultAvatar from '../assets/defaultAvatar.png';
 
 const UserDashboardProfile = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     username: '',
@@ -23,7 +17,6 @@ const UserDashboardProfile = () => {
     birthday: '',
     gender: ''
   });
-  const [avatar, setAvatar] = useState('');
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -40,7 +33,6 @@ const UserDashboardProfile = () => {
           birthday: userData.birthday || '',
           gender: userData.gender || ''
         });
-        setAvatar(userData.avatar_url || '');
       } catch (error) {
         console.error('Error fetching user data:', error);
       } finally {
@@ -59,36 +51,13 @@ const UserDashboardProfile = () => {
     }));
   };
 
-  const handleAvatarEdit = () => {
-    setShowAvatarModal(true);
-  };
-
-  const handleAvatarSelect = async (avatarType) => {
-    const newAvatar = AVATARS[avatarType];
-    setAvatar(newAvatar);
-    setShowAvatarModal(false);
-    
-    // Update avatar on backend
-    try {
-      await axios.put('http://localhost:5000/profile', 
-        { avatar_url: newAvatar }, 
-        { withCredentials: true }
-      );
-    } catch (error) {
-      console.error('Error updating avatar:', error);
-    }
-  };
-
   const handleSave = async () => {
     setSaving(true);
     try {
-      await axios.put('http://localhost:5000/profile', 
-        { ...formData, avatar_url: avatar }, 
-        { withCredentials: true }
-      );
+      await axios.put('http://localhost:5000/profile', formData, {
+        withCredentials: true
+      });
       alert('Profile updated successfully!');
-      // Refresh the page to update header avatar
-      window.location.reload();
     } catch (error) {
       console.error('Error saving profile:', error);
       alert('Failed to update profile. Please try again.');
@@ -124,7 +93,7 @@ const UserDashboardProfile = () => {
             <div className="profile-header-section">
               <div className="profile-avatar-container">
                 <img 
-                  src={avatar || 'https://via.placeholder.com/150'} 
+                  src={defaultAvatar}
                   alt="Profile Avatar"
                   className="profile-avatar-image"
                 />
@@ -133,9 +102,6 @@ const UserDashboardProfile = () => {
                 <h1 className="profile-welcome-title">
                   Welcome, <span className="profile-name-highlight">{formData.fullName.split(' ')[0] || 'User'}</span>!
                 </h1>
-                <button className="profile-edit-avatar-btn" onClick={handleAvatarEdit}>
-                  Edit Avatar
-                </button>
               </div>
             </div>
 
@@ -217,39 +183,6 @@ const UserDashboardProfile = () => {
           </div>
         </div>
       </div>
-
-      {/* Avatar Selection Modal */}
-      {showAvatarModal && (
-        <div className="avatar-modal-overlay" onClick={() => setShowAvatarModal(false)}>
-          <div className="avatar-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="avatar-modal-header">
-              <h2>Choose Your Avatar</h2>
-              <button 
-                className="avatar-modal-close"
-                onClick={() => setShowAvatarModal(false)}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="avatar-options">
-              <div 
-                className={`avatar-option ${avatar === AVATARS.male ? 'selected' : ''}`}
-                onClick={() => handleAvatarSelect('male')}
-              >
-                <img src={AVATARS.male} alt="Male Avatar" />
-                <span>Male</span>
-              </div>
-              <div 
-                className={`avatar-option ${avatar === AVATARS.female ? 'selected' : ''}`}
-                onClick={() => handleAvatarSelect('female')}
-              >
-                <img src={AVATARS.female} alt="Female Avatar" />
-                <span>Female</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
