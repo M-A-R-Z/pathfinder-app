@@ -1,32 +1,29 @@
-from flask import Blueprint, request, jsonify, session, make_response
+from flask import Blueprint, request, jsonify, session
+import jwt
+from app.config import SECRET_KEY, ALGORITHM
 from ..models import User
 from argon2 import PasswordHasher
 from datetime import datetime, timedelta
 from app.services.verify_email import verify_email
 from .. import db
 
-auth_bp = Blueprint("login", __name__)
+auth_bp = Blueprint("auth", __name__)
 ph = PasswordHasher()
-OTP_EXPIRY = 300      
-RESEND_COOLDOWN = 60  
+OTP_EXPIRY = 300      # 5 min
+RESEND_COOLDOWN = 60  # 1 min
 
+# ---------------- LOGIN ----------------
 @auth_bp.route("/login", methods=["POST"])
 def login():
-    print(session)
-    session.clear()
-    print("Login endpoint hit")
     data = request.get_json()
     email = data.get("email")
     password = data.get("password")
-    remember = data.get("remember", False)
 
     if not email or not password:
         return jsonify({"success": False, "message": "Email and password are required"}), 400
-    print(email, password)
-    
+
     user = User.query.filter_by(email=email).first()
-    
-    if user is None:
+    if not user:
         return jsonify({"success": False, "message": "User not found"}), 404
 
     try:
@@ -34,27 +31,58 @@ def login():
     except Exception:
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
-    session["user_id"] = user.user_id
-    print(session)
-    session.permanent = remember
+    # ✅ Create JWT (valid 7 days)
+    payload = {
+        "user_id": user.user_id,
+        "exp": datetime.utcnow() + timedelta(days=7)
+    }
+    token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
     return jsonify({
         "success": True,
+        "token": token,   # frontend saves this in localStorage
         "redirect": "/"
     }), 200
 
+
+# ---------------- CHECK SESSION ----------------
+@auth_bp.route("/check-session", methods=["GET"])
+def check_session():
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return jsonify({"logged_in": False, "message": "Missing token"}), 401
+
+    token = auth_header.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return jsonify({"logged_in": True, "user": payload["user_id"]}), 200
+    except jwt.ExpiredSignatureError:
+        return jsonify({"logged_in": False, "message": "Token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"logged_in": False, "message": "Invalid token"}), 401
+
+
+# ---------------- LOGOUT ----------------
+@auth_bp.route("/logout", methods=["POST"])
+def logout():
+    # Nothing to clear server-side with JWT
+    return jsonify({"success": True, "message": "Logged out. Please delete token client-side"}), 200
+
+
+# ---------------- SIGNUP ----------------
 @auth_bp.route("/signup", methods=["POST"])
 def signup():
     data = request.get_json()
     email = data.get("email")
     password = data.get("password")
+    confirmPassword = data.get("confirmPassword")
     first_name = data.get("first_name")
     last_name = data.get("last_name")
     middle_name = data.get("middle_name", "")
     affix = data.get("affix", "")
     birthday = data.get("birthday")
-    confirmPassword = data.get("confirmPassword")
 
-    if not all([email, password, first_name, last_name, birthday, confirmPassword]):
+    if not all([email, password, confirmPassword, first_name, last_name, birthday]):
         return jsonify({"success": False, "message": "All fields are required"}), 400
     if password != confirmPassword:
         return jsonify({"success": False, "message": "Passwords do not match"}), 400
@@ -82,28 +110,9 @@ def signup():
         "otp_expiry": (datetime.utcnow() + timedelta(seconds=OTP_EXPIRY)).isoformat(),
         "last_sent": datetime.utcnow().isoformat()
     }
-    session["pending_otp"] = otp
 
     return jsonify({"success": True, "message": "OTP sent to email"}), 200
 
-    
-@auth_bp.route("/check-session")
-def check_session():
-    print(session)
-    if "user_id" in session:
-        return jsonify({"logged_in": True, "user": session["user_id"]})
-    else:
-        return jsonify({"logged_in": False}), 401
-    
-@auth_bp.route("/logout", methods=["POST"])
-def logout():
-    session.clear()
-    
-    resp = make_response(jsonify({"success": True, "redirect": "/"}))
-
-    resp.delete_cookie("session")
-    session.permanent = False
-    return resp, 200
 
 @auth_bp.route("/verify-email", methods=["POST"])
 def verify_email_code():
@@ -123,7 +132,6 @@ def verify_email_code():
         return jsonify({"success": False, "message": "Invalid OTP"}), 400
 
     # OTP is correct → create user
-    signup_data = session["pending_signup"]
     new_user = User(
         email=signup_data["email"],
         password=signup_data["password"],
@@ -164,6 +172,8 @@ def resend_signup_otp():
 
     return jsonify({"success": True, "message": "New OTP sent to email"}), 200
 
+
+# ---------------- PASSWORD RESET ----------------
 @auth_bp.route("/request-otp", methods=["POST"])
 def request_otp():
     data = request.get_json()
@@ -184,6 +194,7 @@ def request_otp():
     session["password_reset_email"] = email
 
     return jsonify({"success": True, "message": "OTP sent to email"}), 200
+
 
 @auth_bp.route("/forgot-password", methods=["POST"])
 def forgot_password():
@@ -215,20 +226,3 @@ def forgot_password():
     session.pop("password_reset_email", None)
 
     return jsonify({"success": True, "message": "Password reset successfully"}), 200
-
-@auth_bp.route("/me", methods=["GET"])
-def get_current_user():
-    print("/me hit")
-    print(session)
-    try:
-        user_id = session.get("user_id")
-        if not user_id:
-            return jsonify({"error": "Not logged in"}), 401
-
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify({"error": "User not found"}), 404
-
-        return jsonify(user.user_info()), 200
-    except Exception as e:
-        return jsonify({"error": f"Failed to get current user: {str(e)}"}), 500

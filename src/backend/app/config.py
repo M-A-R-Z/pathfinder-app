@@ -21,3 +21,4 @@ class Config:
     SESSION_COOKIE_SECURE = True 
     SESSION_COOKIE_SAMESITE = "None"
     FRONTEND_URL = os.getenv("FRONTEND_URL")
+    ALGORITHM = "HS256"
