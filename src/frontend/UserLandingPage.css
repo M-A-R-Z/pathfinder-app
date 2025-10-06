@@ -1022,6 +1022,11 @@ body, html {
   box-shadow: 0 10px 30px rgba(255,107,107,0.6);
 }
 
+.landing-page .about-text > a {
+  text-decoration: none;
+  display: inline-block;
+}
+
 /* Footer */
 .landing-page .footer {
   padding: 40px 0;
