@@ -21,7 +21,7 @@ function App() {
       <Route path="/userlogin" element={<UserLogin />} />
       <Route path="/usersignup" element={<UserSignUp />} />
       <Route path="/userforgotpassword" element={<UserForgotPassword />} />
-      <Route path="/userdashboardhome" element={<ProtectedRoute><UserDashboardHome /></ProtectedRoute>} />
+      <Route path="/userdashboardhome" element={<UserDashboardHome />} />
       <Route path="/userdashboardassessment" element={<ProtectedRoute><UserDashboardAssessment /></ProtectedRoute>} />
       <Route path="/userdashboardtakeassessment" element={<ProtectedRoute><UserDashboardTakeAssessment /></ProtectedRoute>} />
       <Route path="/userdashboardcourses" element={<ProtectedRoute><UserDashboardCourses /></ProtectedRoute>} />

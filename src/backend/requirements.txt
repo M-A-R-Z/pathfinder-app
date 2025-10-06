@@ -9,5 +9,5 @@ pandas
 psycopg2-binary
 sendgrid
 certifi
-jwt
+PyJWT
 gunicorn
