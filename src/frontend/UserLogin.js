@@ -28,34 +28,32 @@ const UserLogin = ({ onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    const { email, password, rememberMe } = formData;
-    console.log('Login attempted with:', formData);
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      const res = await axios.post(
-        `${API_BASE_URL}/login`,
-        { 
-          email: formData.email, 
-          password: formData.password, 
+      const res = await fetch(`${API_BASE_URL}/login`, {
+        method: "POST",
+        credentials: "include", // 👈 IMPORTANT: ensures cookies are sent/stored
+        headers: {
+          "Content-Type": "application/json",
         },
-        { withCredentials: true }
-      );
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
-      if (res.data.success) {
+      const data = await res.json();
+
+      if (res.ok && data.success) {
         navigate("/userdashboardhome");
       } else {
-        alert(res.data.message);
+        alert(data.message || "Login failed");
       }
     } catch (err) {
-      console.error(err);
-
-      if (err.response?.data?.message) {
-        alert(err.response.data.message);
-      } else {
-        alert("Something went wrong. Try again.");
-      }
+      console.error("Login error:", err);
+      alert("Something went wrong. Try again.");
     }
+
     setIsLoading(false);
   };
 
