@@ -1,32 +1,46 @@
-from flask import Blueprint, request, jsonify, session, make_response
-from ..models import User
-from argon2 import PasswordHasher
+from flask import Blueprint, request, jsonify, session
+import jwt
 from datetime import datetime, timedelta
-from app.services.verify_email import verify_email
+from argon2 import PasswordHasher
 from .. import db
+from ..models import User
+from ..config import Config
+from app.services.verify_email import verify_email
 
-auth_bp = Blueprint("login", __name__)
+auth_bp = Blueprint("auth", __name__)
 ph = PasswordHasher()
-OTP_EXPIRY = 300      
-RESEND_COOLDOWN = 60  
 
+# JWT Config
+SECRET_KEY = Config.SECRET_KEY
+ALGORITHM = Config.ALGORITHM
+ACCESS_TOKEN_EXPIRE_DAYS = 7
+
+# OTP Config
+OTP_EXPIRY = 300      # 5 min
+RESEND_COOLDOWN = 60  # 1 min
+
+
+# ---------------- UTILITIES ----------------
+def create_jwt(user_id):
+    payload = {
+        "user_id": user_id,
+        "exp": datetime.utcnow() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+
+# ---------------- LOGIN ----------------
 @auth_bp.route("/login", methods=["POST"])
 def login():
-    print(session)
-    session.clear()
-    print("Login endpoint hit")
     data = request.get_json()
     email = data.get("email")
     password = data.get("password")
-    remember = data.get("remember", False)
 
     if not email or not password:
         return jsonify({"success": False, "message": "Email and password are required"}), 400
-    print(email, password)
-    
+
     user = User.query.filter_by(email=email).first()
-    
-    if user is None:
+    if not user:
         return jsonify({"success": False, "message": "User not found"}), 404
 
     try:
@@ -34,27 +48,35 @@ def login():
     except Exception:
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
-    session["user_id"] = user.user_id
-    print(session)
-    session.permanent = remember
+    token = create_jwt(user.user_id)
     return jsonify({
         "success": True,
-        "redirect": "/"
+        "token": token,
+        "redirect": "/userdashboardhome"
     }), 200
 
+
+# ---------------- LOGOUT ----------------
+@auth_bp.route("/logout", methods=["POST"])
+def logout():
+    # With JWT we don’t store sessions server-side
+    return jsonify({"success": True, "message": "Logged out. Please delete token client-side"}), 200
+
+
+# ---------------- SIGNUP ----------------
 @auth_bp.route("/signup", methods=["POST"])
 def signup():
     data = request.get_json()
     email = data.get("email")
     password = data.get("password")
+    confirmPassword = data.get("confirmPassword")
     first_name = data.get("first_name")
     last_name = data.get("last_name")
     middle_name = data.get("middle_name", "")
     affix = data.get("affix", "")
     birthday = data.get("birthday")
-    confirmPassword = data.get("confirmPassword")
 
-    if not all([email, password, first_name, last_name, birthday, confirmPassword]):
+    if not all([email, password, confirmPassword, first_name, last_name, birthday]):
         return jsonify({"success": False, "message": "All fields are required"}), 400
     if password != confirmPassword:
         return jsonify({"success": False, "message": "Passwords do not match"}), 400
@@ -64,12 +86,11 @@ def signup():
     hashed_password = ph.hash(password)
     birthday = datetime.strptime(birthday, "%Y-%m-%d").date()
 
-    # Generate OTP
+    # Send OTP to email
     otp = verify_email(email)
     if not otp:
         return jsonify({"success": False, "message": "Error sending verification email"}), 500
 
-    # Temporarily store user data + OTP in session
     session["pending_signup"] = {
         "email": email,
         "password": hashed_password,
@@ -82,28 +103,9 @@ def signup():
         "otp_expiry": (datetime.utcnow() + timedelta(seconds=OTP_EXPIRY)).isoformat(),
         "last_sent": datetime.utcnow().isoformat()
     }
-    session["pending_otp"] = otp
 
     return jsonify({"success": True, "message": "OTP sent to email"}), 200
 
-    
-@auth_bp.route("/check-session")
-def check_session():
-    print(session)
-    if "user_id" in session:
-        return jsonify({"logged_in": True, "user": session["user_id"]})
-    else:
-        return jsonify({"logged_in": False}), 401
-    
-@auth_bp.route("/logout", methods=["POST"])
-def logout():
-    session.clear()
-    
-    resp = make_response(jsonify({"success": True, "redirect": "/"}))
-
-    resp.delete_cookie("session")
-    session.permanent = False
-    return resp, 200
 
 @auth_bp.route("/verify-email", methods=["POST"])
 def verify_email_code():
@@ -114,7 +116,6 @@ def verify_email_code():
     if not otp or not signup_data:
         return jsonify({"success": False, "message": "No signup session found"}), 400
 
-    # Expiry check
     expiry = datetime.fromisoformat(signup_data["otp_expiry"])
     if datetime.utcnow() > expiry:
         return jsonify({"success": False, "message": "OTP expired"}), 400
@@ -122,8 +123,6 @@ def verify_email_code():
     if str(signup_data["otp"]) != str(otp):
         return jsonify({"success": False, "message": "Invalid OTP"}), 400
 
-    # OTP is correct → create user
-    signup_data = session["pending_signup"]
     new_user = User(
         email=signup_data["email"],
         password=signup_data["password"],
@@ -152,7 +151,6 @@ def resend_signup_otp():
         wait_time = (last_sent + timedelta(seconds=RESEND_COOLDOWN)) - datetime.utcnow()
         return jsonify({"success": False, "message": f"Please wait {int(wait_time.total_seconds())}s before resending."}), 429
 
-    # Generate new OTP
     otp = verify_email(signup_data["email"])
     if not otp:
         return jsonify({"success": False, "message": "Error resending OTP"}), 500
@@ -164,6 +162,8 @@ def resend_signup_otp():
 
     return jsonify({"success": True, "message": "New OTP sent to email"}), 200
 
+
+# ---------------- PASSWORD RESET ----------------
 @auth_bp.route("/request-otp", methods=["POST"])
 def request_otp():
     data = request.get_json()
@@ -185,6 +185,7 @@ def request_otp():
 
     return jsonify({"success": True, "message": "OTP sent to email"}), 200
 
+
 @auth_bp.route("/forgot-password", methods=["POST"])
 def forgot_password():
     data = request.get_json()
@@ -194,14 +195,12 @@ def forgot_password():
     if not otp or not new_password:
         return jsonify({"success": False, "message": "OTP and new password are required"}), 400
 
-    # Check session
     if "password_reset_otp" not in session or "password_reset_email" not in session:
         return jsonify({"success": False, "message": "No password reset session found"}), 400
 
     if str(session["password_reset_otp"]) != str(otp):
         return jsonify({"success": False, "message": "Invalid OTP"}), 400
 
-    # Update user password
     user = User.query.filter_by(email=session["password_reset_email"]).first()
     if not user:
         return jsonify({"success": False, "message": "User not found"}), 404
@@ -210,7 +209,6 @@ def forgot_password():
     user.password = hashed_password
     db.session.commit()
 
-    # Clear session
     session.pop("password_reset_otp", None)
     session.pop("password_reset_email", None)
 
@@ -218,17 +216,32 @@ def forgot_password():
 
 @auth_bp.route("/me", methods=["GET"])
 def get_current_user():
-    print("/me hit")
-    print(session)
     try:
-        user_id = session.get("user_id")
-        if not user_id:
-            return jsonify({"error": "Not logged in"}), 401
+        # Get token from Authorization header
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Authorization header missing or invalid"}), 401
 
+        token = auth_header.split(" ")[1]
+
+        # Decode token
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            user_id = payload.get("user_id")
+        except jwt.ExpiredSignatureError:
+            return jsonify({"error": "Token expired"}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({"error": "Invalid token"}), 401
+
+        # Fetch user
         user = User.query.get(user_id)
         if not user:
             return jsonify({"error": "User not found"}), 404
 
-        return jsonify(user.user_info()), 200
+        return jsonify({
+            "success": True,
+            "user": user.user_info()
+        }), 200
+
     except Exception as e:
         return jsonify({"error": f"Failed to get current user: {str(e)}"}), 500
