@@ -1,154 +1,231 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import "./css/OTPModal.css";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import UserDashboardSidebar from './component/UserDashboardSidebar';
+import UserDashboardHeader from './component/UserDashboardHeader';
+import OTPModal from './component/OTPModal';
+import './UserDashboardSettings.css';
 
-const OTPModal = ({ isOpen, onClose, formData = {}, mode = "signup", onSuccess }) => {
-  const { email = "", newPassword = "", confirmPassword = "" } = formData;
-
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
-  const [resetToken, setResetToken] = useState(null);
-
+const UserDashboardSettings = () => {
   const API_BASE_URL = process.env.REACT_APP_API_URL;
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [showPassword, setShowPassword] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+  
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  const [showOTPModal, setShowOTPModal] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
-  const otpSent = useRef(false); // ✅ ensure initial OTP only sent once
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
+  // fetch logged in user info
   useEffect(() => {
-    if (!isOpen || mode !== "forgot" || otpSent.current) return;
-
-    const sendInitialOtp = async () => {
-      try {
-        const res = await axios.post(`${API_BASE_URL}/request-otp`, { email });
-        setResetToken(res.data.reset_token);
-        setCooldown(60);
-        otpSent.current = true; // mark as sent
-      } catch (err) {
-        console.error("Failed to send OTP:", err.response?.data || err.message);
+    const fetchInitialData = async () => {
+      if (!token) {
+        alert("Session expired. Please log in again.");
+        navigate("/userlogin");
+        return;
       }
+
+      try {
+        // 1️⃣ Fetch user info
+        const meRes = await axios.get(`${API_BASE_URL}/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUserInfo(meRes.data);
+      } catch (err) {
+        console.error("Error fetching user info:", err);
+      } finally {
+      setLoading(false); // done fetching
+    }
     };
 
-    sendInitialOtp();
-  }, [isOpen, mode, email, API_BASE_URL]);
+    fetchInitialData();
+  }, [token, API_BASE_URL, navigate]);
 
-  const handleInputChange = (index, value) => {
-    if (value.length > 1) return;
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    if (value && index < 5) {
-      document.getElementById(`otp-${index + 1}`)?.focus();
-    }
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-  const handleKeyDown = (index, e) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      document.getElementById(`otp-${index - 1}`)?.focus();
-    }
+  const togglePasswordVisibility = (field) => {
+    setShowPassword(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const otpString = otp.join("");
-    if (otpString.length !== 6) {
-      alert("Please enter the 6-digit OTP.");
+  const handleSave = () => {
+    // Validation
+
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      alert('Please fill in all password fields!');
       return;
     }
 
-    if (mode === "forgot") {
-      if (!newPassword || !confirmPassword) {
-        alert("Password fields required.");
-        return;
-      }
-      if (newPassword !== confirmPassword) {
-        alert("Passwords do not match.");
-        return;
-      }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      alert('New passwords do not match!');
+      return;
     }
 
-    setIsLoading(true);
-    try {
-      let res;
-      if (mode === "signup") {
-        res = await axios.post(`${API_BASE_URL}/verify-email`, { otp: otpString });
-        if (res.data.success) {
-          onSuccess?.();
-          navigate("/");
-        }
-      } else if (mode === "forgot") {
-        res = await axios.post(`${API_BASE_URL}/forgot-password`, {
-          otp: otpString,
-          reset_token: resetToken,
-          newPassword
-        });
-        if (res.data.success) {
-          onSuccess?.();
-          alert("Password reset successfully!");
-          navigate("/");
-        }
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || "Something went wrong.");
+    if (passwordData.newPassword.length < 8) {
+      alert('Password must be at least 8 characters long!');
+      return;
     }
-    setIsLoading(false);
+
+    setShowOTPModal(true);
   };
-
-  const handleResend = async () => {
-    try {
-      if (mode === "forgot") {
-        const res = await axios.post(`${API_BASE_URL}/request-otp`, { email });
-        setResetToken(res.data.reset_token);
-        setCooldown(60);
-        alert("New OTP sent!");
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || "Failed to resend OTP.");
-    }
-  };
-
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const timer = setInterval(() => setCooldown(prev => Math.max(prev - 1, 0)), 1000);
-    return () => clearInterval(timer);
-  }, [cooldown]);
-
-  if (!isOpen) return null;
 
   return (
-    <div className="otp-modal-overlay">
-      <div className="otp-modal">
-        <button className="otp-close" onClick={onClose}>×</button>
-        <h2 className="title">{mode === "signup" ? "Verify Your Email" : "Reset Your Password"}</h2>
-        <p className="description">
-          Enter the 6-digit code sent to your email {mode === "signup" ? "to complete signup." : "to reset your password."}
-        </p>
+    <div className="settings-container">
+      <UserDashboardHeader />
+      <div className="settings-main-layout">
+        <UserDashboardSidebar activeItem="Settings" />
+        <div className="settings-main-content">
+          {loading ? (
+            <div className="settings-loading">
+              <div className="loading-spinner"></div>
+              <p>Loading settings...</p>
+            </div>
+          ) : (
+            <>
+              <div className="settings-content-section">
+                <div className="settings-header">
+                  <h1 className="settings-title">Settings</h1>
+                </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="otp-input-container">
-            {otp.map((digit, idx) => (
-              <input
-                key={idx}
-                id={`otp-${idx}`}
-                type="text"
-                className="otp-digit"
-                value={digit}
-                onChange={e => handleInputChange(idx, e.target.value)}
-                onKeyDown={e => handleKeyDown(idx, e)}
-                maxLength={1}
-              />
-            ))}
-          </div>
-          <button type="submit" disabled={isLoading}>{isLoading ? "Verifying..." : "Verify"}</button>
-        </form>
+                <div className="settings-form">
+                  {/* Change Password Section */}
+                  <div className="settings-section">
+                    <div className="settings-form-group">
+                      <label className="settings-label">Current Password:</label>
+                      <div className="settings-password-wrapper">
+                        <input
+                          type={showPassword.current ? "text" : "password"}
+                          name="currentPassword"
+                          value={passwordData.currentPassword}
+                          onChange={handlePasswordChange}
+                          className="settings-input"
+                          placeholder="**************"
+                          minLength={8}
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="settings-password-toggle"
+                          onClick={() => togglePasswordVisibility('current')}
+                        >
+                          👁
+                        </button>
+                      </div>
+                    </div>
 
-        <button onClick={handleResend} disabled={cooldown > 0}>
-          {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend Code"}
-        </button>
+                    <div className="settings-form-group">
+                      <label className="settings-label">New Password:</label>
+                      <div className="settings-password-wrapper">
+                        <input
+                          type={showPassword.new ? "text" : "password"}
+                          name="newPassword"
+                          value={passwordData.newPassword}
+                          onChange={handlePasswordChange}
+                          className="settings-input"
+                          placeholder="**************"
+                          minLength={8}
+                          required                    
+                        />
+                        <button
+                          type="button"
+                          className="settings-password-toggle"
+                          onClick={() => togglePasswordVisibility('new')}
+                        >
+                          👁
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="settings-form-group">
+                      <label className="settings-label">Confirm Password:</label>
+                      <div className="settings-password-wrapper">
+                        <input
+                          type={showPassword.confirm ? "text" : "password"}
+                          name="confirmPassword"
+                          value={passwordData.confirmPassword}
+                          onChange={handlePasswordChange}
+                          className="settings-input"
+                          placeholder="**************"
+                          minLength={8}
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="settings-password-toggle"
+                          onClick={() => togglePasswordVisibility('confirm')}
+                        >
+                          👁
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Save Button */}
+                  <div className="settings-save-section">
+                    <button 
+                      className="settings-save-btn" 
+                      onClick={handleSave}
+                      disabled={saving}
+                    >
+                      {saving ? 'Saving...' : 'Save'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="settings-footer">
+                <p className="settings-copyright">© 2025 PathFinder. All Rights Reserved.</p>
+              </div>
+            </>
+          )}
+          
+        </div>
       </div>
+
+      {/* ✅ OTP Modal for Password Change */}
+      {showOTPModal && (
+        <OTPModal
+          isOpen={showOTPModal}
+          onClose={() => setShowOTPModal(false)}
+          mode="forgot"   // or "change", depending on your backend logic
+          formData={{
+            email: userInfo?.email,
+            currentPassword: passwordData.currentPassword,
+            newPassword: passwordData.newPassword,
+            confirmPassword: passwordData.confirmPassword
+          }}
+          onSuccess={() => {
+            setShowOTPModal(false);
+            setPasswordData({
+              currentPassword: '',
+              newPassword: '',
+              confirmPassword: ''
+            });
+
+          }}
+        />
+      )}
     </div>
   );
 };
 
-export default OTPModal;
+export default UserDashboardSettings;
