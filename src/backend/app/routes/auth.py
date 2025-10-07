@@ -7,7 +7,7 @@ from app.services.jwt_utils import generate_jwt, decode_jwt, token_required, cre
 from ..config import Config
 from .. import db
 
-auth_bp = Blueprint("login", __name__)
+auth_bp = Blueprint("auth", __name__)
 ph = PasswordHasher()
 SECRET_KEY = Config.SECRET_KEY
 ALGORITHM = Config.ALGORITHM
@@ -158,23 +158,35 @@ def request_otp():
     if not user:
         return jsonify({"success": False, "message": "User not found"}), 404
 
-    otp = verify_email(email)
+    otp = verify_email(email)  # send OTP via email
     if not otp:
         return jsonify({"success": False, "message": "Error sending OTP email"}), 500
 
-    return jsonify({"success": True, "message": "OTP sent to email"}), 200
+    # create short-lived reset token
+    reset_token_payload = {
+        "email": email,
+        "otp": str(otp)
+    }
+    reset_token = generate_jwt(reset_token_payload, expires_in=OTP_EXPIRY)
+
+    return jsonify({
+        "success": True,
+        "message": "OTP sent to email",
+        "reset_token": reset_token
+    }), 200
+
 
 @auth_bp.route("/forgot-password", methods=["POST"])
-def forgot_password():
+@token_required
+def forgot_password(payload):
     data = request.get_json()
     otp = data.get("otp")
     reset_token = data.get("reset_token")  # client must send this
     new_password = data.get("newPassword")
-
+    print(data)
     if not otp or not reset_token or not new_password:
         return jsonify({"success": False, "message": "OTP, token, and new password are required"}), 400
 
-    payload = decode_jwt(reset_token)
     if not payload:
         return jsonify({"success": False, "message": "Invalid or expired token"}), 400
     print(payload)
@@ -190,6 +202,23 @@ def forgot_password():
     db.session.commit()
 
     return jsonify({"success": True, "message": "Password reset successfully"}), 200
+
+@auth_bp.route("/verify-password", methods=["POST"])
+@token_required
+def verify_password(payload):
+    data = request.get_json()
+    password = data.get("password")
+
+    if not password:
+        return jsonify({"valid": False, "message": "Password is required"}), 400
+    user = User.query.get(payload["user_id"])
+    if not user:
+        return jsonify({"valid": False, "message": "User not found"}), 404
+    try:
+        ph.verify(user.password, password)
+        return jsonify({"valid": True}), 200
+    except Exception:
+        return jsonify({"valid": False, "message": "Your current password is wrong"}), 401
 
 @auth_bp.route("/me", methods=["GET"])
 @token_required

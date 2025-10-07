@@ -40,7 +40,7 @@ const UserForgotPassword = ({ onClose }) => {
     setTimeout(() => {
       console.log('Password reset request:', formData);
       setIsLoading(false);
-      setShowOtp(true); // show OTP modal after request
+      setShowOtp(true); 
     }, 1500);
   };
 

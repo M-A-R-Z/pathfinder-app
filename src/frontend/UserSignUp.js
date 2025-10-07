@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './UserSignUp.css';
 import axios from 'axios';
 import OTPModal from "./component/OTPModal";
+import ErrorModal from './component/ErrorModal';
 
 const UserSignUp = ({ onClose }) => {
   const [formData, setFormData] = useState({
@@ -20,6 +21,7 @@ const UserSignUp = ({ onClose }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isOtpOpen, setIsOtpOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const API_BASE_URL = process.env.REACT_APP_API_URL;
   
   const navigate = useNavigate();
@@ -54,11 +56,11 @@ const UserSignUp = ({ onClose }) => {
     e.preventDefault();
 
     if (formData.password.length < 8) {
-      alert("Password must be at least 8 characters long!");
+      setErrorMessage("Password must be at least 8 characters long!");
       return;
     }
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      setErrorMessage("Passwords do not match!");
       return;
     }
 
@@ -89,15 +91,15 @@ const UserSignUp = ({ onClose }) => {
 
         setIsOtpOpen(true);   // open OTP modal
       } else {
-        alert(res.data.message || "Signup failed.");
+        setErrorMessage(res.data.message || "Signup failed.");
       }
 
     } catch (err) {
       console.error(err);
       if (err.response?.data?.message) {
-        alert(err.response.data.message);
+        setErrorMessage(err.response.data.message);
       } else {
-        alert("Something went wrong. Try again.");
+        setErrorMessage("Something went wrong. Try again.");
       }
     }
     setIsLoading(false);
@@ -293,7 +295,12 @@ const UserSignUp = ({ onClose }) => {
           </div>
         </form>
       </div>
-
+      {/*  Error Modal */}
+      <ErrorModal
+        isOpen={!!errorMessage}
+        message={errorMessage}
+        onClose={() => setErrorMessage("")}
+      />
       {/* OTP Modal */}
       <OTPModal 
         isOpen={isOtpOpen} 
@@ -301,7 +308,7 @@ const UserSignUp = ({ onClose }) => {
         formData={formData}  
         mode="signup"
         onSuccess={() => {
-          alert("Signup complete, email verified!");
+          setErrorMessage("Signup complete, email verified!");
           navigate('/userlogin');
         }}
       />
