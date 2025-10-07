@@ -14,16 +14,36 @@ const UserDashboardCourses = () => {
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
   const API_BASE_URL = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   useEffect(() => {
-    const fetchResult = async () => {
+    const fetchInitialData = async () => {
+      if (!token) {
+        alert("Session expired. Please log in again.");
+        navigate("/userlogin");
+        return;
+      }
+
       try {
-        // get logged-in user info + active dataset
-        const meRes = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
-        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`, { withCredentials: true });
+        const meRes = await axios.get(`${API_BASE_URL}/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+
+        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const datasetId = datasetRes.data.data_set_id || null;
+
+        if (!datasetId) {
+          console.error("No active dataset found");
+          setLoading(false);
+          return;
+        }
 
         const res = await axios.get(
           `${API_BASE_URL}/progress/${meRes.data.user_id}/${datasetRes.data.data_set_id}`,
-          { withCredentials: true }
+          { headers: { Authorization: `Bearer ${token}`  }}
         );
 
         setCompleted(res.data.completed || false);
@@ -31,19 +51,28 @@ const UserDashboardCourses = () => {
         if (res.data.completed) {
           const resultRes = await axios.get(
             `${API_BASE_URL}/results/${res.data.assessment_id}`,
-            { withCredentials: true }
+            { headers: { Authorization: `Bearer ${token}`  }}
           );
           setStrand(resultRes.data.recommended_strand);
         }
       } catch (err) {
-        console.error("Error fetching results for courses:", err);
+        console.error("Error fetching initial data:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchResult();
-  }, []);
+    fetchInitialData();
+  }, [token, navigate, API_BASE_URL]);
+
+  if (loading) {
+    return (
+      <div className="user-dashboard-loading">
+        <div className="loading-spinner"></div>
+        <p>Loading dashboard...</p>
+      </div>
+    );
+  }
 
   const renderCourses = () => {
     if (!completed) {

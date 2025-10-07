@@ -1,6 +1,7 @@
 # app/routes/assessment.py
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 from app import db
+from app.services.jwt_utils import token_required
 from app.models import (
     Assessment, Answer, Data, DataSet, Results,
     Neighbors, TieTable, Question, User
@@ -48,8 +49,9 @@ def calculate_assessment_stats(assessment_id):
 
 # Create assessment
 @assessment_bp.route("/assessments", methods=["POST"])
-def create_assessment():
-    user_id = session.get("user_id")
+@token_required
+def create_assessment(payload):
+    user_id = payload.get("user_id")
     if not user_id:
         return jsonify({"error": "Not logged in"}), 401
 

@@ -21,8 +21,6 @@ const UserDashboardTakeAssessment = () => {
   const [progress, setProgress] = useState(0);
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // new states for submit process
   const [submitting, setSubmitting] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const questionRefs = useRef({});
@@ -31,33 +29,48 @@ const UserDashboardTakeAssessment = () => {
   const currentPage = step;
   const startIndex = (currentPage - 1) * questionsPerPage;
   const currentQuestions = questions.slice(startIndex, startIndex + questionsPerPage);
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
   // ---------------- Fetch initial data ----------------
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchInitialData = async () => {
+      if (!token) {
+        alert("Session expired. Please log in again.");
+        navigate("/userlogin");
+        return;
+      }
+
       try {
-        const meRes = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
+        const meRes = await axios.get(`${API_BASE_URL}/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setUserId(meRes.data.user_id);
 
+        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const datasetId = datasetRes.data.data_set_id || null;
+
+        if (!datasetId) {
+          console.error("No active dataset found");
+          setLoading(false);
+          return;
+        }
         const coursesRes = await axios.get(`${API_BASE_URL}/courses`);
-        setCourses(coursesRes.data);
-
-        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`);
-        const active = datasetRes.data;
-
-        if (!active.question_set_id) return console.error("Active dataset has no question set");
-        setDatasetId(active.data_set_id);
-
+        setCourses(coursesRes.data || []);
+        if (!datasetRes.data.question_set_id) return console.error("Active dataset has no question set");
+        setDatasetId(datasetRes.data.data_set_id)
         const questionsRes = await axios.get(
-          `${API_BASE_URL}/question-sets/${active.question_set_id}`
+          `${API_BASE_URL}/question-sets/${datasetRes.data.question_set_id}`
         );
         const data = questionsRes.data;
         setQuestions(data.questions || []);
         setTotalPages(Math.ceil((data.questions || []).length / questionsPerPage));
 
         const res = await axios.get(
-          `${API_BASE_URL}/progress/${meRes.data.user_id}/${active.data_set_id}`,
-          { withCredentials: true }
+          `${API_BASE_URL}/progress/${meRes.data.user_id}/${datasetId}`,
+          { headers: { Authorization: `Bearer ${token}` }, }
         );
 
         if (res.data && !res.data.error) {
@@ -70,7 +83,7 @@ const UserDashboardTakeAssessment = () => {
 
           const answersRes = await axios.get(
             `${API_BASE_URL}/assessment/${existing.assessment_id}/answers`,
-            { withCredentials: true }
+            { headers: { Authorization: `Bearer ${token}` }, }
           );
           const savedAnswers = {};
           answersRes.data.forEach((ans) => {
@@ -86,9 +99,8 @@ const UserDashboardTakeAssessment = () => {
         setLoading(false);
       }
     };
-
-    fetchData();
-  }, [API_BASE_URL]);
+    fetchInitialData();
+  }, [token, navigate, API_BASE_URL]);
 
   // ---------------- Warn before leaving ----------------
   useEffect(() => {
@@ -103,28 +115,30 @@ const UserDashboardTakeAssessment = () => {
   }, [progress]);
 
   // ---------------- Start assessment ----------------
-  const handleStartAssessment = () => {
+  const handleStartAssessment = async () => {
+  if (!userId || !datasetId) return;
+
+  try {
     if (assessmentId) {
       setStep(1);
       return;
     }
-
-    if (!userId || !datasetId) return;
     const payload = {
       user_id: userId,
       data_set_id: datasetId,
       is_first_year: isFirstYear,
       course_id: selectedCourse || null,
     };
-
-    axios
-      .post(`${API_BASE_URL}/assessments`, payload, { withCredentials: true })
-      .then((res) => {
-        setAssessmentId(res.data.assessment_id);
-        setStep(1);
-      })
-      .catch((err) => console.error("Error starting assessment:", err));
-  };
+    const res = await axios.post(`${API_BASE_URL}/assessments`, payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setAssessmentId(res.data.assessment_id);
+    setStep(1); // ✅ Move to questions immediately
+  } catch (err) {
+    console.error("Error starting assessment:", err);
+    alert("Failed to start assessment. Please try again.");
+  }
+};
 
   // ---------------- Handle answer change ----------------
   const handleAnswerChange = (questionId, value) => {
@@ -137,7 +151,7 @@ const UserDashboardTakeAssessment = () => {
       .put(
         `${API_BASE_URL}/assessment/${assessmentId}/answers`,
         { question_id: questionId, answer: value },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${token}` }, }
       )
       .then((res) => {
         if (res.data.progress !== undefined) setProgress(res.data.progress);
@@ -152,7 +166,7 @@ const UserDashboardTakeAssessment = () => {
       const res = await axios.post(
         `${API_BASE_URL}/submit_assessment/${assessmentId}`,
         {},
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${token}` }, }
       );
 
       console.log("Submission successful:", res.data);

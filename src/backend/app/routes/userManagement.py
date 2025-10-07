@@ -1,15 +1,17 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 from ..models import User
 from app import db
+from app.services.jwt_utils import token_required
 
 userManagement_bp = Blueprint("user-management", __name__)
 
 
 # GET CURRENT USER PROFILE
 @userManagement_bp.route("/profile", methods=["GET"])
-def get_profile():
+@token_required
+def get_profile(payload):
     try:
-        user_id = session.get("user_id")
+        user_id = payload.get("user_id")
         if not user_id:
             return jsonify({"error": "Unauthorized"}), 401
 
@@ -24,9 +26,10 @@ def get_profile():
 
 # UPDATE CURRENT USER PROFILE
 @userManagement_bp.route("/profile/update", methods=["PUT"])
-def update_profile():
+@token_required
+def update_profile(payload):
     try:
-        user_id = session.get("user_id")
+        user_id = payload.get("user_id")
         if not user_id:
             return jsonify({"error": "Unauthorized"}), 401
 

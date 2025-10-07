@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 import './UserLogin.css';
 import LoginIcon from '../assets/Login 1.png';
 import logo from '../assets/logo.png';
@@ -17,6 +18,22 @@ const UserLogin = ({ onClose }) => {
   const API_BASE_URL = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setFormData(prev => ({
+          ...prev,
+          rememberMe: true,
+          email: decoded.email || ""
+        }));
+      } catch (err) {
+        console.error("Invalid token in localStorage", err);
+        localStorage.removeItem("token");
+      }
+    }
+  }, []);
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -33,16 +50,13 @@ const UserLogin = ({ onClose }) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      const res = await axios.post(
-        `${API_BASE_URL}/login`,
-        { 
-          email: formData.email, 
-          password: formData.password, 
-        },
-        { withCredentials: true }
-      );
-
+      const res = await axios.post(`${API_BASE_URL}/login`, { email, password });
       if (res.data.success) {
+        const token = res.data.token;
+        if (rememberMe)
+          localStorage.setItem("token", token);
+        else
+          sessionStorage.setItem("token", token);
         navigate("/userdashboardhome");
       } else {
         alert(res.data.message);

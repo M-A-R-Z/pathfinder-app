@@ -7,44 +7,55 @@ import "./UserDashboardAssessment.css";
 
 const UserDashboardAssessment = () => {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState(null);
-  const [datasetId, setDatasetId] = useState(null);
   const [existingAssessment, setExistingAssessment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showRetakeConfirm, setShowRetakeConfirm] = useState(false);
   const API_BASE_URL = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   // Fetch user info and existing assessment
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchInitialData = async () => {
+      if (!token) {
+        alert("Session expired. Please log in again.");
+        navigate("/userlogin");
+        return;
+      }
+
       try {
         const meRes = await axios.get(`${API_BASE_URL}/me`, {
-          withCredentials: true,
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setUserId(meRes.data.user_id);
 
-        const datasetRes = await axios.get(
-          `${API_BASE_URL}/active-dataset`,
-          { withCredentials: true }
-        );
-        setDatasetId(datasetRes.data.data_set_id);
+
+        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const datasetId = datasetRes.data.data_set_id || null;
+
+        if (!datasetId) {
+          console.error("No active dataset found");
+          setLoading(false);
+          return;
+        }
 
         const progressRes = await axios.get(
           `${API_BASE_URL}/progress/${meRes.data.user_id}/${datasetRes.data.data_set_id}`,
-          { withCredentials: true }
+          { headers: { Authorization: `Bearer ${token}`  }}
         );
 
         if (progressRes.data && !progressRes.data.error) {
           setExistingAssessment(progressRes.data);
         }
       } catch (err) {
-        console.error("Error fetching assessment data:", err);
+        console.error("Error fetching initial data:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, []);
+    fetchInitialData();
+  }, [token, navigate, API_BASE_URL]);
 
   // Navigate to take/resume assessment
   const handleTakeAssessment = () => navigate("/userdashboardtakeassessment");
@@ -57,7 +68,7 @@ const UserDashboardAssessment = () => {
     try {
       await axios.delete(
         `${API_BASE_URL}/assessment/${existingAssessment.assessment_id}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${token}` }, }
       );
 
       setExistingAssessment(null);

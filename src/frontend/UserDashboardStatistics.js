@@ -21,29 +21,44 @@ export default function UserResultsDashboard() {
   const navigate = useNavigate();
   const API_BASE_URL = process.env.REACT_APP_API_URL;
   const COLORS = ["#4cafef", "#ff9800", "#8bc34a"];
-  const [user, setUser] = useState(null);
   const [assessment, setAssessment] = useState(null);
   const [result, setResult] = useState(null);
   const [neighbors, setNeighbors] = useState([]);
   const [pieData, setPieData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const fetchInitialData = async () => {
+      if (!token) {
+        alert("Session expired. Please log in again.");
+        navigate("/userlogin");
+        return;
+      }
+
       try {
-        // 1️⃣ Get current user
-        const meRes = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
-        const currentUser = meRes.data;
-        setUser(currentUser);
+        // 1️⃣ Fetch user info
+        const userRes = await axios.get(`${API_BASE_URL}/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const meRes = userRes.data;
 
-        // 2️⃣ Get the currently active dataset
-        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`);
-        const activeDataset = datasetRes.data;
+        // 2️⃣ Fetch active dataset
+        const  res = await axios.get(`${API_BASE_URL}/active-dataset`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const datasetRes = res.data;
 
-        // 3️⃣ Get the user's assessment for this dataset
+        if (!datasetRes.data_set_id) { 
+          console.error("No active dataset found");
+          setLoading(false);
+          return;
+        }
+
         const assessmentRes = await axios.get(
-          `${API_BASE_URL}/progress/${currentUser.user_id}/${activeDataset.data_set_id}`
+          `${API_BASE_URL}/progress/${meRes.user_id}/${datasetRes.data_set_id}`, 
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         const userAssessment = assessmentRes.data;
         
@@ -58,7 +73,8 @@ export default function UserResultsDashboard() {
         setAssessment(userAssessment);
 
         // 4️⃣ Get the results for that assessment
-        const resultsRes = await axios.get(`${API_BASE_URL}/results/${userAssessment.assessment_id}`);
+        const resultsRes = await axios.get(`${API_BASE_URL}/results/${userAssessment.assessment_id}`, { 
+          headers: { Authorization: `Bearer ${token}` } });
         const resultData = resultsRes.data;
         setResult(resultData);
 
@@ -76,14 +92,17 @@ export default function UserResultsDashboard() {
 
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching dashboard data:", err);
-        setCompleted(false);
+        console.error("Error fetching initial data:", err);
+  
+
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchDashboardData();
-  }, [API_BASE_URL]);
+    fetchInitialData();
+  }, [token, navigate, API_BASE_URL]);
+
 
   if (loading) {
     return (

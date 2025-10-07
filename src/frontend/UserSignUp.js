@@ -14,6 +14,7 @@ const UserSignUp = ({ onClose }) => {
     birthday: '',
     password: '',
     confirmPassword: ''
+
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -75,15 +76,22 @@ const UserSignUp = ({ onClose }) => {
           affix: formData.affix,
           birthday: formData.birthday,
           confirmPassword: formData.confirmPassword
+
         },
-        { withCredentials: true }
       );
 
       if (res.data.success) {
-        setIsOtpOpen(true);   // ✅ open OTP modal
+        // ✅ merge signup token into formData
+        setFormData(prev => ({
+          ...prev,
+          signupToken: res.data.signup_token
+        }));
+
+        setIsOtpOpen(true);   // open OTP modal
       } else {
         alert(res.data.message || "Signup failed.");
       }
+
     } catch (err) {
       console.error(err);
       if (err.response?.data?.message) {
@@ -290,7 +298,7 @@ const UserSignUp = ({ onClose }) => {
       <OTPModal 
         isOpen={isOtpOpen} 
         onClose={() => setIsOtpOpen(false)}
-        formData={formData}   // ✅ pass form data to modal
+        formData={formData}  
         mode="signup"
         onSuccess={() => {
           alert("Signup complete, email verified!");

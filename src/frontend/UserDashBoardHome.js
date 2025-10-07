@@ -9,65 +9,84 @@ const UserDashBoardHome = () => {
   const navigate = useNavigate();
   const [progress, setProgress] = useState(0);
   const [completed, setCompleted] = useState(false);
-  const [userId, setUserId] = useState(null);
-  const [activeDataSetId, setActiveDataSetId] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const [result, setResult] = useState(null);
   const API_BASE_URL = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
-  // Fetch user info + active dataset
   useEffect(() => {
-    const fetchUserAndDataset = async () => {
+    const fetchInitialData = async () => {
+      if (!token) {
+        alert("Session expired. Please log in again.");
+        navigate("/userlogin");
+        return;
+      }
+
       try {
-        const meRes = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
-        const uid = meRes.data.user_id;
-        setUserId(uid);
+        // 1️⃣ Fetch user info
+        const meRes = await axios.get(`${API_BASE_URL}/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+       
         setUserName(meRes.data.first_name || "User");
 
-        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`, { withCredentials: true });
-        setActiveDataSetId(datasetRes.data.data_set_id || null);
-      } catch (err) {
-        console.error("Error fetching user or dataset:", err);
-      }
-    };
-    fetchUserAndDataset();
-  }, []);
+        // 2️⃣ Fetch active dataset
+        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-  // Fetch progress + result
-  useEffect(() => {
-    const fetchProgressAndResult = async () => {
-      if (!userId || !activeDataSetId) return;
-      try {
-        const res = await axios.get(
-          `${API_BASE_URL}/progress/${userId}/${activeDataSetId}`,
-          { withCredentials: true }
+        const datasetId = datasetRes.data.data_set_id || null;
+
+        if (!datasetId) {
+          console.error("No active dataset found");
+          setLoading(false);
+          return;
+        }
+
+        // 3️⃣ Fetch progress
+        const progressRes = await axios.get(
+          `${API_BASE_URL}/progress/${meRes.data.user_id}/${datasetId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
         );
-        setProgress(res.data.progress || 0);
-        setCompleted(res.data.completed || false);
 
-        if (res.data.completed) {
-          // Fetch submitted results
+        setProgress(progressRes.data.progress || 0);
+        setCompleted(progressRes.data.completed || false);
+
+        // 4️⃣ Fetch results if completed
+        if (progressRes.data.completed) {
           const resultRes = await axios.get(
-            `${API_BASE_URL}/results/${res.data.assessment_id}`,
-            { withCredentials: true }
+            `${API_BASE_URL}/results/${progressRes.data.assessment_id}`,
+            { headers: { Authorization: `Bearer ${token}` } }
           );
           setResult(resultRes.data);
         }
 
       } catch (err) {
-        console.error("Error fetching progress or result:", err);
+        console.error("Error fetching initial data:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchProgressAndResult();
-  }, [userId, activeDataSetId]);
+    fetchInitialData();
+  }, [token, navigate, API_BASE_URL]);
 
+  if (loading) {
+    return (
+      <div className="user-dashboard-loading">
+        <div className="loading-spinner"></div>
+        <p>Loading dashboard...</p>
+      </div>
+    );
+  }
   const handleTakeAssessment = () => {
     if (progress === 100 && !completed) {
       navigate('/userdashboardtakeassessment'); // submit pending
     } else if (progress === 100 && completed) {
       navigate('/userdashboardassessment'); // retake flow
-    } else if (progress > 0) {
+    } else if (progress > 0 && progress < 100) {
       navigate('/userdashboardtakeassessment'); // in-progress
     } else {
       navigate('/userdashboardassessment'); // new

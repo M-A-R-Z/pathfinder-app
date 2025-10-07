@@ -11,7 +11,7 @@ const UserDashboardHeader = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   const toggleDropdown = () => {
     console.log('Dropdown toggled:', !isDropdownOpen);
     setIsDropdownOpen(!isDropdownOpen);
@@ -46,15 +46,10 @@ const UserDashboardHeader = () => {
   const handleLogout = async () => {
     console.log('Log out');
     try {
-      const res = await axios.post(
-        `${API_BASE_URL}/logout`,
-        {},
-        { withCredentials: true }
-      );
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');         
+      navigate("/");
 
-      if (res.data.success) {
-        navigate(res.data.redirect || "/");
-      }
     } catch (err) {
       console.error("Logout failed", err);
       alert("Logout failed: " + (err.response?.data?.error || err.message));

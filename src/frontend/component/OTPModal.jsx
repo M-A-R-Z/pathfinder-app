@@ -10,31 +10,31 @@ const OTPModal = ({
   mode = "signup", // "signup" or "forgot"
   onSuccess
 }) => {
-  const { email = "", newPassword = "", confirmPassword = "" } = formData;
+  const { email = "", newPassword = "", confirmPassword = "", signupToken: initialSignupToken = "", resetToken: initialResetToken = "" } = formData;
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [signupToken, setSignupToken] = useState(initialSignupToken);
+  const [resetToken, setResetToken] = useState(initialResetToken);
+
   const API_BASE_URL = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
- 
- useEffect(() => {
-    const sendInitialOtp = async () => {
-      if (!isOpen) return;
+  // Send initial OTP only once when modal opens
+  useEffect(() => {
+    if (!isOpen) return;
 
+    const sendInitialOtp = async () => {
       setCooldown(60);
 
       try {
         if (mode === "forgot") {
-          await axios.post(
-            `${API_BASE_URL}/request-otp`,
-            { email },
-            { withCredentials: true }
-          );
-          console.log("Forgot password OTP sent");
+          const res = await axios.post(`${API_BASE_URL}/request-otp`, { email });
+          alert(res.data.message || "OTP sent!");
+          // Optionally, save resetToken if backend returns one
         }
-        // 👉 for signup, OTP is already sent during registration, so no resend here
+
       } catch (err) {
         console.error("Failed to send OTP:", err.response?.data || err.message);
       }
@@ -74,19 +74,24 @@ const OTPModal = ({
 
     setIsLoading(true);
     try {
-      let res;
       if (mode === "signup") {
-        res = await axios.post(
+
+        const res = await axios.post(
           `${API_BASE_URL}/verify-email`,
           { otp: otpString },
-          { withCredentials: true }
+          { headers: { Authorization: `Bearer ${signupToken}` } }
         );
+
         if (res.data.success) {
-          
           if (onSuccess) onSuccess();
           navigate("/");
         }
       } else if (mode === "forgot") {
+        if (!resetToken) {
+          alert("Missing reset token.");
+          setIsLoading(false);
+          return;
+        }
         if (!newPassword || !confirmPassword) {
           alert("Password and confirm password are required.");
           setIsLoading(false);
@@ -97,11 +102,13 @@ const OTPModal = ({
           setIsLoading(false);
           return;
         }
-        res = await axios.post(
+
+        const res = await axios.post(
           `${API_BASE_URL}/forgot-password`,
           { otp: otpString, newPassword },
-          { withCredentials: true }
+          { headers: { Authorization: `Bearer ${resetToken}` } }
         );
+
         if (res.data.success) {
           if (onSuccess) onSuccess();
           alert("Password reset successfully!");
@@ -114,12 +121,11 @@ const OTPModal = ({
     setIsLoading(false);
   };
 
+  // Cooldown timer for resend button
   useEffect(() => {
     let timer;
     if (cooldown > 0) {
-      timer = setInterval(() => {
-        setCooldown((prev) => Math.max(prev - 1, 0));
-      }, 1000);
+      timer = setInterval(() => setCooldown(prev => Math.max(prev - 1, 0)), 1000);
     }
     return () => clearInterval(timer);
   }, [cooldown]);
@@ -127,12 +133,24 @@ const OTPModal = ({
   const handleResend = async () => {
     try {
       if (mode === "signup") {
-        const res = await axios.post(`${API_BASE_URL}/signup/resend-otp`, {}, { withCredentials: true });
+        if (!signupToken) {
+          alert("Missing signup token for resend.");
+          return;
+        }
+
+        const res = await axios.post(
+          `${API_BASE_URL}/signup/resend-otp`,
+          {},
+          { headers: { Authorization: `Bearer ${signupToken}` } }
+        );
+
         alert(res.data.message || "New OTP sent!");
-        setCooldown(60); // start 60s cooldown
+        setSignupToken(res.data.signup_token); // update JWT
+        setCooldown(60);
       } else if (mode === "forgot") {
-        await axios.post(`${API_BASE_URL}/request-otp`, { email }, { withCredentials: true });
-        alert("New reset OTP sent!");
+        const res = await axios.post(`${API_BASE_URL}/request-otp`, { email });
+        alert(res.data.message || "New OTP sent!");
+        // Optionally update resetToken if backend returns one
         setCooldown(60);
       }
     } catch (err) {
@@ -141,18 +159,18 @@ const OTPModal = ({
   };
 
   if (!isOpen) return null;
-  
+
   return (
     <div className="otp-modal-overlay">
       <div className="otp-modal">
-        <button className="otp-close" onClick={onClose}>
-          ×
-        </button>
+        <button className="otp-close" onClick={onClose}>×</button>
+
         <div className="email-icon">
           <div className="envelope">
             <div className="location-pin"></div>
           </div>
         </div>
+
         <h2 className="title">
           {mode === "signup" ? "Verify Your Email Address" : "Reset Your Password"}
         </h2>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import UserDashboardSidebar from "./component/UserDashboardSidebar";
 import UserDashboardHeader from "./component/UserDashboardHeader";
 import "./UserDashboardProfile.css";
@@ -52,7 +53,8 @@ const UserDashboardProfile = () => {
   const [saving, setSaving] = useState(false);
   const [modalMessage, setModalMessage] = useState(null);
   const [confirmChanges, setConfirmChanges] = useState(null);
-
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
   const [formData, setFormData] = useState({
     first_name: "",
     middle_name: "",
@@ -66,11 +68,15 @@ const UserDashboardProfile = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
+      if (!token) {
+        alert("Session expired. Please log in again.");
+        navigate("/userlogin");
+        return;
+      }
       try {
         const response = await axios.get(`${API_BASE_URL}/me`, {
-          withCredentials: true,
+          headers: { Authorization: `Bearer ${token}` },
         });
-
         const userData = response.data;
         setFormData({
           first_name: userData.first_name || "",
@@ -124,7 +130,7 @@ const UserDashboardProfile = () => {
     setSaving(true);
     try {
       await axios.put(`${API_BASE_URL}/profile/update`, formData, {
-        withCredentials: true,
+        headers: { Authorization: `Bearer ${token}` },
       });
       setModalMessage("✅ Profile updated successfully!");
       setOriginalData({ ...formData });
