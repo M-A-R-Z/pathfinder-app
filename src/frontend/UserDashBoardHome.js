@@ -15,86 +15,53 @@ const UserDashBoardHome = () => {
   const [result, setResult] = useState(null);
   const API_BASE_URL = process.env.REACT_APP_API_URL;
 
-  // ---------------- AUTH CHECK ----------------
+  // Fetch user info + active dataset
   useEffect(() => {
-    const checkAuth = async () => {
-      // Get token (check both localStorage and sessionStorage for "remember me")
-      const token = localStorage.getItem("authToken") || sessionStorage.getItem("token");
-      console.log("Checking auth with token:", token);
-      if (!token) {
-
-        navigate("/userlogin");
-        return;
-      }
-
+    const fetchUserAndDataset = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const uid = res.data.user_id;
+        const meRes = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
+        const uid = meRes.data.user_id;
         setUserId(uid);
-        setUserName(res.data.first_name || "User");
-      } catch (err) {
-        console.error("Auth check failed:", err);
-        // Token invalid or expired → redirect to login
-        localStorage.removeItem("token");
-        sessionStorage.removeItem("token");
-        navigate("userlogin");
-      }
-    };
+        setUserName(meRes.data.first_name || "User");
 
-    checkAuth();
-  }, [navigate, API_BASE_URL]);
-
-  // ---------------- FETCH ACTIVE DATASET ----------------
-  useEffect(() => {
-    const fetchDataset = async () => {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      if (!token) return;
-
-      try {
-        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`, { withCredentials: true });
         setActiveDataSetId(datasetRes.data.data_set_id || null);
       } catch (err) {
-        console.error("Error fetching dataset:", err);
+        console.error("Error fetching user or dataset:", err);
       }
     };
+    fetchUserAndDataset();
+  }, []);
 
-    fetchDataset();
-  }, [API_BASE_URL]);
-
-  // ---------------- FETCH PROGRESS + RESULTS ----------------
+  // Fetch progress + result
   useEffect(() => {
     const fetchProgressAndResult = async () => {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      if (!userId || !activeDataSetId || !token) return;
-
+      if (!userId || !activeDataSetId) return;
       try {
         const res = await axios.get(
           `${API_BASE_URL}/progress/${userId}/${activeDataSetId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          { withCredentials: true }
         );
         setProgress(res.data.progress || 0);
         setCompleted(res.data.completed || false);
 
         if (res.data.completed) {
+          // Fetch submitted results
           const resultRes = await axios.get(
             `${API_BASE_URL}/results/${res.data.assessment_id}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { withCredentials: true }
           );
           setResult(resultRes.data);
         }
+
       } catch (err) {
         console.error("Error fetching progress or result:", err);
       }
     };
 
     fetchProgressAndResult();
-  }, [userId, activeDataSetId, API_BASE_URL]);
+  }, [userId, activeDataSetId]);
 
-  // ---------------- NAVIGATION HANDLERS ----------------
   const handleTakeAssessment = () => {
     if (progress === 100 && !completed) {
       navigate('/userdashboardtakeassessment'); // submit pending
@@ -107,11 +74,16 @@ const UserDashBoardHome = () => {
     }
   };
 
-  const goToStatistics = () => result && navigate(`/userdashboardstatistics`);
-  const goToCareerMatch = () => result && navigate(`/userdashboardcareers`);
-  const goToCourseMatch = () => result && navigate(`/userdashboardcourses`);
+  const goToStatistics = () => {
+    if (result) navigate(`/userdashboardstatistics`);
+  };
+  const goToCareerMatch = () => {
+    if (result) navigate(`/userdashboardcareers`);
+  };
+  const goToCourseMatch = () => {
+    if (result) navigate(`/userdashboardcourses`);
+  };
 
-  // ---------------- UI ----------------
   return (
     <div className="user-dashboard-container">
       <UserDashboardHeader />
@@ -152,10 +124,10 @@ const UserDashBoardHome = () => {
                 {progress === 100 && !completed
                   ? "Submit Assessment"
                   : progress === 100 && completed
-                  ? "Retake the Assessment"
-                  : progress > 0
-                  ? "Resume Assessment"
-                  : "Take the Assessment"}
+                    ? "Retake the Assessment"
+                    : progress > 0
+                      ? "Resume Assessment"
+                      : "Take the Assessment"}
               </button>
             </div>
 
@@ -179,8 +151,8 @@ const UserDashBoardHome = () => {
                 </p>
               </div>
               <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>
-                <h3>Aligned Courses</h3>
-                <p>{completed && result ? result.top_course : "Locked until assessment is completed"}</p>
+                <h3>Alligned Courses</h3>
+                <p>{completed && result ? result.top_career : "Locked until assessment is completed"}</p>
                 {completed && result && (
                   <button className="dashboard-action-btn" onClick={goToCourseMatch}>
                     View Course Match
@@ -188,7 +160,7 @@ const UserDashBoardHome = () => {
                 )}
               </div>
               <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>
-                <h3>Aligned Careers</h3>
+                <h3>Alligned Careers</h3>
                 <p>{completed && result ? result.top_career : "Locked until assessment is completed"}</p>
                 {completed && result && (
                   <button className="dashboard-action-btn" onClick={goToCareerMatch}>

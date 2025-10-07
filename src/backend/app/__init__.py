@@ -1,4 +1,4 @@
-from flask import Flask, session, request
+from flask import Flask, session
 from datetime import timedelta
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -15,9 +15,8 @@ def create_app():
     
     app.permanent_session_lifetime = timedelta(minutes=30)
 
+
     @app.before_request
-    def debug_incoming():
-        print("Incoming cookies:", request.cookies)
     def make_session_not_permanent():
         session.permanent = False
 
