@@ -11,18 +11,8 @@ export default function ProtectedRoute({ children }) {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/check-session`, {
-          method: "GET",
-          credentials: "include", // 🔑 ensures cookies are sent
-        });
-
-        if (!res.ok) {
-          setAuthenticated(false);
-          return;
-        }
-
-        const data = await res.json();
-        if (data.logged_in) {
+        const res = await axios.get(`${API_BASE_URL}/check-session`);
+        if (res.data.logged_in) {
           setAuthenticated(true);
         } else {
           setAuthenticated(false);
@@ -36,7 +26,6 @@ export default function ProtectedRoute({ children }) {
 
     checkSession();
   }, []);
-
 
   if (loading) return <div>Loading...</div>;
 
