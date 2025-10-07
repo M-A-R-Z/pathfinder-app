@@ -11,4 +11,3 @@ sendgrid
 certifi
 PyJWT
 gunicorn
-functools
