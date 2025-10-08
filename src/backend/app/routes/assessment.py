@@ -271,6 +271,7 @@ def submit_assessment(assessment_id):
 
         # Mark assessment as completed and sync totals
         assessment.completed = True
+        assessment.progress = 100.0
         assessment.stem_total = strand_totals["STEM"]
         assessment.abm_total = strand_totals["ABM"]
         assessment.humss_total = strand_totals["HUMSS"]

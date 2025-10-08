@@ -22,7 +22,7 @@ const UserDashboardSidebar = ({ activeItem = 'Dashboard', progress }) => {
   const handleNavigate = (target) => {
     if (progress > 0 && progress < 100) {
       const leave = window.confirm(
-        "You have unsaved progress. Are you sure you want to leave?"
+        "Do you want to leave? Answers will be saved if you leave the assessment."
       );
       if (!leave) return;
     }
