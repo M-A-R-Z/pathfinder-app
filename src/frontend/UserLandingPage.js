@@ -13,15 +13,25 @@ const UserLandingPage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
 
   const handleEmailSubmit = (e) => {
     e.preventDefault();
     if (email.trim()) {
-      console.log('Email submitted:', email);
-      setEmail('');
-      setAlertMessage('Thank you for subscribing!');
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (emailRegex.test(email)) {
+        console.log('Email submitted:', email);
+        setEmail('');
+        setAlertMessage('Thank you for subscribing!');
+        setAlertType('success');
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 3000);
+      } else {
+        setAlertMessage('Please enter a valid email address');
+        setAlertType('error');
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 3000);
+      }
     }
   };
 
@@ -165,8 +175,8 @@ const UserLandingPage = () => {
       {/* Custom Alert */}
       {showAlert && (
         <div className="custom-alert">
-          <div className="alert-content">
-            <span className="alert-icon">✓</span>
+          <div className={`alert-content ${alertType === 'error' ? 'error' : ''}`}>
+            <span className="alert-icon">{alertType === 'error' ? '✕' : '✓'}</span>
             <span className="alert-text">{alertMessage}</span>
           </div>
         </div>
