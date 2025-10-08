@@ -11,19 +11,23 @@ const UserLandingPage = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const handleEmailSubmit = (e) => {
     e.preventDefault();
     if (email.trim()) {
       console.log('Email submitted:', email);
       setEmail('');
-      alert('Thank you for subscribing!');
+      setAlertMessage('Thank you for subscribing!');
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
     }
   };
 
   const scrollToSection = (sectionId, e) => {
     e.preventDefault();
-    setIsMenuOpen(false); // Close menu after clicking
+    setIsMenuOpen(false);
     
     let element;
     if (sectionId === 'home') {
@@ -50,7 +54,6 @@ const UserLandingPage = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Handle scroll for header background
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -60,7 +63,6 @@ const UserLandingPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       const nav = document.querySelector('.nav');
@@ -75,7 +77,6 @@ const UserLandingPage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen]);
 
-  // Intersection Observer to track active section
   useEffect(() => {
     const sections = [
       { id: 'home', element: document.querySelector('.hero') },
@@ -120,7 +121,6 @@ const UserLandingPage = () => {
     };
   }, []);
 
-  // Scroll animation observer for About and FAQ sections
   useEffect(() => {
     const animateOnScroll = new IntersectionObserver(
       (entries) => {
@@ -137,7 +137,6 @@ const UserLandingPage = () => {
       }
     );
 
-    // Observe About section elements
     const aboutText = document.querySelector('.about-text');
     const ctaButton = document.querySelector('.cta-button');
     const studyImages = document.querySelectorAll('.study-image');
@@ -146,7 +145,6 @@ const UserLandingPage = () => {
     if (ctaButton) animateOnScroll.observe(ctaButton);
     studyImages.forEach(img => animateOnScroll.observe(img));
 
-    // Observe FAQ section elements
     const faqItems = document.querySelectorAll('.faq-item');
     const questionBubbles = document.querySelectorAll('.question-bubble');
     
@@ -164,12 +162,21 @@ const UserLandingPage = () => {
 
   return (
     <div className="landing-page">
-      {/* Sticky Header */}
+      {/* Custom Alert */}
+      {showAlert && (
+        <div className="custom-alert">
+          <div className="alert-content">
+            <span className="alert-icon">✓</span>
+            <span className="alert-text">{alertMessage}</span>
+          </div>
+        </div>
+      )}
+
       <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
         <div className="container">
           <div className="nav">
             <div className="logo" onClick={(e) => scrollToSection('home', e)}>
-              <span className="logo-icon"><img src = {logo} alt="Logo"></img></span>
+              <span className="logo-icon"><img src={logo} alt="Logo" /></span>
               <span className="logo-text">Strandify</span>
             </div>
             
@@ -211,10 +218,8 @@ const UserLandingPage = () => {
         </div>
       </header>
 
-      {/* Menu Overlay */}
       {isMenuOpen && <div className="menu-overlay" onClick={() => setIsMenuOpen(false)}></div>}
 
-      {/* Hero Section */}
       <section className="hero" id="home">
         <div className="container">
           <div className="hero-content">
@@ -233,9 +238,18 @@ const UserLandingPage = () => {
             </div>
             <div className="hero-image">
               <div className="students-group">
-                {[1, 2, 3, 4, 5, 6].map((num) => (
-                  <div key={num} className={`student student-${num}`}>
-                    <div className="student-avatar"></div>
+                {[
+                  { emoji: '📚', class: 'student-1' },
+                  { emoji: '🎓', class: 'student-2' },
+                  { emoji: '✏️', class: 'student-3' },
+                  { emoji: '🔬', class: 'student-4' },
+                  { emoji: '💡', class: 'student-5' },
+                  { emoji: '🎯', class: 'student-6' }
+                ].map((item, index) => (
+                  <div key={index} className={`student ${item.class}`}>
+                    <div className="student-avatar">
+                      <span>{item.emoji}</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -244,7 +258,6 @@ const UserLandingPage = () => {
         </div>
       </section>
 
-      {/* About Section */}
       <section id="about-section" className="about">
         <div className="container">         
           <div className="about-content">
@@ -279,7 +292,6 @@ const UserLandingPage = () => {
         </div>
       </section>
 
-      {/* FAQ Section */}
       <section id="faq-section" className="faq">
         <div className="container">
           <div className="faq-content">
@@ -333,7 +345,6 @@ const UserLandingPage = () => {
         </div>
       </section>
 
-      {/* Newsletter Section */}
       <section className="newsletter">
         <div className="container">
           <div className="newsletter-content">
@@ -353,7 +364,6 @@ const UserLandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="footer">
         <div className="container">
           <p>&copy; 2025 Strandify. All Rights Reserved.</p>
