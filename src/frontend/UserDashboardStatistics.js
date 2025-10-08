@@ -219,7 +219,7 @@ export default function UserResultsDashboard() {
           <div className="statistics-bottom-section">
             {/* Neighbors Table */}
             <div className="statistics-card">
-              <div className="statistics-card-header"><h2>Nearest Neighbors</h2></div>
+              <div className="statistics-card-header"><h2>Closest Matches</h2></div>
               <div className="statistics-card-body">
                 {neighbors.length > 0 ? (
                   <table className="statistics-question-table">
@@ -245,7 +245,7 @@ export default function UserResultsDashboard() {
 
             {/* Pie Chart */}
             <div className="statistics-card statistics-chart">
-              <div className="statistics-card-header"><h2>Neighbor Strand Distribution</h2></div>
+              <div className="statistics-card-header"><h2>Closest Matches Distribution</h2></div>
               <div className="statistics-card-body">
                 {pieData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={250}>

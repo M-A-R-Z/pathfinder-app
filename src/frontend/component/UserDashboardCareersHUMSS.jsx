@@ -1,5 +1,6 @@
 import React from 'react';
 import './css/UserDashboardCareersHUMSS.css';
+import { useNavigate } from 'react-router-dom';
 
 // Career Card Component
 const CareerCard = ({ title, description, salary, growth, borderColor, icon }) => {
@@ -28,6 +29,7 @@ const CareerCard = ({ title, description, salary, growth, borderColor, icon }) =
 
 // HUMSS Careers Content Component
 const UserDashboardCareersHUMSS = () => {
+  const navigate = useNavigate();
   const careers = [
     {
       title: "Teacher / Educator",
@@ -104,7 +106,9 @@ const UserDashboardCareersHUMSS = () => {
 
       {/* Retake Button */}
       <div className="humss-retake-section">
-        <button className="humss-retake-btn">
+        <button className="humss-retake-btn"
+        onClick={() => navigate('/userdashboardassessment')}
+        >
           TAKE THE ASSESSMENT AGAIN?
         </button>
       </div>

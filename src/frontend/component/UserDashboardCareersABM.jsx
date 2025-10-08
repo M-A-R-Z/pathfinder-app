@@ -1,6 +1,6 @@
 import React from 'react';
 import './css/UserDashboardCareersABM.css';
-
+import { useNavigate } from 'react-router-dom';
 // Career Card Component
 const CareerCard = ({ title, description, salary, growth, borderColor, icon }) => {
   return (
@@ -28,6 +28,7 @@ const CareerCard = ({ title, description, salary, growth, borderColor, icon }) =
 
 // ABM Careers Content Component
 const UserDashboardCareersABM = () => {
+  const navigate = useNavigate();
   const careers = [
     {
       title: "Certified Public Accountant (CPA)",
@@ -104,7 +105,9 @@ const UserDashboardCareersABM = () => {
 
       {/* Retake Button */}
       <div className="abm-retake-section">
-        <button className="abm-retake-btn">
+        <button className="abm-retake-btn"
+        onClick={() => navigate('/userdashboardassessment')}
+        >
           TAKE THE ASSESSMENT AGAIN?
         </button>
       </div>

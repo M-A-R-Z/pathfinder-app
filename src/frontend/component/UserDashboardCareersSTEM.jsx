@@ -1,5 +1,6 @@
 import React from 'react';
 import './css/UserDashboardCareersSTEM.css';
+import { useNavigate } from 'react-router-dom';
 
 // Career Card Component
 const CareerCard = ({ title, description, salary, growth, borderColor, icon }) => {
@@ -28,6 +29,7 @@ const CareerCard = ({ title, description, salary, growth, borderColor, icon }) =
 
 // STEM Careers Content Component
 const UserDashboardCareersSTEM = () => {
+  const navigate = useNavigate();
   const careers = [
     {
       title: "Software Developer",
@@ -104,7 +106,9 @@ const UserDashboardCareersSTEM = () => {
 
       {/* Retake Button */}
       <div className="stem-retake-section">
-        <button className="stem-retake-btn">
+        <button className="stem-retake-btn"
+        onClick={() => navigate('/userdashboardassessment')}>
+
           TAKE THE ASSESSMENT AGAIN?
         </button>
       </div>
