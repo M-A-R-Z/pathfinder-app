@@ -13,6 +13,12 @@ import UserDashboardProfile from './frontend/UserDashboardProfile';
 import UserDashboardSettings from './frontend/UserDashboardSettings';
 import UserDashboardStatistics from './frontend/UserDashboardStatistics';
 import ProtectedRoute from './frontend/component/ProtectedRoute';
+import UserDashboardAssessmentCopy from './frontend/UserDashboardAssessment copy';
+import UserDashBoardHomeCopy from './frontend/UserDashBoardHome copy';
+import UserDashboardStatisticsCopy from './frontend/UserDashboardStatistics copy';
+import UserDashboardTakeAssessmentCopy from './frontend/UserDashboardTakeAssessment copy';
+import UserSignUpCopy from './frontend/UserSignUp copy';
+import UserLoginCopy from './frontend/UserLogin copy';
 
 function App() {
   return (
@@ -29,6 +35,13 @@ function App() {
       <Route path="/userdashboardprofile" element={<ProtectedRoute><UserDashboardProfile /></ProtectedRoute>} />
       <Route path="/userdashboardsettings" element={<ProtectedRoute><UserDashboardSettings /></ProtectedRoute>} />
       <Route path="/userdashboardstatistics" element={<ProtectedRoute><UserDashboardStatistics /></ProtectedRoute>} />
+      <Route path="/userlogincopy" element={<UserLoginCopy />} />
+      <Route path="/usersignupcopy" element={<UserSignUpCopy />} />
+      <Route path="/userdashboardhomecopy" element={<UserDashBoardHomeCopy />} />
+      <Route path="/userdashboardassessmentcopy" element={<UserDashboardAssessmentCopy />} />
+      <Route path="/userdashboardtakeassessmentcopy" element={<UserDashboardTakeAssessmentCopy />} />
+      <Route path="/userdashboardstatisticscopy" element={<UserDashboardStatisticsCopy />} />
+      
     </Routes>
   );
 }

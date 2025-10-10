@@ -91,6 +91,55 @@ def signup():
         "signup_token": signup_token
     }), 200
 
+@auth_bp.route("/signupcopy", methods=["POST"])
+def signupcopy():
+    data = request.get_json()
+    email = data.get("email")
+    password = data.get("password")
+    first_name = data.get("first_name")
+    last_name = data.get("last_name")
+    middle_name = data.get("middle_name", "")
+    affix = data.get("affix", "")
+    birthday = data.get("birthday")
+    confirmPassword = data.get("confirmPassword")
+
+    if not all([email, password, first_name, last_name, birthday, confirmPassword]):
+        return jsonify({"success": False, "message": "All fields are required"}), 400
+    if password != confirmPassword:
+        return jsonify({"success": False, "message": "Passwords do not match"}), 400
+    if User.query.filter_by(email=email).first():
+        return jsonify({"success": False, "message": "Email already registered"}), 400
+
+    hashed_password = ph.hash(password)
+    birthday = datetime.strptime(birthday, "%Y-%m-%d").date()
+
+
+
+    # Store user data + OTP in a JWT instead of session
+    pending_signup_payload = {
+        "email": email,
+        "password": hashed_password,
+        "first_name": first_name,
+        "last_name": last_name,
+        "middle_name": middle_name,
+        "affix": affix,
+        "birthday": birthday.isoformat(),
+        "role": "USER"
+    }
+    new_user = User(
+        email=email,
+        password=hashed_password,
+        first_name=first_name,
+        last_name=last_name,
+        middle_name=middle_name,
+        affix=affix,
+        birthday=birthday,
+        role="USER"
+    )
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({"success": True, "message": "Email verified, user created successfully"}), 201
 
 # Verify email using JWT
 @auth_bp.route("/verify-email", methods=["POST"])
