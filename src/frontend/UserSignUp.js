@@ -44,11 +44,26 @@ const UserSignUp = ({ onClose }) => {
     </svg>
   );
 
+  const formatName = (str) => {
+    return str
+      .toLowerCase()
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+
+    let formattedValue = value;
+
+    if (["firstName", "middleName", "surname", "affix"].includes(name)) {
+      formattedValue = formatName(value);
+    } else if (name === "email") {
+      formattedValue = value.toLowerCase();
+    }
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: formattedValue
     }));
   };
 
@@ -70,7 +85,7 @@ const UserSignUp = ({ onClose }) => {
       const res = await axios.post(
         `${API_BASE_URL}/signup`,
         { 
-          email: formData.email, 
+          email: formData.email.toLowerCase(), 
           password: formData.password,
           first_name: formData.firstName,
           middle_name: formData.middleName,
