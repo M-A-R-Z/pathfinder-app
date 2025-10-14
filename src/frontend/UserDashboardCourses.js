@@ -13,13 +13,24 @@ const UserDashboardCourses = () => {
   const [strand, setStrand] = useState(null);
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
   const API_BASE_URL = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+  const showAlertMessage = (message, type = 'success') => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 3000);
+  };
+  
   useEffect(() => {
     const fetchInitialData = async () => {
       if (!token) {
-        alert("Session expired. Please log in again.");
-        navigate("/userlogin");
+        showAlertMessage("Session expired. Please log in again.", "error");
+        setTimeout(() => navigate("/userlogin"), 1500);
         return;
       }
 
@@ -57,6 +68,14 @@ const UserDashboardCourses = () => {
         }
       } catch (err) {
         console.error("Error fetching initial data:", err);
+        if (err.response?.status === 401) {
+          showAlertMessage("Session expired. Please log in again.", "error");
+          localStorage.removeItem('token');
+          sessionStorage.removeItem('token');
+          setTimeout(() => navigate("/userlogin"), 1500);
+        } else {
+          showAlertMessage("Failed to load courses data. Please refresh.", "error");
+        }
       } finally {
         setLoading(false);
       }
@@ -67,9 +86,17 @@ const UserDashboardCourses = () => {
 
   if (loading) {
     return (
-      <div className="user-dashboard-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading dashboard...</p>
+      <div className="courses-container">
+        <UserDashboardHeader />
+        <div className="courses-main-layout">
+          <UserDashboardSidebar activeItem="Courses" />
+          <div className="courses-main-content">
+            <div className="courses-loading">
+              <div className="loading-spinner"></div>
+              <p>Loading courses...</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -119,18 +146,21 @@ const UserDashboardCourses = () => {
 
   return (
     <div className="courses-container">
+      {/* Custom Alert */}
+      {showAlert && (
+        <div className="custom-alert">
+          <div className={`alert-content ${alertType === 'error' ? 'error' : ''}`}>
+            <span className="alert-icon">{alertType === 'error' ? '✕' : '✓'}</span>
+            <span className="alert-text">{alertMessage}</span>
+          </div>
+        </div>
+      )}
+
       <UserDashboardHeader />
       <div className="courses-main-layout">
         <UserDashboardSidebar activeItem="Courses" />
         <div className="courses-main-content">
-          {loading ? (
-            <div className="courses-loading">
-              <div className="loading-spinner"></div>
-              <p>Loading courses...</p>
-            </div>
-          ) : (
-            renderCourses()
-          )}
+          {renderCourses()}
 
           {/* Footer */}
           <div className="courses-footer">

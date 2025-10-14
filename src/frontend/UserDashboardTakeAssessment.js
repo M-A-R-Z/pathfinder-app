@@ -23,6 +23,9 @@ const UserDashboardTakeAssessment = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
   const questionRefs = useRef({});
   const [validationError, setValidationError] = useState(null);
   const questionsPerPage = 15;
@@ -31,12 +34,19 @@ const UserDashboardTakeAssessment = () => {
   const currentQuestions = questions.slice(startIndex, startIndex + questionsPerPage);
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
+  const showAlertMessage = (message, type = 'success') => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 3000);
+  };
+
   // ---------------- Fetch initial data ----------------
   useEffect(() => {
     const fetchInitialData = async () => {
       if (!token) {
-        alert("Session expired. Please log in again.");
-        navigate("/userlogin");
+        showAlertMessage("Session expired. Please log in again.", "error");
+        setTimeout(() => navigate("/userlogin"), 1500);
         return;
       }
 
@@ -95,6 +105,14 @@ const UserDashboardTakeAssessment = () => {
         }
       } catch (err) {
         console.error(err);
+        if (err.response?.status === 401) {
+          showAlertMessage("Session expired. Please log in again.", "error");
+          localStorage.removeItem('token');
+          sessionStorage.removeItem('token');
+          setTimeout(() => navigate("/userlogin"), 1500);
+        } else {
+          showAlertMessage("Failed to load assessment data. Please refresh.", "error");
+        }
       } finally {
         setLoading(false);
       }
@@ -136,7 +154,7 @@ const UserDashboardTakeAssessment = () => {
     setStep(1); // ✅ Move to questions immediately
   } catch (err) {
     console.error("Error starting assessment:", err);
-    alert("Failed to start assessment. Please try again.");
+    showAlertMessage("Failed to start assessment. Please try again.", "error");
   }
 };
 
@@ -175,6 +193,7 @@ const UserDashboardTakeAssessment = () => {
       setShowCompleteModal(true);
     } catch (err) {
       console.error("Error submitting assessment:", err);
+      showAlertMessage("Failed to submit assessment. Please try again.", "error");
       setSubmitting(false);
     }
   };
@@ -217,6 +236,16 @@ const UserDashboardTakeAssessment = () => {
 
   return (
     <div className="take-assessment-container">
+      {/* Custom Alert */}
+      {showAlert && (
+        <div className="custom-alert">
+          <div className={`alert-content ${alertType === 'error' ? 'error' : ''}`}>
+            <span className="alert-icon">{alertType === 'error' ? '✕' : '✓'}</span>
+            <span className="alert-text">{alertMessage}</span>
+          </div>
+        </div>
+      )}
+
       <UserDashboardHeader />
       <div className="take-assessment-main-layout">
         <UserDashboardSidebar activeItem="Assessment" progress={progress} />

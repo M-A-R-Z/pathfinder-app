@@ -12,59 +12,75 @@ const UserDashBoardHome = () => {
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const [result, setResult] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
   const API_BASE_URL = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+  const showAlertMessage = (message, type = 'success') => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 3000);
+  };
 
   useEffect(() => {
     const fetchInitialData = async () => {
       if (!token) {
-        alert("Session expired. Please log in again.");
-        navigate("/userlogin");
+        showAlertMessage("Session expired. Please log in again.", "error");
+        setTimeout(() => navigate("/userlogin"), 1500);
         return;
       }
 
       try {
-        // 1️⃣ Fetch user info
-        const meRes = await axios.get(`${API_BASE_URL}/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const headers = { Authorization: `Bearer ${token}` };
 
-       
+        // 1️⃣ Fetch user info
+        const meRes = await axios.get(`${API_BASE_URL}/me`, { headers });
+        const userId = meRes.data.user_id;
         setUserName(meRes.data.first_name || "User");
 
         // 2️⃣ Fetch active dataset
-        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
+        const datasetRes = await axios.get(`${API_BASE_URL}/active-dataset`, { headers });
         const datasetId = datasetRes.data.data_set_id || null;
 
         if (!datasetId) {
-          console.error("No active dataset found");
+          showAlertMessage("No active dataset found. Please contact support.", "error");
           setLoading(false);
           return;
         }
 
         // 3️⃣ Fetch progress
         const progressRes = await axios.get(
-          `${API_BASE_URL}/progress/${meRes.data.user_id}/${datasetId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          `${API_BASE_URL}/progress/${userId}/${datasetId}`,
+          { headers }
         );
 
         setProgress(progressRes.data.progress || 0);
         setCompleted(progressRes.data.completed || false);
 
         // 4️⃣ Fetch results if completed
-        if (progressRes.data.completed) {
+        if (progressRes.data.completed && progressRes.data.assessment_id) {
           const resultRes = await axios.get(
             `${API_BASE_URL}/results/${progressRes.data.assessment_id}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers }
           );
           setResult(resultRes.data);
         }
 
       } catch (err) {
         console.error("Error fetching initial data:", err);
+        
+        // Handle specific error cases
+        if (err.response?.status === 401) {
+          showAlertMessage("Session expired. Please log in again.", "error");
+          localStorage.removeItem('token');
+          sessionStorage.removeItem('token');
+          setTimeout(() => navigate("/userlogin"), 1500);
+        } else {
+          showAlertMessage("Failed to load dashboard data. Please refresh the page.", "error");
+        }
       } finally {
         setLoading(false);
       }
@@ -73,14 +89,6 @@ const UserDashBoardHome = () => {
     fetchInitialData();
   }, [token, navigate, API_BASE_URL]);
 
-  if (loading) {
-    return (
-      <div className="user-dashboard-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading dashboard...</p>
-      </div>
-    );
-  }
   const handleTakeAssessment = () => {
     if (progress === 100 && !completed) {
       navigate('/userdashboardtakeassessment'); // submit pending
@@ -94,17 +102,46 @@ const UserDashBoardHome = () => {
   };
 
   const goToStatistics = () => {
-    if (result) navigate(`/userdashboardstatistics`);
+    if (result) navigate('/userdashboardstatistics');
   };
+
   const goToCareerMatch = () => {
-    if (result) navigate(`/userdashboardcareers`);
+    if (result) navigate('/userdashboardcareers');
   };
+
   const goToCourseMatch = () => {
-    if (result) navigate(`/userdashboardcourses`);
+    if (result) navigate('/userdashboardcourses');
   };
+
+  if (loading) {
+    return (
+      <div className="user-dashboard-container">
+        <UserDashboardHeader />
+        <div className="user-dashboard-main-layout">
+          <UserDashboardSidebar activeItem="Dashboard" />
+          <div className="user-dashboard-main-content">
+            <div className="user-dashboard-loading">
+              <div className="loading-spinner"></div>
+              <p>Loading dashboard...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="user-dashboard-container">
+      {/* Custom Alert */}
+      {showAlert && (
+        <div className="custom-alert">
+          <div className={`alert-content ${alertType === 'error' ? 'error' : ''}`}>
+            <span className="alert-icon">{alertType === 'error' ? '✕' : '✓'}</span>
+            <span className="alert-text">{alertMessage}</span>
+          </div>
+        </div>
+      )}
+
       <UserDashboardHeader />
       <div className="user-dashboard-main-layout">
         <UserDashboardSidebar activeItem="Dashboard" />
@@ -169,24 +206,35 @@ const UserDashBoardHome = () => {
                     : "Locked until assessment is completed"}
                 </p>
               </div>
+              
               <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>
-                <h3>Alligned Courses</h3>
-                <p>{completed && result ? result.top_career : "Locked until assessment is completed"}</p>
+                <h3>Aligned Courses</h3>
+                <p>
+                  {completed && result 
+                    ? result.top_career
+                    : "Locked until assessment is completed"}
+                </p>
                 {completed && result && (
                   <button className="dashboard-action-btn" onClick={goToCourseMatch}>
                     View Course Match
                   </button>
                 )}
               </div>
+              
               <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>
-                <h3>Alligned Careers</h3>
-                <p>{completed && result ? result.top_career : "Locked until assessment is completed"}</p>
+                <h3>Aligned Careers</h3>
+                <p>
+                  {completed && result 
+                    ? result.top_career 
+                    : "Locked until assessment is completed"}
+                </p>
                 {completed && result && (
                   <button className="dashboard-action-btn" onClick={goToCareerMatch}>
                     View Career Match
                   </button>
                 )}
               </div>
+              
               <div className="user-dashboard-card">         
                 <h3>Progress</h3>
                 <p>
@@ -199,6 +247,7 @@ const UserDashBoardHome = () => {
                   ></div>
                 </div>              
               </div>
+              
               <div className={`user-dashboard-card ${!completed ? 'locked' : ''}`}>
                 <h3>Statistics</h3>
                 <p>{completed ? "View detailed breakdown" : "Locked until assessment is completed"}</p>

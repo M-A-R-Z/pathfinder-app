@@ -13,13 +13,24 @@ const UserDashboardCareers = () => {
   const [strand, setStrand] = useState(null);
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
   const API_BASE_URL = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    useEffect(() => {
+
+  const showAlertMessage = (message, type = 'success') => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 3000);
+  };
+
+  useEffect(() => {
     const fetchInitialData = async () => {
       if (!token) {
-        alert("Session expired. Please log in again.");
-        navigate("/userlogin");
+        showAlertMessage("Session expired. Please log in again.", "error");
+        setTimeout(() => navigate("/userlogin"), 1500);
         return;
       }
 
@@ -57,6 +68,14 @@ const UserDashboardCareers = () => {
         }
       } catch (err) {
         console.error("Error fetching initial data:", err);
+        if (err.response?.status === 401) {
+          showAlertMessage("Session expired. Please log in again.", "error");
+          localStorage.removeItem('token');
+          sessionStorage.removeItem('token');
+          setTimeout(() => navigate("/userlogin"), 1500);
+        } else {
+          showAlertMessage("Failed to load careers data. Please refresh.", "error");
+        }
       } finally {
         setLoading(false);
       }
@@ -64,6 +83,23 @@ const UserDashboardCareers = () => {
 
     fetchInitialData();
   }, [token, navigate, API_BASE_URL]);
+
+  if (loading) {
+    return (
+      <div className="careers-container">
+        <UserDashboardHeader />
+        <div className="careers-main-layout">
+          <UserDashboardSidebar activeItem="Careers" />
+          <div className="careers-main-content">
+            <div className="careers-loading">
+              <div className="loading-spinner"></div>
+              <p>Loading careers...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const renderCareers = () => {
     if (!completed) {
@@ -110,18 +146,21 @@ const UserDashboardCareers = () => {
 
   return (
     <div className="careers-container">
+      {/* Custom Alert */}
+      {showAlert && (
+        <div className="custom-alert">
+          <div className={`alert-content ${alertType === 'error' ? 'error' : ''}`}>
+            <span className="alert-icon">{alertType === 'error' ? '✕' : '✓'}</span>
+            <span className="alert-text">{alertMessage}</span>
+          </div>
+        </div>
+      )}
+
       <UserDashboardHeader />
       <div className="careers-main-layout">
         <UserDashboardSidebar activeItem="Careers" />
         <div className="careers-main-content">
-          {loading ? (
-            <div className="careers-loading">
-              <div className="loading-spinner"></div>
-              <p>Loading careers...</p>
-            </div>
-          ) : (
-            renderCareers()
-          )}
+          {renderCareers()}
 
           {/* Footer */}
           <div className="careers-footer">

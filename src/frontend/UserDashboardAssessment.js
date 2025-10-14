@@ -10,14 +10,25 @@ const UserDashboardAssessment = () => {
   const [existingAssessment, setExistingAssessment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showRetakeConfirm, setShowRetakeConfirm] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
   const API_BASE_URL = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+  const showAlertMessage = (message, type = 'success') => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 3000);
+  };
+
   // Fetch user info and existing assessment
   useEffect(() => {
     const fetchInitialData = async () => {
       if (!token) {
-        alert("Session expired. Please log in again.");
-        navigate("/userlogin");
+        showAlertMessage("Session expired. Please log in again.", "error");
+        setTimeout(() => navigate("/userlogin"), 1500);
         return;
       }
 
@@ -49,6 +60,14 @@ const UserDashboardAssessment = () => {
         }
       } catch (err) {
         console.error("Error fetching initial data:", err);
+        if (err.response?.status === 401) {
+          showAlertMessage("Session expired. Please log in again.", "error");
+          localStorage.removeItem('token');
+          sessionStorage.removeItem('token');
+          setTimeout(() => navigate("/userlogin"), 1500);
+        } else {
+          showAlertMessage("Failed to load assessment data. Please refresh.", "error");
+        }
       } finally {
         setLoading(false);
       }
@@ -72,18 +91,45 @@ const UserDashboardAssessment = () => {
       );
 
       setExistingAssessment(null);
-      navigate("/userdashboardtakeassessment");
+      showAlertMessage("Assessment deleted successfully. Redirecting...", "success");
+      setTimeout(() => navigate("/userdashboardtakeassessment"), 1000);
     } catch (err) {
       console.error("Error retaking assessment:", err);
+      showAlertMessage("Failed to delete assessment. Please try again.", "error");
     } finally {
       setShowRetakeConfirm(false);
     }
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="assessment-container">
+        <UserDashboardHeader />
+        <div className="assessment-main-layout">
+          <UserDashboardSidebar activeItem="Assessment" />
+          <div className="assessment-main-content">
+            <div className="assessment-loading">
+              <div className="loading-spinner"></div>
+              <p>Loading assessment...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="assessment-container">
+      {/* Custom Alert */}
+      {showAlert && (
+        <div className="custom-alert">
+          <div className={`alert-content ${alertType === 'error' ? 'error' : ''}`}>
+            <span className="alert-icon">{alertType === 'error' ? '✕' : '✓'}</span>
+            <span className="alert-text">{alertMessage}</span>
+          </div>
+        </div>
+      )}
+
       <UserDashboardHeader />
       <div className="assessment-main-layout">
         <UserDashboardSidebar activeItem="Assessment" />
