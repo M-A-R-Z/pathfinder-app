@@ -73,9 +73,7 @@ const UserDashboardCareers = () => {
           localStorage.removeItem('token');
           sessionStorage.removeItem('token');
           setTimeout(() => navigate("/userlogin"), 1500);
-        } else {
-          showAlertMessage("Failed to load careers data. Please refresh.", "error");
-        }
+        } 
       } finally {
         setLoading(false);
       }

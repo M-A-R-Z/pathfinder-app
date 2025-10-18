@@ -73,8 +73,6 @@ const UserDashboardCourses = () => {
           localStorage.removeItem('token');
           sessionStorage.removeItem('token');
           setTimeout(() => navigate("/userlogin"), 1500);
-        } else {
-          showAlertMessage("Failed to load courses data. Please refresh.", "error");
         }
       } finally {
         setLoading(false);

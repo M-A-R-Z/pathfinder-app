@@ -10,11 +10,7 @@ def get_progress(user_id, data_set_id):
     assessment = Assessment.query.filter_by(user_id=user_id, data_set_id=data_set_id).first()
     if not assessment:
         print("Assessment not found")
-        return jsonify({
-            "progress": 0,
-            "completed": False,
-            "assessment_id": None
-        }), 200
+        return jsonify({"error": "Assessment not found"}), 404
 
     return jsonify(assessment.assessment_info())
 

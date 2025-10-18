@@ -78,9 +78,7 @@ const UserDashBoardHome = () => {
           localStorage.removeItem('token');
           sessionStorage.removeItem('token');
           setTimeout(() => navigate("/userlogin"), 1500);
-        } else {
-          showAlertMessage("Failed to load dashboard data. Please refresh the page.", "error");
-        }
+        } 
       } finally {
         setLoading(false);
       }

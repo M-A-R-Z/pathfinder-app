@@ -55,8 +55,10 @@ const UserDashboardAssessment = () => {
           { headers: { Authorization: `Bearer ${token}`  }}
         );
 
-        if (progressRes.data && !progressRes.data.error) {
+        if (progressRes.data && progressRes.data.assessment_id) {
           setExistingAssessment(progressRes.data);
+        } else {
+          setExistingAssessment(null);
         }
       } catch (err) {
         console.error("Error fetching initial data:", err);
@@ -65,9 +67,7 @@ const UserDashboardAssessment = () => {
           localStorage.removeItem('token');
           sessionStorage.removeItem('token');
           setTimeout(() => navigate("/userlogin"), 1500);
-        } else {
-          showAlertMessage("Failed to load assessment data. Please refresh.", "error");
-        }
+        } 
       } finally {
         setLoading(false);
       }
